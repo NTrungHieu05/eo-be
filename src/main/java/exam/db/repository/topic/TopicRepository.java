@@ -14,4 +14,6 @@ public interface TopicRepository extends MongoRepository<Topic, String> {
 	Topic findFirstByIdAndDeletedIsFalse(String id);
 
 	List<Topic> findAllByIdInAndDeletedIsFalse(List<String> ids);
+
+	List<Topic> findAllByDeletedIsFalse();
 }

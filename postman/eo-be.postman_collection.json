@@ -1,0 +1,1694 @@
+{
+  "info": {
+    "_postman_id": "7c9e2b1a-4d55-4f3a-9c10-eo-be-phase5",
+    "name": "eo-be Phase 4-5",
+    "description": "Collection test Phase 4 (auth/user) + Phase 5 (skill/topic/exam/card/admin).\n\nCach dung:\n1. Import file nay + eo-be.local.postman_environment.json\n2. Chon environment eo-be local\n3. Dam bao BE dang chay o http://localhost:8080\n4. Chay theo thu tu: Login admin -> Skill header -> Create exam -> Create card\n\nAdmin seed: admin@toeic.local / Admin@123\nOTP va reset code in ra console BE, khong gui Gmail.\nCac API create/update/delete skill-topic-exam-card can ROLE_ADMIN.\nKhong chay Delete tren data seed (Part 1-7) neu khong muon mat data mau.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "skillId",
+      "value": ""
+    },
+    {
+      "key": "topicId",
+      "value": ""
+    },
+    {
+      "key": "examId",
+      "value": ""
+    },
+    {
+      "key": "cardId",
+      "value": ""
+    },
+    {
+      "key": "createdSkillId",
+      "value": ""
+    },
+    {
+      "key": "createdTopicId",
+      "value": ""
+    },
+    {
+      "key": "createdExamId",
+      "value": ""
+    },
+    {
+      "key": "createdCardId",
+      "value": ""
+    },
+    {
+      "key": "blockUserId",
+      "value": ""
+    },
+    {
+      "key": "otp",
+      "value": ""
+    },
+    {
+      "key": "resetCode",
+      "value": ""
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin@toeic.local"
+    },
+    {
+      "key": "adminPassword",
+      "value": "Admin@123"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 Auth",
+      "item": [
+        {
+          "name": "Login admin (luu token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/app/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "app",
+                "login"
+              ],
+              "query": []
+            },
+            "description": "Chay request nay truoc. Token duoc luu vao {{token}}.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));",
+                  "pm.test('has access_token', () => pm.expect(json.responseData.access_token).to.be.a('string'));",
+                  "pm.collectionVariables.set('token', json.responseData.access_token);",
+                  "if (json.responseData.examUser) {",
+                  "  pm.collectionVariables.set('userId', json.responseData.examUser.userId);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login sai password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/app/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "app",
+                "login"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"WrongPass@1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('code 1004', () => pm.expect(json.error.code).to.eql(1004));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/public/register/user",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "public",
+                "register",
+                "user"
+              ],
+              "query": []
+            },
+            "description": "OTP in console BE. Copy OTP vao {{otp}} roi goi Verify OTP truoc khi login user moi.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"tester.{{$timestamp}}@toeic.local\",\n  \"password\": \"Test@1234\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"displayName\": \"Tester\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));",
+                  "if (json.responseData && json.responseData.userId) {",
+                  "  pm.collectionVariables.set('blockUserId', json.responseData.userId);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/notification/verify-otp?email=tester@toeic.local&otp={{otp}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notification",
+                "verify-otp"
+              ],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "tester@toeic.local"
+                },
+                {
+                  "key": "otp",
+                  "value": "{{otp}}"
+                }
+              ]
+            },
+            "description": "Sua email cho khop user vua register. OTP lay tu log BE.",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/app/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "app",
+                "logout"
+              ],
+              "query": []
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 User",
+      "item": [
+        {
+          "name": "Get user detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "{{userId}}"
+              ],
+              "query": []
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update user info",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/info",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "info"
+              ],
+              "query": []
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"firstName\": \"Admin\",\n  \"lastName\": \"TOEIC\",\n  \"displayName\": \"Admin TOEIC\",\n  \"phone\": \"0900000000\",\n  \"address\": \"Ha Noi\",\n  \"gender\": \"MALE\",\n  \"dob\": \"01/01/1990\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Change password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/pwd/change",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "pwd",
+                "change"
+              ],
+              "query": []
+            },
+            "description": "Giu nguyen password admin de test tiep. Doi neu muon thu that.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oldPassword\": \"{{adminPassword}}\",\n  \"newPassword\": \"Admin@123\",\n  \"confirmPassword\": \"Admin@123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Forgot password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/pwd/forgot",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "pwd",
+                "forgot"
+              ],
+              "query": []
+            },
+            "description": "Reset code in console BE (Temporary password for ...). Gan vao {{resetCode}}.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reset password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/pwd/reset",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "pwd",
+                "reset"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resetCode\": \"{{resetCode}}\",\n  \"newPassword\": \"Admin@123\",\n  \"confirmPassword\": \"Admin@123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 Skill",
+      "item": [
+        {
+          "name": "Skill header (public, luu skillId + topicId)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/skill/header",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "skill",
+                "header"
+              ],
+              "query": []
+            },
+            "description": "Khong can JWT. Tra Listening/Reading + Part 1-7. Luu id seed vao bien.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));",
+                  "pm.test('has skills', () => pm.expect(json.responseData).to.be.an('array').that.is.not.empty);",
+                  "const skill = json.responseData[0];",
+                  "pm.collectionVariables.set('skillId', skill.id);",
+                  "if (skill.topics && skill.topics[0]) {",
+                  "  pm.collectionVariables.set('topicId', skill.topics[0].topicId);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get skill detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/skill/{{skillId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "skill",
+                "{{skillId}}"
+              ],
+              "query": []
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create skill",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/skill",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "skill"
+              ],
+              "query": []
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Skill test {{$timestamp}}\",\n  \"topicIds\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));",
+                  "if (json.responseData && json.responseData.id) {",
+                  "  pm.collectionVariables.set('createdSkillId', json.responseData.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update skill",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/skill",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "skill"
+              ],
+              "query": []
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{createdSkillId}}\",\n  \"name\": \"Skill test updated\",\n  \"topicIds\": [\n    \"{{topicId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete skill (createdSkillId)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/skill/delete/multiple",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "skill",
+                "delete",
+                "multiple"
+              ],
+              "query": []
+            },
+            "description": "Chi xoa skill vua tao, khong xoa Listening/Reading.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    \"{{createdSkillId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 Topic",
+      "item": [
+        {
+          "name": "Get topic detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/topic/{{topicId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "topic",
+                "{{topicId}}"
+              ],
+              "query": []
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get exams by topic",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/topic/exam/{{topicId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "topic",
+                "exam",
+                "{{topicId}}"
+              ],
+              "query": []
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create topic",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/topic",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "topic"
+              ],
+              "query": []
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Topic test {{$timestamp}}\",\n  \"examIds\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));",
+                  "if (json.responseData && json.responseData.id) {",
+                  "  pm.collectionVariables.set('createdTopicId', json.responseData.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update topic",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/topic",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "topic"
+              ],
+              "query": []
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{createdTopicId}}\",\n  \"name\": \"Topic test updated\",\n  \"examIds\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete topic (createdTopicId)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/topic/delete/multiple",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "topic",
+                "delete",
+                "multiple"
+              ],
+              "query": []
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    \"{{createdTopicId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 Exam",
+      "item": [
+        {
+          "name": "Create exam (gan vao topic seed)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exam",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "exam"
+              ],
+              "query": []
+            },
+            "description": "topicId lay tu Skill header. Exam se duoc append vao topic.examIds.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Exam test Part 1 {{$timestamp}}\",\n  \"topicId\": \"{{topicId}}\",\n  \"cardIds\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));",
+                  "if (json.responseData && json.responseData.id) {",
+                  "  pm.collectionVariables.set('examId', json.responseData.id);",
+                  "}",
+                  "pm.collectionVariables.set('createdExamId', json.responseData.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get exam detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/exam/{{examId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "exam",
+                "{{examId}}"
+              ],
+              "query": []
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get cards by exam",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/exam/card/{{examId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "exam",
+                "card",
+                "{{examId}}"
+              ],
+              "query": []
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update exam",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exam",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "exam"
+              ],
+              "query": []
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{examId}}\",\n  \"name\": \"Exam test updated\",\n  \"topicId\": \"{{topicId}}\",\n  \"cardIds\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete exam (createdExamId)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exam/delete/multiple",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "exam",
+                "delete",
+                "multiple"
+              ],
+              "query": []
+            },
+            "description": "Chay sau khi da test xong card. Soft-delete exam vua tao.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    \"{{createdExamId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "06 Card",
+      "item": [
+        {
+          "name": "Create card (gan vao exam)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/card",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "card"
+              ],
+              "query": []
+            },
+            "description": "Card duoc append vao exam.cardIds. Dung Create exam truoc.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"examId\": \"{{examId}}\",\n  \"topicId\": \"{{topicId}}\",\n  \"isQuestionGroup\": false,\n  \"question\": {\n    \"text\": \"What is in the picture?\",\n    \"hint\": \"Look at the photo\",\n    \"image\": \"\",\n    \"sound\": \"\"\n  },\n  \"answer\": {\n    \"choices\": [\n      \"A man is sitting\",\n      \"A woman is walking\",\n      \"A child is running\",\n      \"A dog is sleeping\"\n    ],\n    \"texts\": [\n      \"A\"\n    ],\n    \"hint\": \"A\",\n    \"image\": \"\"\n  },\n  \"childCards\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));",
+                  "if (json.responseData && json.responseData.id) {",
+                  "  pm.collectionVariables.set('cardId', json.responseData.id);",
+                  "}",
+                  "pm.collectionVariables.set('createdCardId', json.responseData.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get card detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/card/{{cardId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "card",
+                "{{cardId}}"
+              ],
+              "query": []
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update card",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/card",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "card"
+              ],
+              "query": []
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{cardId}}\",\n  \"examId\": \"{{examId}}\",\n  \"topicId\": \"{{topicId}}\",\n  \"isQuestionGroup\": false,\n  \"question\": {\n    \"text\": \"What is the man doing?\",\n    \"hint\": \"Updated\",\n    \"image\": \"\",\n    \"sound\": \"\"\n  },\n  \"answer\": {\n    \"choices\": [\n      \"Sitting\",\n      \"Walking\",\n      \"Running\",\n      \"Sleeping\"\n    ],\n    \"texts\": [\n      \"A\"\n    ],\n    \"hint\": \"A\",\n    \"image\": \"\"\n  },\n  \"childCards\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete card (createdCardId)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/card/delete/multiple",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "card",
+                "delete",
+                "multiple"
+              ],
+              "query": []
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    \"{{createdCardId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "07 Admin",
+      "item": [
+        {
+          "name": "List users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users?pageIndex=0&pageSize=20&keyword=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "pageIndex",
+                  "value": "0"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20"
+                },
+                {
+                  "key": "keyword",
+                  "value": ""
+                }
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));",
+                  "const users = json.responseData && json.responseData.data;",
+                  "if (users && users.length) {",
+                  "  const other = users.find(u => u.email !== pm.collectionVariables.get('adminEmail')) || users[0];",
+                  "  pm.collectionVariables.set('blockUserId', other.userId);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List skills",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/skill?pageIndex=0&pageSize=20&keyword=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "skill"
+              ],
+              "query": [
+                {
+                  "key": "pageIndex",
+                  "value": "0"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20"
+                },
+                {
+                  "key": "keyword",
+                  "value": ""
+                }
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List topics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/topic?pageIndex=0&pageSize=20&keyword=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "topic"
+              ],
+              "query": [
+                {
+                  "key": "pageIndex",
+                  "value": "0"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20"
+                },
+                {
+                  "key": "keyword",
+                  "value": ""
+                }
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));",
+                  "const topics = json.responseData && json.responseData.topics;",
+                  "if (topics && topics[0] && !pm.collectionVariables.get('topicId')) {",
+                  "  pm.collectionVariables.set('topicId', topics[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List exams",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/exam?pageIndex=0&pageSize=20&keyword=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "exam"
+              ],
+              "query": [
+                {
+                  "key": "pageIndex",
+                  "value": "0"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20"
+                },
+                {
+                  "key": "keyword",
+                  "value": ""
+                }
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List cards",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/card?pageIndex=0&pageSize=20&keyword=&examId={{examId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "card"
+              ],
+              "query": [
+                {
+                  "key": "pageIndex",
+                  "value": "0"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20"
+                },
+                {
+                  "key": "keyword",
+                  "value": ""
+                },
+                {
+                  "key": "examId",
+                  "value": "{{examId}}"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Block user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/block",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "block"
+              ],
+              "query": []
+            },
+            "description": "Khong block admin. Dung userId tu List users hoac Register.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    \"{{blockUserId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Unblock user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/unblock",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "unblock"
+              ],
+              "query": []
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    \"{{blockUserId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

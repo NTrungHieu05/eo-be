@@ -1,9 +1,13 @@
 package exam.service.user;
 
+import exam.db.dto.user.BlockUserRequest;
 import exam.db.dto.user.ChangePasswordRequest;
 import exam.db.dto.user.CreateUserRequest;
 import exam.db.dto.user.ForgotPasswordRequest;
+import exam.db.dto.user.ListUserRequest;
+import exam.db.dto.user.ListUserResponse;
 import exam.db.dto.user.ResetPasswordRequest;
+import exam.db.dto.user.UnblockUserRequest;
 import exam.db.dto.user.UpdateUserRequest;
 import exam.db.dto.user.UserResponse;
 import exam.db.entity.Role;
@@ -24,4 +28,10 @@ public interface UserService {
 	Boolean forgotPassword(ForgotPasswordRequest request) throws ExamBaseException;
 
 	Boolean resetPassword(ResetPasswordRequest request) throws ExamBaseException;
+
+	ListUserResponse listUserForAdmin(ListUserRequest request) throws ExamBaseException;
+
+	Boolean blockUser(BlockUserRequest request) throws ExamBaseException;
+
+	Boolean unblockUser(UnblockUserRequest request) throws ExamBaseException;
 }

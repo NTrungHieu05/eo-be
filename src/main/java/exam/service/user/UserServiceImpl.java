@@ -1,10 +1,14 @@
 package exam.service.user;
 
+import exam.db.dto.user.BlockUserRequest;
 import exam.db.dto.user.ChangePasswordRequest;
 import exam.db.dto.user.CreateUserRequest;
 import exam.db.dto.user.ExamUser;
 import exam.db.dto.user.ForgotPasswordRequest;
+import exam.db.dto.user.ListUserRequest;
+import exam.db.dto.user.ListUserResponse;
 import exam.db.dto.user.ResetPasswordRequest;
+import exam.db.dto.user.UnblockUserRequest;
 import exam.db.dto.user.UpdateUserRequest;
 import exam.db.dto.user.UserResponse;
 import exam.db.entity.Role;
@@ -26,8 +30,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -183,6 +190,38 @@ public class UserServiceImpl implements UserService {
 		userRecovery.setDeleted(true);
 		userRecoveryRepo.save(userRecovery);
 		return true;
+	}
+
+	@Override
+	public ListUserResponse listUserForAdmin(ListUserRequest request) throws ExamBaseException {
+		requireAdmin();
+		List<User> users = userRepo.findAllByDeletedIsFalse();
+		List<UserResponse> responses = users.stream().map(this::buildUserResponse).collect(Collectors.toList());
+		return new ListUserResponse(responses, responses.size());
+	}
+
+	@Override
+	public Boolean blockUser(BlockUserRequest request) throws ExamBaseException {
+		requireAdmin();
+		List<User> users = userRepo.findByUserIdIn(new ArrayList<>(request.getIds()));
+		users.forEach(u -> u.setAccountNonLocked(false));
+		userRepo.saveAll(users);
+		return Boolean.TRUE;
+	}
+
+	@Override
+	public Boolean unblockUser(UnblockUserRequest request) throws ExamBaseException {
+		requireAdmin();
+		List<User> users = userRepo.findByUserIdIn(new ArrayList<>(request.getIds()));
+		users.forEach(u -> u.setAccountNonLocked(true));
+		userRepo.saveAll(users);
+		return Boolean.TRUE;
+	}
+
+	private void requireAdmin() throws ExamBaseException {
+		ExamUser examUser = SecurityContextService.getUser();
+		Assert.notNull(examUser, ErrorInfo.ACCESS_DENIED_ERROR);
+		Assert.isTrue(examUser.isAdmin(), ErrorInfo.ACCESS_DENIED_ERROR);
 	}
 
 	private String buildAndSendOTP(String email) {

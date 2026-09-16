@@ -12,4 +12,6 @@ public interface ExamRepository extends MongoRepository<Exam, String> {
 	Exam findFirstByIdAndDeletedIsFalse(String id);
 
 	List<Exam> findByIdInAndDeletedIsFalse(Collection<String> ids);
+
+	List<Exam> findAllByDeletedIsFalse();
 }

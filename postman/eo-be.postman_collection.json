@@ -1,8 +1,8 @@
 {
   "info": {
     "_postman_id": "7c9e2b1a-4d55-4f3a-9c10-eo-be-phase5",
-    "name": "eo-be Phase 4-5",
-    "description": "Collection test Phase 4 (auth/user) + Phase 5 (skill/topic/exam/card/admin).\n\nCach dung:\n1. Import file nay + eo-be.local.postman_environment.json\n2. Chon environment eo-be local\n3. Dam bao BE dang chay o http://localhost:8080\n4. Chay theo thu tu: Login admin -> Skill header -> Create exam -> Create card\n\nAdmin seed: admin@toeic.local / Admin@123\nOTP va reset code in ra console BE, khong gui Gmail.\nCac API create/update/delete skill-topic-exam-card can ROLE_ADMIN.\nKhong chay Delete tren data seed (Part 1-7) neu khong muon mat data mau.",
+    "name": "eo-be Phase 4-6",
+    "description": "Collection test auth/user, skill/topic/exam/card/admin, va thi thu TOEIC 7 phan.\n\nCach dung:\n1. Import lai collection + environment eo-be local\n2. Chon environment eo-be local\n3. Restart BE de seed de thi thu (GET /practice-test)\n4. Login admin, roi test GET /practice-test (200 cau, 120 phut)\n\nTai khoan:\n- Admin: admin@toeic.local / Admin@123\n- User: user@toeic.local / User@123\n\nThi thu TOEIC: GET /practice-test, luu ket qua POST /exam/collect voi practiceExamId.\nKhong con mini-test. Khong Delete skill/topic seed Part 1-7.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -26,23 +26,31 @@
     },
     {
       "key": "userId",
-      "value": ""
+      "value": "6aa966400ae89833167a9e58"
     },
     {
       "key": "skillId",
-      "value": ""
+      "value": "6aa966400ae89833167a9e55"
     },
     {
       "key": "topicId",
-      "value": ""
+      "value": "6a828539842e6d4fafd70b3a"
     },
     {
       "key": "examId",
+      "value": "68ca00010000000000000001"
+    },
+    {
+      "key": "practiceExamId",
+      "value": "68cb00010000000000000001"
+    },
+    {
+      "key": "mediaUrl",
       "value": ""
     },
     {
       "key": "cardId",
-      "value": ""
+      "value": "68ca00020000000000000001"
     },
     {
       "key": "createdSkillId",
@@ -62,7 +70,15 @@
     },
     {
       "key": "blockUserId",
-      "value": ""
+      "value": "68ca00030000000000000001"
+    },
+    {
+      "key": "userEmail",
+      "value": "user@toeic.local"
+    },
+    {
+      "key": "userPassword",
+      "value": "User@123"
     },
     {
       "key": "otp",
@@ -134,6 +150,56 @@
                   "if (json.responseData.examUser) {",
                   "  pm.collectionVariables.set('userId', json.responseData.examUser.userId);",
                   "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login user mau",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/app/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "app",
+                "login"
+              ],
+              "query": []
+            },
+            "description": "User mau ROLE_USER. Cac API create skill/topic/exam/card se bi tu choi. Dung de so sanh voi admin.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{userPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));",
+                  "pm.collectionVariables.set('token', json.responseData.access_token);"
                 ]
               }
             }
@@ -1687,6 +1753,161 @@
               }
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "08 Thi thu TOEIC",
+      "item": [
+        {
+          "name": "Get practice test (7 phan, 200 cau)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/practice-test",
+              "host": ["{{baseUrl}}"],
+              "path": ["practice-test"],
+              "query": []
+            },
+            "description": "De thi thu TOEIC Listening+Reading: Part 1-7, 200 cau, 120 phut. Can JWT. Restart BE de Mongock seed de nay."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));",
+                  "pm.test('200 questions', () => pm.expect(json.responseData.questionCount).to.eql(200));",
+                  "pm.test('7 parts', () => pm.expect(json.responseData.parts.length).to.eql(7));",
+                  "if (json.responseData && json.responseData.id) {",
+                  "  pm.collectionVariables.set('practiceExamId', json.responseData.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Collect practice test result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exam/collect",
+              "host": ["{{baseUrl}}"],
+              "path": ["exam", "collect"],
+              "query": []
+            },
+            "description": "Luu progress thi thu. status=1 la complete.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"examId\": \"{{practiceExamId}}\",\n  \"progress\": 75,\n  \"status\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "09 Media",
+      "item": [
+        {
+          "name": "Upload file",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/upload?type=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["upload"],
+              "query": [
+                { "key": "type", "value": "0" }
+              ]
+            },
+            "description": "multipart field name = file. Anh vao data/images, audio vao data/sounds. mediaUrl la /data/... de gan vao question.image hoac question.sound.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));",
+                  "if (json.responseData && json.responseData.mediaUrl) {",
+                  "  pm.collectionVariables.set('mediaUrl', json.responseData.mediaUrl);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get uploaded file",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{mediaUrl}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["{{mediaUrl}}"],
+              "query": []
+            },
+            "description": "Mo file tinh. Chay Upload truoc. URL dang http://localhost:8080/data/images/foo.png"
+          }
+        },
+        {
+          "name": "File to base64",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/media/url/base64?fileURL={{mediaUrl}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["media", "url", "base64"],
+              "query": [
+                { "key": "fileURL", "value": "{{mediaUrl}}" }
+              ]
+            },
+            "description": "fileURL co the la /data/images/foo.png hoac path o dia."
+          }
         }
       ]
     }

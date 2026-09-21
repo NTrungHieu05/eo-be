@@ -16,6 +16,7 @@ public class ExamResponse {
 	private String topicId;
 	private List<String> cardIds;
 	private List<Card> cards;
+	private Boolean practiceTest;
 
 	public ExamResponse(Exam exam) {
 		BeanUtils.copyProperties(exam, this);

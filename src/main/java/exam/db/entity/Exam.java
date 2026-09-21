@@ -27,4 +27,7 @@ public class Exam extends AbstractVersion {
 
 	@Field(FieldConst.CARD_IDS)
 	private List<String> cardIds;
+
+	@Field(FieldConst.PRACTICE_TEST)
+	private Boolean practiceTest;
 }

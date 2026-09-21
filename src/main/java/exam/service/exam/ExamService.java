@@ -5,6 +5,7 @@ import exam.db.dto.exam.DeleteExamRequest;
 import exam.db.dto.exam.ListExamRequest;
 import exam.db.dto.exam.ListExamResponse;
 import exam.db.dto.exam.ExamResponse;
+import exam.db.dto.exam.PracticeTestResponse;
 import exam.db.dto.exam.UpdateExamRequest;
 import exam.ultis.ExamBaseException;
 
@@ -20,4 +21,6 @@ public interface ExamService {
 	ListExamResponse getListExamForAdmin(ListExamRequest request) throws ExamBaseException;
 
 	ExamResponse getAllCardsByExamId(String examId) throws ExamBaseException;
+
+	PracticeTestResponse getPracticeTest() throws ExamBaseException;
 }

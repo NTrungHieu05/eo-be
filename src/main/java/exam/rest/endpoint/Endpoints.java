@@ -28,11 +28,12 @@ public interface Endpoints {
 	String PATH_VARIABLE_TOPIC_ID_URL = "/{topicId}";
 
 	String MEDIA_URL_BASE64 = "/media/url/base64";
+	String UPLOAD_URL = "/upload";
 
 	String CARD_URL = "/card";
 	String CARD_IMPORT_URL = "/card/import";
 	String CARD_DELETE_MULTIPLE = "/card/delete/multiple";
-	String MINI_TEST_URL = "/mini-test";
+	String PRACTICE_TEST_URL = "/practice-test";
 
 	String SKILL_URL = "/skill";
 	String SKILL_HEADER_URL = "/skill/header";

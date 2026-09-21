@@ -40,3 +40,9 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Uploaded media ###
+data/images/**
+data/sounds/**
+data/files/**
+!data/**/.gitkeep

@@ -4,6 +4,7 @@ import exam.db.dto.ResponseObject;
 import exam.db.dto.exam.CreateExamRequest;
 import exam.db.dto.exam.DeleteExamRequest;
 import exam.db.dto.exam.ExamResponse;
+import exam.db.dto.exam.PracticeTestResponse;
 import exam.db.dto.exam.UpdateExamRequest;
 import exam.db.enums.DBConst;
 import exam.rest.endpoint.Endpoints;
@@ -75,6 +76,17 @@ public class ExamController {
 		ResponseObject<ExamResponse> response = new ResponseObject<>();
 		try {
 			response.setResponseData(examService.getAllCardsByExamId(examId));
+		} catch (ExamBaseException e) {
+			response.setError(e.getError());
+		}
+		return new ResponseEntity<>(response, new HttpHeaders(), HttpStatus.OK);
+	}
+
+	@GetMapping(Endpoints.PRACTICE_TEST_URL)
+	public ResponseEntity<Object> getPracticeTest() {
+		ResponseObject<PracticeTestResponse> response = new ResponseObject<>();
+		try {
+			response.setResponseData(examService.getPracticeTest());
 		} catch (ExamBaseException e) {
 			response.setError(e.getError());
 		}

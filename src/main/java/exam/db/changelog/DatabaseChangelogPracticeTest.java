@@ -72,6 +72,47 @@ public class DatabaseChangelogPracticeTest {
 		log.info("Seeded full TOEIC practice test {} with {} parent cards", PRACTICE_EXAM_ID, cardIds.size());
 	}
 
+	@ChangeSet(id = "practice_test_listening_media", author = "system", order = "002")
+	public void attachListeningMedia(ExamRepository examRepo, CardRepository cardRepo) {
+		Exam exam = examRepo.findFirstByIdAndDeletedIsFalse(PRACTICE_EXAM_ID);
+		if (exam == null || exam.getCardIds() == null || exam.getCardIds().isEmpty()) {
+			log.warn("Practice test {} not found, skip media attach", PRACTICE_EXAM_ID);
+			return;
+		}
+		List<Card> found = cardRepo.findByIdInAndDeletedIsFalse(exam.getCardIds());
+		Map<String, Card> byId = found.stream().collect(Collectors.toMap(Card::getId, card -> card, (a, b) -> a));
+		int part1 = 0;
+		int part2 = 0;
+		int part3 = 0;
+		int part4 = 0;
+		int updated = 0;
+		for (String id : exam.getCardIds()) {
+			Card card = byId.get(id);
+			if (card == null || card.getQuestion() == null) {
+				continue;
+			}
+			if (part1 < 6) {
+				part1++;
+				card.getQuestion().setImage("/data/images/part1-" + part1 + ".png");
+				card.getQuestion().setSound("/data/sounds/part1-" + part1 + ".wav");
+			} else if (part2 < 25) {
+				part2++;
+				card.getQuestion().setSound("/data/sounds/part2-" + part2 + ".wav");
+			} else if (part3 < 13) {
+				part3++;
+				card.getQuestion().setSound("/data/sounds/part3-" + part3 + ".wav");
+			} else if (part4 < 10) {
+				part4++;
+				card.getQuestion().setSound("/data/sounds/part4-" + part4 + ".wav");
+			} else {
+				break;
+			}
+			cardRepo.save(card);
+			updated++;
+		}
+		log.info("Attached listening media to {} practice-test cards", updated);
+	}
+
 	private List<Card> buildPart1(String topicId) {
 		List<Card> cards = new ArrayList<>();
 		String[] stems = {
@@ -83,12 +124,13 @@ public class DatabaseChangelogPracticeTest {
 				"Look at the picture. What is next to the building?"
 		};
 		for (int i = 0; i < 6; i++) {
+			int n = i + 1;
 			cards.add(singleCard(topicId, stems[i], new String[]{
 					"He is sitting at a desk.",
 					"He is running in a park.",
 					"He is cooking in a kitchen.",
 					"He is driving a truck."
-			}, i % 4, false));
+			}, i % 4, false, "/data/images/part1-" + n + ".png", "/data/sounds/part1-" + n + ".wav"));
 		}
 		return cards;
 	}
@@ -100,7 +142,7 @@ public class DatabaseChangelogPracticeTest {
 					"In the conference room.",
 					"At nine o'clock.",
 					"Yes, I received it."
-			}, i % 3, false));
+			}, i % 3, false, "", "/data/sounds/part2-" + i + ".wav"));
 		}
 		return cards;
 	}
@@ -110,7 +152,8 @@ public class DatabaseChangelogPracticeTest {
 		for (int i = 1; i <= 13; i++) {
 			cards.add(groupCard(topicId,
 					"Conversation " + i + ": A man and a woman talk about a workplace schedule.",
-					buildChildren(3, "According to the conversation, what will they do?", 4)));
+					buildChildren(3, "According to the conversation, what will they do?", 4),
+					"", "/data/sounds/part3-" + i + ".wav"));
 		}
 		return cards;
 	}
@@ -120,7 +163,8 @@ public class DatabaseChangelogPracticeTest {
 		for (int i = 1; i <= 10; i++) {
 			cards.add(groupCard(topicId,
 					"Talk " + i + ": A short announcement at a train station.",
-					buildChildren(3, "What is the purpose of the talk?", 4)));
+					buildChildren(3, "What is the purpose of the talk?", 4),
+					"", "/data/sounds/part4-" + i + ".wav"));
 		}
 		return cards;
 	}
@@ -189,11 +233,16 @@ public class DatabaseChangelogPracticeTest {
 	}
 
 	private Card singleCard(String topicId, String text, String[] choices, int correctIndex, boolean child) {
+		return singleCard(topicId, text, choices, correctIndex, child, "", "");
+	}
+
+	private Card singleCard(String topicId, String text, String[] choices, int correctIndex, boolean child,
+			String image, String sound) {
 		Question question = new Question();
 		question.setText(text);
 		question.setHint("");
-		question.setImage("");
-		question.setSound("");
+		question.setImage(image == null ? "" : image);
+		question.setSound(sound == null ? "" : sound);
 
 		Answer answer = new Answer();
 		answer.setChoices(Arrays.asList(choices));
@@ -215,11 +264,15 @@ public class DatabaseChangelogPracticeTest {
 	}
 
 	private Card groupCard(String topicId, String passage, List<Card> children) {
+		return groupCard(topicId, passage, children, "", "");
+	}
+
+	private Card groupCard(String topicId, String passage, List<Card> children, String image, String sound) {
 		Question question = new Question();
 		question.setText(passage);
 		question.setHint("");
-		question.setImage("");
-		question.setSound("");
+		question.setImage(image == null ? "" : image);
+		question.setSound(sound == null ? "" : sound);
 
 		Answer answer = new Answer();
 		answer.setChoices(new ArrayList<>());

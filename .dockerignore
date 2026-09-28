@@ -1,0 +1,9 @@
+.gradle
+build
+.idea
+.git
+data/images/**
+data/sounds/**
+data/files/**
+!data/**/.gitkeep
+*.iml

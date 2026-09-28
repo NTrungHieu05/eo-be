@@ -61,6 +61,7 @@ sourceSets {
     main {
         resources {
             srcDirs 'src/main/conf/dev'
+            srcDirs 'src/main/conf/prod'
             srcDirs 'src/main/conf/error'
         }
     }

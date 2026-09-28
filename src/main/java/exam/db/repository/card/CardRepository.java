@@ -16,6 +16,8 @@ public interface CardRepository extends MongoRepository<Card, String> {
 
 	List<Card> findAllByDeletedIsFalse();
 
+	List<Card> findByExamIdAndDeletedIsFalse(String examId);
+
 	@Aggregation(pipeline = {
 			"{ $match: { topicId: ?0 } }",
 			"{ $sample: { size: 2 } }"

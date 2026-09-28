@@ -20,6 +20,9 @@ import org.springframework.util.StringUtils;
 @PropertySource("classpath:${spring.profiles.active:dev}_mongo.properties")
 public class MongoConfig extends AbstractMongoClientConfiguration {
 
+	@Value("${mongo.uri:}")
+	private String mongoUri;
+
 	@Value("${mongo.prefix}")
 	private String mongoPrefix;
 
@@ -48,6 +51,9 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
 	}
 
 	private String getConnectionURI() {
+		if (StringUtils.hasText(mongoUri)) {
+			return mongoUri;
+		}
 		StringBuilder sb = new StringBuilder(mongoPrefix + "://");
 		if (StringUtils.hasText(username)) {
 			sb.append(username);

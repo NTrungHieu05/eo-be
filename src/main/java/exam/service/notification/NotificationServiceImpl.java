@@ -34,7 +34,7 @@ public class NotificationServiceImpl implements NotificationService {
 
 	@Override
 	public void sendMailResetPwd(String email, String pwd) {
-		log.info("Temporary password for {} is {}", email, pwd);
+		log.info("Reset code for {} is {}", email, pwd);
 	}
 
 	@Override

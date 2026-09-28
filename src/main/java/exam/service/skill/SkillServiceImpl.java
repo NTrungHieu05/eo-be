@@ -87,7 +87,9 @@ public class SkillServiceImpl implements SkillService {
 
 	@Override
 	public List<SkillResponse> getAllSkillForHeader() {
-		List<Skill> skills = skillRepo.findAllByDeletedIsFalse();
+		List<Skill> skills = skillRepo.findAllByDeletedIsFalse().stream()
+				.filter(skill -> skill.getTopicIds() != null && !skill.getTopicIds().isEmpty())
+				.collect(Collectors.toList());
 		List<String> topicIds = new ArrayList<>();
 		skills.forEach(s -> {
 			if (s.getTopicIds() != null) {

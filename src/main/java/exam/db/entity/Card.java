@@ -1,5 +1,6 @@
 package exam.db.entity;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import exam.db.enums.CollectionConst;
 import exam.db.enums.FieldConst;
 import lombok.Data;
@@ -36,4 +37,9 @@ public class Card extends AbstractVersion {
 
 	@Field(FieldConst.IS_QUESTION_GROUP)
 	private Boolean isQuestionGroup;
+
+	@JsonGetter("_id")
+	public String getJsonId() {
+		return id;
+	}
 }

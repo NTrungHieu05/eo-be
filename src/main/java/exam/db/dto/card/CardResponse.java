@@ -1,5 +1,6 @@
 package exam.db.dto.card;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import exam.db.entity.Answer;
 import exam.db.entity.Card;
 import exam.db.entity.Question;
@@ -22,5 +23,10 @@ public class CardResponse {
 
 	public CardResponse(Card card) {
 		BeanUtils.copyProperties(card, this);
+	}
+
+	@JsonGetter("_id")
+	public String getJsonId() {
+		return id;
 	}
 }

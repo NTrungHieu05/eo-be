@@ -48,4 +48,5 @@ public interface Endpoints {
 	String EXAM_DELETE_MULTIPLE = "/exam/delete/multiple";
 
 	String HISTORY_URL = "/exam/collect";
+	String EXAM_SCORE_URL = "/exam/score";
 }

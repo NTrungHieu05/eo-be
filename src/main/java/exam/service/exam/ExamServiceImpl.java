@@ -7,6 +7,8 @@ import exam.db.dto.exam.ListExamRequest;
 import exam.db.dto.exam.ListExamResponse;
 import exam.db.dto.exam.PracticeTestPartResponse;
 import exam.db.dto.exam.PracticeTestResponse;
+import exam.db.dto.exam.ToeicScoreRequest;
+import exam.db.dto.exam.ToeicScoreResponse;
 import exam.db.dto.exam.UpdateExamRequest;
 import exam.db.dto.card.CardResponse;
 import exam.db.dto.user.ExamUser;
@@ -142,6 +144,24 @@ public class ExamServiceImpl implements ExamService {
 		response.setQuestionCount(questionCount);
 		response.setTotal(questionCount);
 		response.setParts(buildParts(cards));
+		return response;
+	}
+
+	@Override
+	public ToeicScoreResponse score(ToeicScoreRequest request) throws ExamBaseException {
+		requireUser();
+		int listeningCorrect = request == null || request.getListeningCorrect() == null
+				? 0
+				: request.getListeningCorrect();
+		int readingCorrect = request == null || request.getReadingCorrect() == null
+				? 0
+				: request.getReadingCorrect();
+		ToeicScoreResponse response = new ToeicScoreResponse();
+		response.setListeningCorrect(Math.max(0, Math.min(100, listeningCorrect)));
+		response.setReadingCorrect(Math.max(0, Math.min(100, readingCorrect)));
+		response.setListeningScore(ToeicScore.listening(listeningCorrect));
+		response.setReadingScore(ToeicScore.reading(readingCorrect));
+		response.setTotalScore(response.getListeningScore() + response.getReadingScore());
 		return response;
 	}
 

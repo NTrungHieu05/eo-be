@@ -5,6 +5,8 @@ import exam.db.dto.exam.CreateExamRequest;
 import exam.db.dto.exam.DeleteExamRequest;
 import exam.db.dto.exam.ExamResponse;
 import exam.db.dto.exam.PracticeTestResponse;
+import exam.db.dto.exam.ToeicScoreRequest;
+import exam.db.dto.exam.ToeicScoreResponse;
 import exam.db.dto.exam.UpdateExamRequest;
 import exam.db.enums.DBConst;
 import exam.rest.endpoint.Endpoints;
@@ -76,6 +78,17 @@ public class ExamController {
 		ResponseObject<ExamResponse> response = new ResponseObject<>();
 		try {
 			response.setResponseData(examService.getAllCardsByExamId(examId));
+		} catch (ExamBaseException e) {
+			response.setError(e.getError());
+		}
+		return new ResponseEntity<>(response, new HttpHeaders(), HttpStatus.OK);
+	}
+
+	@PostMapping(Endpoints.EXAM_SCORE_URL)
+	public ResponseEntity<Object> score(@RequestBody ToeicScoreRequest request) {
+		ResponseObject<ToeicScoreResponse> response = new ResponseObject<>();
+		try {
+			response.setResponseData(examService.score(request));
 		} catch (ExamBaseException e) {
 			response.setError(e.getError());
 		}

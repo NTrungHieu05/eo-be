@@ -6,6 +6,8 @@ import exam.db.dto.exam.ListExamRequest;
 import exam.db.dto.exam.ListExamResponse;
 import exam.db.dto.exam.ExamResponse;
 import exam.db.dto.exam.PracticeTestResponse;
+import exam.db.dto.exam.ToeicScoreRequest;
+import exam.db.dto.exam.ToeicScoreResponse;
 import exam.db.dto.exam.UpdateExamRequest;
 import exam.ultis.ExamBaseException;
 
@@ -23,4 +25,6 @@ public interface ExamService {
 	ExamResponse getAllCardsByExamId(String examId) throws ExamBaseException;
 
 	PracticeTestResponse getPracticeTest() throws ExamBaseException;
+
+	ToeicScoreResponse score(ToeicScoreRequest request) throws ExamBaseException;
 }

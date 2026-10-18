@@ -39,12 +39,12 @@ public class JwtUtils {
 	}
 
 	private boolean isTokenExpired(Claims claims) {
-		return claims.getExpiration().after(new Date());
+		return claims.getExpiration().before(new Date());
 	}
 
 	public String getUserNameFromJwtToken(String token) {
 		Claims claims = getClaimsFromJwtToken(token);
-		if (claims != null && isTokenExpired(claims)) {
+		if (claims != null && !isTokenExpired(claims)) {
 			return claims.getSubject();
 		}
 		return null;

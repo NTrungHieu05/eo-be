@@ -3,6 +3,7 @@ package exam.rest.card;
 import exam.db.dto.ResponseObject;
 import exam.db.dto.card.CardResponse;
 import exam.db.dto.card.CreateCardRequest;
+import exam.db.dto.card.ImportCardRequest;
 import exam.db.dto.card.DeleteCardRequest;
 import exam.db.dto.card.UpdateCardRequest;
 import exam.db.enums.DBConst;
@@ -27,7 +28,7 @@ public class CardController {
 	private CardService cardSv;
 
 	@PostMapping(Endpoints.CARD_URL)
-	public ResponseEntity<Object> create(@RequestBody CreateCardRequest request) {
+	public final ResponseEntity<Object> create(@RequestBody CreateCardRequest request) {
 		ResponseObject<CardResponse> response = new ResponseObject<>();
 		try {
 			response.setResponseData(cardSv.create(request));
@@ -38,7 +39,7 @@ public class CardController {
 	}
 
 	@PutMapping(Endpoints.CARD_URL)
-	public ResponseEntity<Object> update(@RequestBody UpdateCardRequest request) {
+	public final ResponseEntity<Object> update(@RequestBody UpdateCardRequest request) {
 		ResponseObject<CardResponse> response = new ResponseObject<>();
 		try {
 			response.setResponseData(cardSv.update(request));
@@ -49,7 +50,7 @@ public class CardController {
 	}
 
 	@PutMapping(Endpoints.CARD_DELETE_MULTIPLE)
-	public ResponseEntity<Object> deleteMultiple(@RequestBody DeleteCardRequest request) {
+	public final ResponseEntity<Object> deleteMultiple(@RequestBody DeleteCardRequest request) {
 		ResponseObject<Boolean> response = new ResponseObject<>();
 		try {
 			response.setResponseData(cardSv.deleteMultiple(request));
@@ -60,10 +61,21 @@ public class CardController {
 	}
 
 	@GetMapping(Endpoints.CARD_URL + Endpoints.PATH_VARIABLE_URL)
-	public ResponseEntity<Object> getDetail(@PathVariable(DBConst.ID) String id) {
+	public final ResponseEntity<Object> getDetail(@PathVariable(DBConst.ID) String id) {
 		ResponseObject<CardResponse> response = new ResponseObject<>();
 		try {
 			response.setResponseData(cardSv.getDetail(id));
+		} catch (ExamBaseException e) {
+			response.setError(e.getError());
+		}
+		return new ResponseEntity<>(response, new HttpHeaders(), HttpStatus.OK);
+	}
+
+	@PostMapping(Endpoints.CARD_IMPORT_URL)
+	public final ResponseEntity<Object> importCard(@RequestBody ImportCardRequest request) {
+		ResponseObject<Boolean> response = new ResponseObject<>();
+		try {
+			response.setResponseData(cardSv.importCard(request));
 		} catch (ExamBaseException e) {
 			response.setError(e.getError());
 		}

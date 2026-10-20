@@ -22,7 +22,7 @@ public class MediaController {
 	private MediaService mediaSv;
 
 	@PostMapping(path = Endpoints.UPLOAD_URL, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-	public ResponseEntity<Object> uploadImage(@RequestPart MultipartFile file, @RequestParam(required = false) Integer type) {
+	public final ResponseEntity<Object> uploadImage(@RequestPart MultipartFile file, @RequestParam(required = false) Integer type) {
 		ResponseObject<Object> response = new ResponseObject<>();
 		try {
 			response.setResponseData(mediaSv.uploadMedia(file, type == null ? 0 : type));
@@ -33,7 +33,7 @@ public class MediaController {
 	}
 
 	@PostMapping(Endpoints.MEDIA_URL_BASE64)
-	public ResponseEntity<Object> getBase64FromUrl(@RequestParam String fileURL) {
+	public final ResponseEntity<Object> getBase64FromUrl(@RequestParam String fileURL) {
 		ResponseObject<Object> response = new ResponseObject<>();
 		response.setResponseData(mediaSv.getDataBase64FromUrl(fileURL));
 		return ResponseEntity.ok(response);

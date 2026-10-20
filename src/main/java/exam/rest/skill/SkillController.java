@@ -1,6 +1,7 @@
 package exam.rest.skill;
 
 import exam.db.dto.ResponseObject;
+import exam.db.dto.skill.AddSkillRequest;
 import exam.db.dto.skill.CreateSkillRequest;
 import exam.db.dto.skill.DeleteSkillRequest;
 import exam.db.dto.skill.SkillResponse;
@@ -29,7 +30,7 @@ public class SkillController {
 	private SkillService skillSv;
 
 	@PostMapping(Endpoints.SKILL_URL)
-	public ResponseEntity<Object> create(@RequestBody CreateSkillRequest request) {
+	public final ResponseEntity<Object> create(@RequestBody CreateSkillRequest request) {
 		ResponseObject<SkillResponse> response = new ResponseObject<>();
 		try {
 			response.setResponseData(skillSv.create(request));
@@ -40,7 +41,7 @@ public class SkillController {
 	}
 
 	@PutMapping(Endpoints.SKILL_URL)
-	public ResponseEntity<Object> update(@RequestBody UpdateSkillRequest request) {
+	public final ResponseEntity<Object> update(@RequestBody UpdateSkillRequest request) {
 		ResponseObject<SkillResponse> response = new ResponseObject<>();
 		try {
 			response.setResponseData(skillSv.update(request));
@@ -51,7 +52,7 @@ public class SkillController {
 	}
 
 	@PutMapping(Endpoints.SKILL_DELETE_MULTIPLE)
-	public ResponseEntity<Object> deleteMultiple(@RequestBody DeleteSkillRequest request) {
+	public final ResponseEntity<Object> deleteMultiple(@RequestBody DeleteSkillRequest request) {
 		ResponseObject<Boolean> response = new ResponseObject<>();
 		try {
 			response.setResponseData(skillSv.deleteMultiple(request));
@@ -62,7 +63,7 @@ public class SkillController {
 	}
 
 	@GetMapping(Endpoints.SKILL_URL + Endpoints.PATH_VARIABLE_URL)
-	public ResponseEntity<Object> getDetail(@PathVariable(DBConst.ID) String id) {
+	public final ResponseEntity<Object> getDetail(@PathVariable(DBConst.ID) String id) {
 		ResponseObject<SkillResponse> response = new ResponseObject<>();
 		try {
 			response.setResponseData(skillSv.getDetail(id));
@@ -73,9 +74,24 @@ public class SkillController {
 	}
 
 	@GetMapping(Endpoints.SKILL_HEADER_URL)
-	public ResponseEntity<Object> getAllSkillForHeader() {
+	public final ResponseEntity<Object> getAllSkillForHeader() {
 		ResponseObject<List<SkillResponse>> response = new ResponseObject<>();
-		response.setResponseData(skillSv.getAllSkillForHeader());
+		try {
+			response.setResponseData(skillSv.getAllSkillForHeader());
+		} catch (ExamBaseException e) {
+			response.setError(e.getError());
+		}
+		return new ResponseEntity<>(response, new HttpHeaders(), HttpStatus.OK);
+	}
+
+	@PostMapping(Endpoints.SKILL_ADD_TOPIC_URL)
+	public final ResponseEntity<Object> addTopic(@RequestBody AddSkillRequest request) {
+		ResponseObject<SkillResponse> response = new ResponseObject<>();
+		try {
+			response.setResponseData(skillSv.addTopic(request));
+		} catch (ExamBaseException e) {
+			response.setError(e.getError());
+		}
 		return new ResponseEntity<>(response, new HttpHeaders(), HttpStatus.OK);
 	}
 }

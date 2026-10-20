@@ -32,7 +32,7 @@ public class AdminController {
 	private AdminService adminService;
 
 	@GetMapping(Endpoints.ADMIN_USERS_URL)
-	public ResponseEntity<Object> listSimpleUser(ListUserRequest request) {
+	public final ResponseEntity<Object> listSimpleUser(ListUserRequest request) {
 		ResponseObject<ListUserResponse> response = new ResponseObject<>();
 		try {
 			response.setResponseData(adminService.listUserForAdmin(request));
@@ -43,7 +43,7 @@ public class AdminController {
 	}
 
 	@PostMapping(Endpoints.ADMIN_USERS_BLOCK)
-	public ResponseEntity<Object> blockUser(@RequestBody BlockUserRequest request) {
+	public final ResponseEntity<Object> blockUser(@RequestBody BlockUserRequest request) {
 		ResponseObject<Boolean> response = new ResponseObject<>();
 		try {
 			response.setResponseData(adminService.blockUser(request));
@@ -54,7 +54,7 @@ public class AdminController {
 	}
 
 	@PostMapping(Endpoints.ADMIN_USERS_UNBLOCK)
-	public ResponseEntity<Object> unblockUser(@RequestBody UnblockUserRequest request) {
+	public final ResponseEntity<Object> unblockUser(@RequestBody UnblockUserRequest request) {
 		ResponseObject<Boolean> response = new ResponseObject<>();
 		try {
 			response.setResponseData(adminService.unblockUser(request));
@@ -65,7 +65,7 @@ public class AdminController {
 	}
 
 	@GetMapping(Endpoints.ADMIN_CARD_URL)
-	public ResponseEntity<Object> getListCard(ListCardRequest request) {
+	public final ResponseEntity<Object> getListCard(ListCardRequest request) {
 		ResponseObject<ListCardResponse> responses = new ResponseObject<>();
 		try {
 			responses.setResponseData(adminService.getListCardForAdmin(request));
@@ -76,7 +76,7 @@ public class AdminController {
 	}
 
 	@GetMapping(Endpoints.ADMIN_SKILL_URL)
-	public ResponseEntity<Object> getListSkill(ListSkillRequest request) {
+	public final ResponseEntity<Object> getListSkill(ListSkillRequest request) {
 		ResponseObject<ListSkillResponse> responses = new ResponseObject<>();
 		try {
 			responses.setResponseData(adminService.getListSkillForAdmin(request));
@@ -87,7 +87,7 @@ public class AdminController {
 	}
 
 	@GetMapping(Endpoints.ADMIN_TOPIC_URL)
-	public ResponseEntity<Object> getListTopic(ListTopicRequest request) {
+	public final ResponseEntity<Object> getListTopic(ListTopicRequest request) {
 		ResponseObject<ListTopicResponse> responses = new ResponseObject<>();
 		try {
 			responses.setResponseData(adminService.getListTopicForAdmin(request));
@@ -98,7 +98,7 @@ public class AdminController {
 	}
 
 	@GetMapping(Endpoints.ADMIN_EXAM_URL)
-	public ResponseEntity<Object> getListExam(ListExamRequest request) {
+	public final ResponseEntity<Object> getListExam(ListExamRequest request) {
 		ResponseObject<ListExamResponse> responses = new ResponseObject<>();
 		try {
 			responses.setResponseData(adminService.getListExamForAdmin(request));

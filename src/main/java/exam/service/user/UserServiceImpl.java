@@ -17,6 +17,7 @@ import exam.db.entity.UserRecovery;
 import exam.db.enums.Assert;
 import exam.db.enums.DBConst;
 import exam.db.enums.ErrorInfo;
+import exam.db.enums.FieldConst;
 import exam.db.repository.role.RoleRepository;
 import exam.db.repository.user.UserRecoveryRepository;
 import exam.db.repository.user.UserRepository;
@@ -62,7 +63,9 @@ public class UserServiceImpl implements UserService {
 		Role role = roleRepo.findByName(request.getRole());
 		Assert.notNull(role, ErrorInfo.BAD_REQUEST);
 		User user = createUser(request, role);
-		return buildUserResponse(user);
+		UserResponse response = buildUserResponse(user);
+		response.setOtp(user.getOtp());
+		return response;
 	}
 
 	@Override
@@ -122,8 +125,13 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserResponse updateUserInfo(UpdateUserRequest request) throws ExamBaseException {
-		Assert.notNull(request.getUserId(), ErrorInfo.USER_NOT_FOUND_ERROR);
-		User user = userRepo.findByUserId(request.getUserId());
+		ExamUser current = SecurityContextService.getUser();
+		Assert.notNull(current, ErrorInfo.ACCESS_DENIED_ERROR);
+		String userId = request.getUserId();
+		if (!StringUtils.hasText(userId) || !current.isAdmin()) {
+			userId = current.getUserId();
+		}
+		User user = userRepo.findByUserId(userId);
 		Assert.notNull(user, ErrorInfo.USER_NOT_FOUND_ERROR);
 		if (StringUtils.hasText(request.getGender())) {
 			user.setGender(request.getGender());
@@ -232,7 +240,7 @@ public class UserServiceImpl implements UserService {
 
 	private UserResponse buildUserResponse(User user) {
 		UserResponse userResponse = new UserResponse();
-		BeanUtils.copyProperties(user, userResponse, DBConst.ROLES);
+		BeanUtils.copyProperties(user, userResponse, DBConst.ROLES, FieldConst.OTP);
 		userResponse.setRoles(user.getRoleStrings());
 		return userResponse;
 	}

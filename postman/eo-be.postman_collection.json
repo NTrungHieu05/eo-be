@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "7c9e2b1a-4d55-4f3a-9c10-eo-be-phase5",
     "name": "eo-be Phase 4-6",
-    "description": "Collection test auth/user, skill/topic/exam/card/admin, va thi thu TOEIC 7 phan.\n\nCach dung:\n1. Import lai collection + environment eo-be local\n2. Chon environment eo-be local\n3. Restart BE de seed de thi thu (GET /practice-test)\n4. Login admin, roi test GET /practice-test (200 cau, 120 phut)\n\nTai khoan:\n- Admin: admin@toeic.local / Admin@123\n- User: user@toeic.local / User@123\n\nThi thu TOEIC: GET /practice-test, luu ket qua POST /exam/collect voi practiceExamId.\nKhong con mini-test. Khong Delete skill/topic seed Part 1-7.",
+    "description": "Collection test day du API eo-be (Endpoints.java).\n\nCach dung:\n1. Import collection + environment eo-be local\n2. Chon environment eo-be local\n3. Login admin truoc khi goi API can JWT\n\nTai khoan:\n- Admin: admin@toeic.local / Admin@123\n- User: user@toeic.local / User@123\n",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -95,6 +95,10 @@
     {
       "key": "adminPassword",
       "value": "Admin@123"
+    },
+    {
+      "key": "importFilePath",
+      "value": ""
     }
   ],
   "item": [
@@ -772,6 +776,52 @@
           ]
         },
         {
+          "name": "Add topic to skill",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/skill/add-topic",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "skill",
+                "add-topic"
+              ],
+              "query": []
+            },
+            "description": "Gan chu de seed vao skill vua tao. Chay Create skill truoc.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{createdSkillId}}\",\n  \"topicIds\": [\n    \"{{topicId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Delete skill (createdSkillId)",
           "request": {
             "method": "PUT",
@@ -960,6 +1010,52 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"id\": \"{{createdTopicId}}\",\n  \"name\": \"Topic test updated\",\n  \"examIds\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add exam to topic",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/topic/add-exam",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "topic",
+                "add-exam"
+              ],
+              "query": []
+            },
+            "description": "Gan de thi vao chu de vua tao. Chay Create topic + Create exam truoc.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{createdTopicId}}\",\n  \"examIds\": [\n    \"{{examId}}\"\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1193,6 +1289,52 @@
           ]
         },
         {
+          "name": "Add card to exam",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exam/add-card",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "exam",
+                "add-card"
+              ],
+              "query": []
+            },
+            "description": "Gan card vao de thi. Chay Create exam + Create card truoc.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{examId}}\",\n  \"cardIds\": [\n    \"{{cardId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Delete exam (createdExamId)",
           "request": {
             "method": "PUT",
@@ -1349,6 +1491,52 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"id\": \"{{cardId}}\",\n  \"examId\": \"{{examId}}\",\n  \"topicId\": \"{{topicId}}\",\n  \"isQuestionGroup\": false,\n  \"question\": {\n    \"text\": \"What is the man doing?\",\n    \"hint\": \"Updated\",\n    \"image\": \"\",\n    \"sound\": \"\"\n  },\n  \"answer\": {\n    \"choices\": [\n      \"Sitting\",\n      \"Walking\",\n      \"Running\",\n      \"Sleeping\"\n    ],\n    \"texts\": [\n      \"A\"\n    ],\n    \"hint\": \"A\",\n    \"image\": \"\"\n  },\n  \"childCards\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Import card from Excel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/card/import",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "card",
+                "import"
+              ],
+              "query": []
+            },
+            "description": "filePath la path Excel da upload (POST /upload) hoac file trong data/files. ROLE_ADMIN.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filePath\": \"{{importFilePath}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1766,8 +1954,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/practice-test",
-              "host": ["{{baseUrl}}"],
-              "path": ["practice-test"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "practice-test"
+              ],
               "query": []
             },
             "description": "De thi thu TOEIC Listening+Reading: Part 1-7, 200 cau, 120 phut. Can JWT. Restart BE de Mongock seed de nay."
@@ -1792,6 +1984,57 @@
           ]
         },
         {
+          "name": "Score TOEIC",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/exam/score",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "exam",
+                "score"
+              ],
+              "query": []
+            },
+            "description": "Quy doi so cau dung Listening/Reading (0-100) sang diem TOEIC.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"listeningCorrect\": 85,\n  \"readingCorrect\": 80\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));",
+                  "pm.test('has TOEIC scores', () => {",
+                  "  pm.expect(json.responseData.listeningScore).to.be.a('number');",
+                  "  pm.expect(json.responseData.readingScore).to.be.a('number');",
+                  "  pm.expect(json.responseData.totalScore).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Collect practice test result",
           "request": {
             "method": "POST",
@@ -1803,8 +2046,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/exam/collect",
-              "host": ["{{baseUrl}}"],
-              "path": ["exam", "collect"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "exam",
+                "collect"
+              ],
               "query": []
             },
             "description": "Luu progress thi thu. status=1 la complete.",
@@ -1844,10 +2092,17 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/upload?type=0",
-              "host": ["{{baseUrl}}"],
-              "path": ["upload"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "upload"
+              ],
               "query": [
-                { "key": "type", "value": "0" }
+                {
+                  "key": "type",
+                  "value": "0"
+                }
               ]
             },
             "description": "multipart field name = file. Anh vao data/images, audio vao data/sounds. mediaUrl la /data/... de gan vao question.image hoac question.sound.",
@@ -1886,8 +2141,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}{{mediaUrl}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["{{mediaUrl}}"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{mediaUrl}}"
+              ],
               "query": []
             },
             "description": "Mo file tinh. Chay Upload truoc. URL dang http://localhost:8080/data/images/foo.png"
@@ -1900,10 +2159,19 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/media/url/base64?fileURL={{mediaUrl}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["media", "url", "base64"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "media",
+                "url",
+                "base64"
+              ],
               "query": [
-                { "key": "fileURL", "value": "{{mediaUrl}}" }
+                {
+                  "key": "fileURL",
+                  "value": "{{mediaUrl}}"
+                }
               ]
             },
             "description": "fileURL co the la /data/images/foo.png hoac path o dia."

@@ -25,6 +25,7 @@ public class UserResponse {
 	private LocalDate dob;
 	private String gender;
 	private Boolean accountNonLocked;
+	private String otp;
 
 	public UserResponse(User user) {
 		this.userId = user.getUserId();

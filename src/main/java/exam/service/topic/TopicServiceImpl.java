@@ -1,6 +1,7 @@
 package exam.service.topic;
 
 import exam.db.dto.exam.ExamDataResponse;
+import exam.db.dto.topic.AddExamToTopicRequest;
 import exam.db.dto.topic.CreateTopicRequest;
 import exam.db.dto.topic.DeleteTopicRequest;
 import exam.db.dto.topic.ListTopicRequest;
@@ -22,6 +23,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -106,6 +108,28 @@ public class TopicServiceImpl implements TopicService {
 			histories = new ArrayList<>();
 		}
 		return buildTopicByIdResponse(topic, exams, histories);
+	}
+
+	@Override
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
+	public TopicResponse addExam(AddExamToTopicRequest request) throws ExamBaseException {
+		requireUser();
+		Assert.notEmpty(request.getId(), ErrorInfo.TOPIC_NOT_FOUND_ERROR);
+		Assert.notEmpty(request.getExamIds(), ErrorInfo.BAD_REQUEST);
+		Topic topic = topicRepo.findFirstByIdAndDeletedIsFalse(request.getId());
+		Assert.notNull(topic, ErrorInfo.TOPIC_NOT_FOUND_ERROR);
+		List<String> examIds = topic.getExamIds() == null ? new ArrayList<>() : new ArrayList<>(topic.getExamIds());
+		for (String examId : request.getExamIds()) {
+			if (!StringUtils.hasText(examId) || examIds.contains(examId)) {
+				continue;
+			}
+			if (examRepo.findFirstByIdAndDeletedIsFalse(examId) != null) {
+				examIds.add(examId);
+			}
+		}
+		topic.setExamIds(examIds);
+		topicRepo.save(topic);
+		return new TopicResponse(topic);
 	}
 
 	private TopicResponse buildTopicByIdResponse(Topic topic, List<Exam> exams, List<History> histories) {

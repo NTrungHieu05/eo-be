@@ -1,5 +1,6 @@
 package exam.service.exam;
 
+import exam.db.dto.exam.AddCardToExamRequest;
 import exam.db.dto.exam.CreateExamRequest;
 import exam.db.dto.exam.DeleteExamRequest;
 import exam.db.dto.exam.ListExamRequest;
@@ -27,4 +28,6 @@ public interface ExamService {
 	PracticeTestResponse getPracticeTest() throws ExamBaseException;
 
 	ToeicScoreResponse score(ToeicScoreRequest request) throws ExamBaseException;
+
+	ExamResponse addCard(AddCardToExamRequest request) throws ExamBaseException;
 }

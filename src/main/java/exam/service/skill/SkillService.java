@@ -1,5 +1,6 @@
 package exam.service.skill;
 
+import exam.db.dto.skill.AddSkillRequest;
 import exam.db.dto.skill.CreateSkillRequest;
 import exam.db.dto.skill.DeleteSkillRequest;
 import exam.db.dto.skill.ListSkillRequest;
@@ -21,5 +22,7 @@ public interface SkillService {
 
 	ListSkillResponse getListSkillForAdmin(ListSkillRequest request) throws ExamBaseException;
 
-	List<SkillResponse> getAllSkillForHeader();
+	List<SkillResponse> getAllSkillForHeader() throws ExamBaseException;
+
+	SkillResponse addTopic(AddSkillRequest request) throws ExamBaseException;
 }

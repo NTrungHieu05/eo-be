@@ -3,30 +3,47 @@ package exam.service.card;
 import exam.db.dto.card.CardResponse;
 import exam.db.dto.card.CreateCardRequest;
 import exam.db.dto.card.DeleteCardRequest;
+import exam.db.dto.card.ImportCardRequest;
 import exam.db.dto.card.ListCardRequest;
 import exam.db.dto.card.ListCardResponse;
 import exam.db.dto.card.UpdateCardRequest;
 import exam.db.dto.user.ExamUser;
+import exam.db.entity.Answer;
 import exam.db.entity.Card;
 import exam.db.entity.Exam;
+import exam.db.entity.Question;
 import exam.db.enums.Assert;
 import exam.db.enums.ErrorInfo;
 import exam.db.repository.card.CardRepository;
 import exam.db.repository.exam.ExamRepository;
 import exam.ultis.ExamBaseException;
 import exam.ultis.SecurityContextService;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class CardServiceImpl implements CardService {
+
+	@Value("${app.upload.root:D:/DATN/eo-be/data}")
+	private String uploadRoot;
 
 	@Autowired
 	private CardRepository cardRepo;
@@ -90,6 +107,168 @@ public class CardServiceImpl implements CardService {
 				.map(CardResponse::new)
 				.collect(Collectors.toList());
 		return new ListCardResponse(cards, cards.size());
+	}
+
+	@Override
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
+	public Boolean importCard(ImportCardRequest request) throws ExamBaseException {
+		requireUser();
+		Assert.notNull(request, ErrorInfo.BAD_REQUEST);
+		Assert.notEmpty(request.getFilePath(), ErrorInfo.BAD_REQUEST);
+		File file = resolveImportFile(request.getFilePath());
+		if (file == null || !file.isFile()) {
+			throw new ExamBaseException(ErrorInfo.BAD_REQUEST);
+		}
+		try (FileInputStream inputStream = new FileInputStream(file);
+			 Workbook workbook = new XSSFWorkbook(inputStream)) {
+			int totalSheet = workbook.getNumberOfSheets();
+			for (int i = 0; i < totalSheet; i++) {
+				Sheet sheet = workbook.getSheetAt(i);
+				for (Row row : sheet) {
+					if (row == null || isHeaderRow(row)) {
+						continue;
+					}
+					Card card = createCardFromExcelRow(row);
+					if (!hasQuestionText(card)) {
+						continue;
+					}
+					cardRepo.save(card);
+					linkCardToExam(card);
+				}
+			}
+		} catch (IOException e) {
+			throw new ExamBaseException(ErrorInfo.BAD_REQUEST);
+		}
+		return Boolean.TRUE;
+	}
+
+	private File resolveImportFile(String filePath) {
+		Path root = Paths.get(uploadRoot).toAbsolutePath().normalize();
+		Path direct = Paths.get(filePath).toAbsolutePath().normalize();
+		if (direct.startsWith(root) && direct.toFile().isFile()) {
+			return direct.toFile();
+		}
+		String fileName = Paths.get(filePath).getFileName().toString();
+		String[] folders = {"", "files", "images", "sounds"};
+		for (String folder : folders) {
+			Path candidate = folder.isEmpty() ? root.resolve(fileName) : root.resolve(folder).resolve(fileName);
+			if (candidate.toFile().isFile()) {
+				return candidate.toFile();
+			}
+		}
+		return null;
+	}
+
+	private boolean isHeaderRow(Row row) {
+		String first = cellText(row.getCell(0)).toLowerCase();
+		return first.contains("choice") || first.contains("answer") || first.equals("text");
+	}
+
+	private boolean hasQuestionText(Card card) {
+		if (card.getQuestion() != null && StringUtils.hasText(card.getQuestion().getText())) {
+			return true;
+		}
+		if (card.getChildCards() == null) {
+			return false;
+		}
+		for (Card child : card.getChildCards()) {
+			if (child.getQuestion() != null && StringUtils.hasText(child.getQuestion().getText())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void linkCardToExam(Card card) {
+		if (!StringUtils.hasText(card.getExamId())) {
+			return;
+		}
+		Exam exam = examRepo.findFirstByIdAndDeletedIsFalse(card.getExamId());
+		if (exam == null) {
+			return;
+		}
+		List<String> cardIds = exam.getCardIds() == null ? new ArrayList<>() : new ArrayList<>(exam.getCardIds());
+		if (!cardIds.contains(card.getId())) {
+			cardIds.add(card.getId());
+			exam.setCardIds(cardIds);
+			examRepo.save(exam);
+		}
+	}
+
+	private Card createCardFromExcelRow(Row row) {
+		Card card = new Card();
+		Question question = new Question();
+		Answer answer = new Answer();
+		int cellIndex = 0;
+
+		answer.setChoices(cellList(row.getCell(cellIndex++)));
+		answer.setHint(cellText(row.getCell(cellIndex++)));
+		answer.setImage(cellText(row.getCell(cellIndex++)));
+		answer.setTexts(cellList(row.getCell(cellIndex++)));
+
+		question.setHint(cellText(row.getCell(cellIndex++)));
+		question.setImage(cellText(row.getCell(cellIndex++)));
+		question.setSound(cellText(row.getCell(cellIndex++)));
+		question.setText(cellText(row.getCell(cellIndex++)));
+
+		String examId = cellText(row.getCell(cellIndex++));
+		String topicId = cellText(row.getCell(cellIndex++));
+
+		List<Card> childCards = new ArrayList<>();
+		for (int i = 0; i < 3; i++) {
+			Answer childAnswer = new Answer();
+			Question childQuestion = new Question();
+			childAnswer.setChoices(cellList(row.getCell(cellIndex++)));
+			childAnswer.setHint(cellText(row.getCell(cellIndex++)));
+			childAnswer.setImage(cellText(row.getCell(cellIndex++)));
+			childAnswer.setTexts(cellList(row.getCell(cellIndex++)));
+			childQuestion.setHint(cellText(row.getCell(cellIndex++)));
+			childQuestion.setImage(cellText(row.getCell(cellIndex++)));
+			childQuestion.setSound(cellText(row.getCell(cellIndex++)));
+			childQuestion.setText(cellText(row.getCell(cellIndex++)));
+			if (!StringUtils.hasText(childQuestion.getText())) {
+				continue;
+			}
+			Card child = new Card();
+			child.setQuestion(childQuestion);
+			child.setAnswer(childAnswer);
+			child.setIsQuestionGroup(false);
+			childCards.add(child);
+		}
+
+		card.setQuestion(question);
+		card.setAnswer(answer);
+		card.setExamId(examId);
+		card.setTopicId(topicId);
+		card.setChildCards(childCards);
+		card.setIsQuestionGroup(!childCards.isEmpty());
+		return card;
+	}
+
+	private String cellText(Cell cell) {
+		if (cell == null) {
+			return "";
+		}
+		try {
+			return cell.getStringCellValue().trim();
+		} catch (Exception ex) {
+			return "";
+		}
+	}
+
+	private List<String> cellList(Cell cell) {
+		List<String> list = new ArrayList<>();
+		String cellValue = cellText(cell);
+		if (!StringUtils.hasText(cellValue)) {
+			return list;
+		}
+		String[] values = cellValue.split("[.,]");
+		for (String value : values) {
+			if (StringUtils.hasText(value)) {
+				list.add(value.trim());
+			}
+		}
+		return list;
 	}
 
 	private void requireUser() throws ExamBaseException {

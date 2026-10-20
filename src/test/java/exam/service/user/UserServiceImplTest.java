@@ -6,6 +6,7 @@ import exam.db.dto.user.CreateUserRequest;
 import exam.db.dto.user.ForgotPasswordRequest;
 import exam.db.dto.user.ResetPasswordRequest;
 import exam.db.dto.user.UnblockUserRequest;
+import exam.db.dto.user.UpdateUserRequest;
 import exam.db.dto.user.UserResponse;
 import exam.db.entity.Role;
 import exam.db.entity.User;
@@ -99,8 +100,31 @@ class UserServiceImplTest {
 		assertThat(user.getOtp()).isEqualTo("654321");
 		assertThat(user.isEnabled()).isTrue();
 		assertThat(response.getEmail()).isEqualTo("user@toeic.local");
+		assertThat(response.getOtp()).isEqualTo("654321");
 		assertThat(response.getRoles()).containsExactly(RoleEnum.ROLE_USER.getName());
 		verify(notificationSv).sendOTPEmail("  User@Toeic.local  ", "654321");
+	}
+
+	@Test
+	void updateUserInfoSavesDisplayNamePhoneAndDob() throws ExamBaseException {
+		User current = TestUsers.user("user-1", RoleEnum.ROLE_USER);
+		TestUsers.authenticate(current);
+		when(userRepo.findByUserId("user-1")).thenReturn(current);
+
+		UpdateUserRequest request = new UpdateUserRequest();
+		request.setDisplayName("Ngo Trung Hieu");
+		request.setFirstName("Trung Hieu");
+		request.setLastName("Ngo");
+		request.setPhone("0901234567");
+		request.setDob(java.time.LocalDate.of(2005, 12, 22));
+
+		UserResponse response = userService.updateUserInfo(request);
+
+		assertThat(current.getDisplayName()).isEqualTo("Ngo Trung Hieu");
+		assertThat(current.getPhone()).isEqualTo("0901234567");
+		assertThat(current.getDob()).isEqualTo(java.time.LocalDate.of(2005, 12, 22));
+		assertThat(response.getDisplayName()).isEqualTo("Ngo Trung Hieu");
+		verify(userRepo).save(current);
 	}
 
 	@Test

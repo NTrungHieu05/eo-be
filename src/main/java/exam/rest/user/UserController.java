@@ -30,7 +30,7 @@ public class UserController {
 	private UserService userService;
 
 	@PutMapping(Endpoints.USER_INFO_URL)
-	public ResponseEntity<Object> updateUserInfo(@RequestBody UpdateUserRequest request) {
+	public final ResponseEntity<Object> updateUserInfo(@RequestBody UpdateUserRequest request) {
 		ResponseObject<Object> response = new ResponseObject<>();
 		try {
 			response.setResponseData(userService.updateUserInfo(request));
@@ -41,7 +41,7 @@ public class UserController {
 	}
 
 	@PostMapping(Endpoints.CHANGE_PASSWORD_URL)
-	public ResponseEntity<Object> changePassword(@RequestBody @Valid ChangePasswordRequest request) {
+	public final ResponseEntity<Object> changePassword(@RequestBody @Valid ChangePasswordRequest request) {
 		ResponseObject<Object> response = new ResponseObject<>();
 		try {
 			userService.changePassword(request);
@@ -53,7 +53,7 @@ public class UserController {
 	}
 
 	@PostMapping(Endpoints.FORGOT_PASSWORD_URL)
-	public ResponseEntity<Object> forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
+	public final ResponseEntity<Object> forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
 		ResponseObject<Boolean> response = new ResponseObject<>();
 		try {
 			response.setResponseData(userService.forgotPassword(request));
@@ -64,7 +64,7 @@ public class UserController {
 	}
 
 	@PostMapping(Endpoints.RESET_PASSWORD_URL)
-	public ResponseEntity<Object> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
+	public final ResponseEntity<Object> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
 		ResponseObject<Object> response = new ResponseObject<>();
 		try {
 			userService.resetPassword(request);
@@ -76,7 +76,7 @@ public class UserController {
 	}
 
 	@GetMapping(Endpoints.USER_URL + Endpoints.PATH_VARIABLE_URL)
-	public ResponseEntity<Object> getDetail(@PathVariable(DBConst.ID) String id) {
+	public final ResponseEntity<Object> getDetail(@PathVariable(DBConst.ID) String id) {
 		ResponseObject<UserResponse> response = new ResponseObject<>();
 		try {
 			response.setResponseData(userService.getSimpleUsersInfo(id));

@@ -1,5 +1,6 @@
 package exam.service.topic;
 
+import exam.db.dto.topic.AddExamToTopicRequest;
 import exam.db.dto.topic.CreateTopicRequest;
 import exam.db.dto.topic.DeleteTopicRequest;
 import exam.db.dto.topic.ListTopicRequest;
@@ -20,4 +21,6 @@ public interface TopicService {
 	ListTopicResponse getListTopicForAdmin(ListTopicRequest request) throws ExamBaseException;
 
 	TopicResponse getAllExamByTopicId(String topicId) throws ExamBaseException;
+
+	TopicResponse addExam(AddExamToTopicRequest request) throws ExamBaseException;
 }

@@ -1,5 +1,6 @@
 package exam.service.exam;
 
+import exam.db.dto.exam.AddCardToExamRequest;
 import exam.db.dto.exam.CreateExamRequest;
 import exam.db.dto.exam.DeleteExamRequest;
 import exam.db.dto.exam.ExamResponse;
@@ -163,6 +164,31 @@ public class ExamServiceImpl implements ExamService {
 		response.setReadingScore(ToeicScore.reading(readingCorrect));
 		response.setTotalScore(response.getListeningScore() + response.getReadingScore());
 		return response;
+	}
+
+	@Override
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
+	public ExamResponse addCard(AddCardToExamRequest request) throws ExamBaseException {
+		requireUser();
+		Assert.notEmpty(request.getId(), ErrorInfo.EXAM_NOT_FOUND_ERROR);
+		Assert.notEmpty(request.getCardIds(), ErrorInfo.BAD_REQUEST);
+		Exam exam = examRepo.findFirstByIdAndDeletedIsFalse(request.getId());
+		Assert.notNull(exam, ErrorInfo.EXAM_NOT_FOUND_ERROR);
+		List<String> cardIds = exam.getCardIds() == null ? new ArrayList<>() : new ArrayList<>(exam.getCardIds());
+		for (String cardId : request.getCardIds()) {
+			if (!StringUtils.hasText(cardId) || cardIds.contains(cardId)) {
+				continue;
+			}
+			Card card = cardRepo.findFirstByIdAndDeletedIsFalse(cardId);
+			if (card != null) {
+				cardIds.add(cardId);
+				card.setExamId(exam.getId());
+				cardRepo.save(card);
+			}
+		}
+		exam.setCardIds(cardIds);
+		examRepo.save(exam);
+		return new ExamResponse(exam);
 	}
 
 	private List<PracticeTestPartResponse> buildParts(List<Card> cards) {

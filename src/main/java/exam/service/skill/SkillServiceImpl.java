@@ -1,5 +1,6 @@
 package exam.service.skill;
 
+import exam.db.dto.skill.AddSkillRequest;
 import exam.db.dto.skill.CreateSkillRequest;
 import exam.db.dto.skill.DeleteSkillRequest;
 import exam.db.dto.skill.ListSkillRequest;
@@ -20,6 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +88,7 @@ public class SkillServiceImpl implements SkillService {
 	}
 
 	@Override
-	public List<SkillResponse> getAllSkillForHeader() {
+	public List<SkillResponse> getAllSkillForHeader() throws ExamBaseException {
 		List<Skill> skills = skillRepo.findAllByDeletedIsFalse().stream()
 				.filter(skill -> skill.getTopicIds() != null && !skill.getTopicIds().isEmpty())
 				.collect(Collectors.toList());
@@ -100,6 +102,28 @@ public class SkillServiceImpl implements SkillService {
 				? new ArrayList<>()
 				: topicRepo.findAllByIdInAndDeletedIsFalse(topicIds);
 		return buildListSkillResponse(skills, topics);
+	}
+
+	@Override
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
+	public SkillResponse addTopic(AddSkillRequest request) throws ExamBaseException {
+		requireUser();
+		Assert.notEmpty(request.getId(), ErrorInfo.SKILL_NOT_FOUND_ERROR);
+		Assert.notEmpty(request.getTopicIds(), ErrorInfo.BAD_REQUEST);
+		Skill skill = skillRepo.findFirstByIdAndDeletedIsFalse(request.getId());
+		Assert.notNull(skill, ErrorInfo.SKILL_NOT_FOUND_ERROR);
+		List<String> topicIds = skill.getTopicIds() == null ? new ArrayList<>() : new ArrayList<>(skill.getTopicIds());
+		for (String topicId : request.getTopicIds()) {
+			if (!StringUtils.hasText(topicId) || topicIds.contains(topicId)) {
+				continue;
+			}
+			if (topicRepo.findFirstByIdAndDeletedIsFalse(topicId) != null) {
+				topicIds.add(topicId);
+			}
+		}
+		skill.setTopicIds(topicIds);
+		skillRepo.save(skill);
+		return new SkillResponse(skill);
 	}
 
 	private List<SkillResponse> buildListSkillResponse(List<Skill> skills, List<Topic> topics) {

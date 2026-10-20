@@ -20,7 +20,7 @@ public class HistoryController {
 	private HistoryService historyService;
 
 	@PostMapping(Endpoints.HISTORY_URL)
-	public ResponseEntity<Object> create(@RequestBody HistoryRequest request) {
+	public final ResponseEntity<Object> create(@RequestBody HistoryRequest request) {
 		ResponseObject<Boolean> response = new ResponseObject<>();
 		try {
 			response.setResponseData(historyService.create(request));

@@ -3,6 +3,7 @@ package exam.service.card;
 import exam.db.dto.card.CardResponse;
 import exam.db.dto.card.CreateCardRequest;
 import exam.db.dto.card.DeleteCardRequest;
+import exam.db.dto.card.ImportCardRequest;
 import exam.db.dto.card.ListCardRequest;
 import exam.db.dto.card.ListCardResponse;
 import exam.db.dto.card.UpdateCardRequest;
@@ -18,4 +19,6 @@ public interface CardService {
 	CardResponse getDetail(String id) throws ExamBaseException;
 
 	ListCardResponse getListCardForAdmin(ListCardRequest request) throws ExamBaseException;
+
+	Boolean importCard(ImportCardRequest request) throws ExamBaseException;
 }

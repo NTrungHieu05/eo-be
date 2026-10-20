@@ -1,5 +1,6 @@
 package exam.service.exam;
 
+import exam.db.dto.exam.AddCardToExamRequest;
 import exam.db.dto.exam.CreateExamRequest;
 import exam.db.dto.exam.DeleteExamRequest;
 import exam.db.dto.exam.ExamResponse;
@@ -175,6 +176,27 @@ class ExamServiceImplTest {
 		assertThat(examService.deleteMultiple(request)).isTrue();
 		assertThat(exam.isDeleted()).isTrue();
 		verify(examRepo).saveAll(List.of(exam));
+	}
+
+	@Test
+	void addCardAppendsExistingCardsUsingTheSameIdsField() throws ExamBaseException {
+		TestUsers.authenticate(TestUsers.user("admin-1", RoleEnum.ROLE_ADMIN));
+		Exam exam = new Exam();
+		exam.setId("exam-1");
+		exam.setCardIds(new ArrayList<>(List.of("a")));
+		Card card = single("b", "t1");
+		when(examRepo.findFirstByIdAndDeletedIsFalse("exam-1")).thenReturn(exam);
+		when(cardRepo.findFirstByIdAndDeletedIsFalse("b")).thenReturn(card);
+		when(examRepo.save(exam)).thenReturn(exam);
+
+		AddCardToExamRequest request = new AddCardToExamRequest();
+		request.setId("exam-1");
+		request.setCardIds(List.of("b", "missing"));
+
+		ExamResponse response = examService.addCard(request);
+
+		assertThat(response.getCardIds()).containsExactly("a", "b");
+		assertThat(card.getExamId()).isEqualTo("exam-1");
 	}
 
 	private Exam practiceExam(List<String> cardIds) {

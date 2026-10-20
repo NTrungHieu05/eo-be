@@ -38,12 +38,27 @@ Thời gian: 45 phút nghe + 75 phút đọc = 120 phút. Luyện từng Part v�
 
 ## API dùng khi kiểm tra
 
+Mọi phần nội dung dùng cùng một khung. Body luôn bọc trong `responseData`, lỗi trong `error`.
+
+| Hành động | Skill | Topic | Exam | Card |
+| --- | --- | --- | --- | --- |
+| Tạo | `POST /skill` | `POST /topic` | `POST /exam` | `POST /card` |
+| Sửa | `PUT /skill` | `PUT /topic` | `PUT /exam` | `PUT /card` |
+| Xóa nhiều | `PUT /skill/delete/multiple` | `PUT /topic/delete/multiple` | `PUT /exam/delete/multiple` | `PUT /card/delete/multiple` |
+| Chi tiết | `GET /skill/{id}` | `GET /topic/{id}` | `GET /exam/{id}` | `GET /card/{id}` |
+| Danh sách admin | `GET /admin/skill` | `GET /admin/topic` | `GET /admin/exam` | `GET /admin/card` |
+| Gắn phần con | `POST /skill/add-topic` `{id, topicIds}` | `POST /topic/add-exam` `{id, examIds}` | `POST /exam/add-card` `{id, cardIds}` | `POST /card/import` `{filePath}` |
+
+Request tạo/sửa cùng tên field với response: `name`, danh sách id con (`topicIds`, `examIds`, `cardIds`). Xóa nhiều luôn gửi `{ "ids": [] }` và trả `true`.
+
 | Method | Path | Ý nghĩa |
 | --- | --- | --- |
 | POST | `/app/login` | Đăng nhập, trả JWT. Tài khoản còn OTP thì bị từ chối |
 | POST | `/public/register/user` | Đăng ký, luôn gán `ROLE_USER` |
-| GET | `/practice-test` | Đề thi thử, cần JWT |
+| GET | `/skill/header` | Skill kèm topic cho trang chủ |
+| GET | `/topic/exam/{topicId}` | Danh sách bài trong một part |
 | GET | `/exam/card/{examId}` | Câu hỏi của một bài luyện |
+| GET | `/practice-test` | Đề thi thử, cần JWT |
 | POST | `/exam/score` | Quy đổi số câu đúng Listening/Reading sang điểm 5–495, tổng 10–990 |
 | POST | `/exam/collect` | Lưu điểm thi thử vào History của user đang đăng nhập |
 | POST | `/user/pwd/change` | Đổi mật khẩu, kiểm tra mật khẩu cũ và xác nhận |

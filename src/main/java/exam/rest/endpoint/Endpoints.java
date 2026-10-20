@@ -1,52 +1,56 @@
 package exam.rest.endpoint;
 
 public interface Endpoints {
-	String USER_URL = "/user";
-	String CHANGE_PASSWORD_URL = "/user/pwd/change";
-	String USER_INFO_URL = "/user/info";
-	String FORGOT_PASSWORD_URL = "/user/pwd/forgot";
-	String RESET_PASSWORD_URL = "/user/pwd/reset";
-
-	String ADMIN_USERS_URL = "/admin/users";
-	String ADMIN_USERS_BLOCK = "/admin/users/block";
-	String ADMIN_USERS_UNBLOCK = "/admin/users/unblock";
-	String ADMIN_CARD_URL = "/admin/card";
-	String ADMIN_SKILL_URL = "/admin/skill";
-	String ADMIN_TOPIC_URL = "/admin/topic";
-	String ADMIN_EXAM_URL = "/admin/exam";
-
+	// ==================== USER =======================
+	public static final String USER_URL = "/user";
+	public static final String CHANGE_PASSWORD_URL = "/user/pwd/change";
+	public static final String USER_INFO_URL = "/user/info";
+	public static final String FORGOT_PASSWORD_URL = "/user/pwd/forgot";
+	public static final String RESET_PASSWORD_URL = "/user/pwd/reset";
+	// ==================== ADMIN =======================
+	public static final String ADMIN_USERS_URL = "/admin/users";
+	public static final String ADMIN_USERS_BLOCK = "/admin/users/block";
+	public static final String ADMIN_USERS_UNBLOCK = "/admin/users/unblock";
+	public static final String ADMIN_CARD_URL = "/admin/card";
+	public static final String ADMIN_SKILL_URL = "/admin/skill";
+	public static final String ADMIN_TOPIC_URL = "/admin/topic";
+	public static final String ADMIN_EXAM_URL = "/admin/exam";
+	//=========================== PUBLIC ======================
 	String REGISTER_USER_URL = "public/register/user";
-
+	//=========================== LOGIN/ LOGOUT ======================
 	String LOGIN_URL = "/app/login";
 	String LOGOUT_URL = "/app/logout";
-
-	String NOTIFICATION = "/notification";
-	String VERIFY_OTP = "/verify-otp";
-
-	String PATH_VARIABLE_URL = "/{id}";
-	String PATH_VARIABLE_EXAM_ID_URL = "/{examId}";
-	String PATH_VARIABLE_TOPIC_ID_URL = "/{topicId}";
-
-	String MEDIA_URL_BASE64 = "/media/url/base64";
-	String UPLOAD_URL = "/upload";
-
-	String CARD_URL = "/card";
-	String CARD_IMPORT_URL = "/card/import";
-	String CARD_DELETE_MULTIPLE = "/card/delete/multiple";
-	String PRACTICE_TEST_URL = "/practice-test";
-
-	String SKILL_URL = "/skill";
-	String SKILL_HEADER_URL = "/skill/header";
-	String SKILL_DELETE_MULTIPLE = "/skill/delete/multiple";
-
-	String TOPIC_URL = "/topic";
-	String TOPIC_EXAM_URL = "/topic/exam";
-	String TOPIC_DELETE_MULTIPLE = "/topic/delete/multiple";
-
-	String EXAM_URL = "/exam";
-	String EXAM_CARD_URL = "/exam/card";
-	String EXAM_DELETE_MULTIPLE = "/exam/delete/multiple";
-
-	String HISTORY_URL = "/exam/collect";
-	String EXAM_SCORE_URL = "/exam/score";
+	//=========================== NOTIFICATION ======================
+	public static final String NOTIFICATION = "/notification";
+	public static final String VERIFY_OTP = "/verify-otp";
+	//=========================== COMMONS =====================
+	public static final String PATH_VARIABLE_URL = "/{id}";
+	public static final String PATH_VARIABLE_EXAM_ID_URL = "/{examId}";
+	public static final String PATH_VARIABLE_TOPIC_ID_URL = "/{topicId}";
+	//=========================== MEDIA =====================
+	public static final String MEDIA_URL_BASE64 = "/media/url/base64";
+	public static final String UPLOAD_URL = "/upload";
+	//=========================== CARD =====================
+	public static final String CARD_URL = "/card";
+	public static final String CARD_IMPORT_URL = "/card/import";
+	public static final String CARD_DELETE_MULTIPLE = "/card/delete/multiple";
+	public static final String PRACTICE_TEST_URL = "/practice-test";
+	//=========================== SKILL =====================
+	public static final String SKILL_URL = "/skill";
+	public static final String SKILL_HEADER_URL = "/skill/header";
+	public static final String SKILL_ADD_TOPIC_URL = "/skill/add-topic";
+	public static final String SKILL_DELETE_MULTIPLE = "/skill/delete/multiple";
+	//=========================== TOPIC =====================
+	public static final String TOPIC_URL = "/topic";
+	public static final String TOPIC_EXAM_URL = "/topic/exam";
+	public static final String TOPIC_ADD_EXAM_URL = "/topic/add-exam";
+	public static final String TOPIC_DELETE_MULTIPLE = "/topic/delete/multiple";
+	//=========================== EXAM =====================
+	public static final String EXAM_URL = "/exam";
+	public static final String EXAM_CARD_URL = "/exam/card";
+	public static final String EXAM_ADD_CARD_URL = "/exam/add-card";
+	public static final String EXAM_DELETE_MULTIPLE = "/exam/delete/multiple";
+	public static final String EXAM_SCORE_URL = "/exam/score";
+	//=========================== HISTORY =====================
+	public static final String HISTORY_URL = "/exam/collect";
 }

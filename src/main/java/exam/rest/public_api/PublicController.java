@@ -29,7 +29,7 @@ public class PublicController {
 	private AuthService authService;
 
 	@PostMapping(Endpoints.LOGIN_URL)
-	public ResponseEntity<Object> appLogin(@RequestBody @Valid LoginRequest request) {
+	public final ResponseEntity<Object> appLogin(@RequestBody @Valid LoginRequest request) {
 		ResponseObject<Object> response = new ResponseObject<>();
 		try {
 			response.setResponseData(authService.login(request));
@@ -40,7 +40,7 @@ public class PublicController {
 	}
 
 	@PostMapping(Endpoints.LOGOUT_URL)
-	public ResponseEntity<Object> appLogout(HttpServletRequest request) {
+	public final ResponseEntity<Object> appLogout(HttpServletRequest request) {
 		ResponseObject<Object> response = new ResponseObject<>();
 		try {
 			authService.logout(request.getHeader(SecurityConst.AUTHORIZATION_HEADER));
@@ -52,7 +52,7 @@ public class PublicController {
 	}
 
 	@PostMapping(Endpoints.REGISTER_USER_URL)
-	public ResponseEntity<Object> registerUser(@RequestBody @Valid CreateUserRequest request) {
+	public final ResponseEntity<Object> registerUser(@RequestBody @Valid CreateUserRequest request) {
 		ResponseObject<Object> response = new ResponseObject<>();
 		try {
 			response.setResponseData(registrationSv.registerUser(request));

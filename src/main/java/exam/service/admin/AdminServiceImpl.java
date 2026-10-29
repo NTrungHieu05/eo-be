@@ -9,9 +9,11 @@ import exam.db.dto.skill.ListSkillResponse;
 import exam.db.dto.topic.ListTopicRequest;
 import exam.db.dto.topic.ListTopicResponse;
 import exam.db.dto.user.BlockUserRequest;
+import exam.db.dto.user.CreateUserRequest;
 import exam.db.dto.user.ListUserRequest;
 import exam.db.dto.user.ListUserResponse;
 import exam.db.dto.user.UnblockUserRequest;
+import exam.db.dto.user.UserResponse;
 import exam.service.card.CardService;
 import exam.service.exam.ExamService;
 import exam.service.skill.SkillService;
@@ -42,6 +44,11 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public ListUserResponse listUserForAdmin(ListUserRequest request) throws ExamBaseException {
 		return userService.listUserForAdmin(request);
+	}
+
+	@Override
+	public UserResponse createUserForAdmin(CreateUserRequest request) throws ExamBaseException {
+		return userService.createUserForAdmin(request);
 	}
 
 	@Override

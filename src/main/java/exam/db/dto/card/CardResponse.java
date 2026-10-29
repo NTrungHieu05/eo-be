@@ -20,6 +20,7 @@ public class CardResponse {
 	private List<Card> childCards;
 	private String examId;
 	private String topicId;
+	private Integer partNumber;
 
 	public CardResponse(Card card) {
 		BeanUtils.copyProperties(card, this);

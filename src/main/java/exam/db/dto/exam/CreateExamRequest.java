@@ -11,4 +11,5 @@ public class CreateExamRequest {
 	private String name;
 	private String topicId;
 	private List<String> cardIds;
+	private Boolean practiceTest;
 }

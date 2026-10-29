@@ -30,6 +30,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,11 +76,10 @@ class UserServiceImplTest {
 	}
 
 	@Test
-	void createUserNormalizesEmailEncodesPasswordAndSendsOtp() throws ExamBaseException {
+	void createUserNormalizesEmailAndEncodesPassword() throws ExamBaseException {
 		when(roleRepo.findByName(RoleEnum.ROLE_USER.getName())).thenReturn(new Role(RoleEnum.ROLE_USER.getName()));
 		when(passwordEncoder.encode("User@123")).thenReturn("hashed");
 		when(userDetailSv.userExists("User@Toeic.local")).thenReturn(false);
-		when(notificationSv.generateOTP()).thenReturn("654321");
 
 		CreateUserRequest request = new CreateUserRequest();
 		request.setEmail("  User@Toeic.local  ");
@@ -97,19 +97,19 @@ class UserServiceImplTest {
 		assertThat(user.getUsername()).isEqualTo("user@toeic.local");
 		assertThat(user.getPassword()).isEqualTo("hashed");
 		assertThat(user.getDisplayName()).isEqualTo("An Nguyen");
-		assertThat(user.getOtp()).isEqualTo("654321");
+		assertThat(user.getOtp()).isNull();
 		assertThat(user.isEnabled()).isTrue();
 		assertThat(response.getEmail()).isEqualTo("user@toeic.local");
-		assertThat(response.getOtp()).isEqualTo("654321");
+		assertThat(response.getOtp()).isNull();
 		assertThat(response.getRoles()).containsExactly(RoleEnum.ROLE_USER.getName());
-		verify(notificationSv).sendOTPEmail("  User@Toeic.local  ", "654321");
+		verify(notificationSv, never()).sendMailResetPwd(anyString(), anyString());
 	}
 
 	@Test
 	void updateUserInfoSavesDisplayNamePhoneAndDob() throws ExamBaseException {
 		User current = TestUsers.user("user-1", RoleEnum.ROLE_USER);
 		TestUsers.authenticate(current);
-		when(userRepo.findByUserId("user-1")).thenReturn(current);
+		when(userRepo.findByUserIdAndDeletedIsFalse("user-1")).thenReturn(current);
 
 		UpdateUserRequest request = new UpdateUserRequest();
 		request.setDisplayName("Ngo Trung Hieu");
@@ -125,6 +125,27 @@ class UserServiceImplTest {
 		assertThat(current.getDob()).isEqualTo(java.time.LocalDate.of(2005, 12, 22));
 		assertThat(response.getDisplayName()).isEqualTo("Ngo Trung Hieu");
 		verify(userRepo).save(current);
+	}
+
+	@Test
+	void updateUserInfoClearsLastNameWhenDisplayNameIsASingleWord() throws ExamBaseException {
+		User current = TestUsers.user("user-1", RoleEnum.ROLE_USER);
+		current.setFirstName("Trung Hieu");
+		current.setLastName("Ngo");
+		current.setDisplayName("Ngo Trung Hieu");
+		TestUsers.authenticate(current);
+		when(userRepo.findByUserIdAndDeletedIsFalse("user-1")).thenReturn(current);
+
+		UpdateUserRequest request = new UpdateUserRequest();
+		request.setDisplayName("Hieu");
+		request.setFirstName("Hieu");
+		request.setLastName("");
+
+		userService.updateUserInfo(request);
+
+		assertThat(current.getDisplayName()).isEqualTo("Hieu");
+		assertThat(current.getFirstName()).isEqualTo("Hieu");
+		assertThat(current.getLastName()).isEmpty();
 	}
 
 	@Test
@@ -163,7 +184,7 @@ class UserServiceImplTest {
 		User user = TestUsers.user("user-1", RoleEnum.ROLE_USER);
 		user.setPassword("hashed-old");
 		TestUsers.authenticate(user);
-		when(userRepo.findByUserId("user-1")).thenReturn(user);
+		when(userRepo.findByUserIdAndDeletedIsFalse("user-1")).thenReturn(user);
 		when(passwordEncoder.matches("wrong", "hashed-old")).thenReturn(false);
 
 		assertThatThrownBy(() -> userService.changePassword(changePassword("wrong", "New@1234", "New@1234")))
@@ -178,7 +199,7 @@ class UserServiceImplTest {
 		User user = TestUsers.user("user-1", RoleEnum.ROLE_USER);
 		user.setPassword("hashed-old");
 		TestUsers.authenticate(user);
-		when(userRepo.findByUserId("user-1")).thenReturn(user);
+		when(userRepo.findByUserIdAndDeletedIsFalse("user-1")).thenReturn(user);
 		when(passwordEncoder.matches("Old@1234", "hashed-old")).thenReturn(true);
 
 		assertThatThrownBy(() -> userService.changePassword(changePassword("Old@1234", "New@1234", "Other@123")))
@@ -188,15 +209,30 @@ class UserServiceImplTest {
 	}
 
 	@Test
+	void changePasswordRejectsValueShorterThanEightAfterTrim() {
+		User user = TestUsers.user("user-1", RoleEnum.ROLE_USER);
+		user.setPassword("hashed-old");
+		TestUsers.authenticate(user);
+		when(userRepo.findByUserIdAndDeletedIsFalse("user-1")).thenReturn(user);
+		when(passwordEncoder.matches("Old@1234", "hashed-old")).thenReturn(true);
+
+		assertThatThrownBy(() -> userService.changePassword(changePassword("Old@1234", "  abcdef1  ", "  abcdef1  ")))
+				.isInstanceOf(ExamBaseException.class)
+				.extracting(ex -> ((ExamBaseException) ex).getError().getCode())
+				.isEqualTo(ErrorInfo.PASSWORD_TOO_SHORT_CODE);
+		verify(userRepo, never()).save(user);
+	}
+
+	@Test
 	void changePasswordSavesEncodedPassword() throws ExamBaseException {
 		User user = TestUsers.user("user-1", RoleEnum.ROLE_USER);
 		user.setPassword("hashed-old");
 		TestUsers.authenticate(user);
-		when(userRepo.findByUserId("user-1")).thenReturn(user);
+		when(userRepo.findByUserIdAndDeletedIsFalse("user-1")).thenReturn(user);
 		when(passwordEncoder.matches("Old@1234", "hashed-old")).thenReturn(true);
 		when(passwordEncoder.encode("New@1234")).thenReturn("hashed-new");
 
-		Boolean changed = userService.changePassword(changePassword("Old@1234", "New@1234", "New@1234"));
+		Boolean changed = userService.changePassword(changePassword("  Old@1234  ", "  New@1234  ", " New@1234 "));
 
 		assertThat(changed).isTrue();
 		assertThat(user.getPassword()).isEqualTo("hashed-new");
@@ -206,20 +242,22 @@ class UserServiceImplTest {
 	@Test
 	void resetPasswordMarksRecoveryUsed() throws ExamBaseException {
 		User user = TestUsers.user("user-1", RoleEnum.ROLE_USER);
+		user.setOtp("123456");
 		UserRecovery recovery = new UserRecovery();
 		recovery.setUserId("user-1");
 		recovery.setResetCode("abc12345");
 		when(userRecoveryRepo.findByResetCodeAndDeletedIsFalse("abc12345")).thenReturn(recovery);
-		when(userRepo.findByUserId("user-1")).thenReturn(user);
+		when(userRepo.findByUserIdAndDeletedIsFalse("user-1")).thenReturn(user);
 		when(passwordEncoder.encode("New@1234")).thenReturn("hashed-new");
 
 		ResetPasswordRequest request = new ResetPasswordRequest();
-		request.setResetCode("abc12345");
+		request.setResetCode("  abc12345  ");
 		request.setNewPassword("New@1234");
 		request.setConfirmPassword("New@1234");
 
 		assertThat(userService.resetPassword(request)).isTrue();
 		assertThat(user.getPassword()).isEqualTo("hashed-new");
+		assertThat(user.getOtp()).isNull();
 		assertThat(recovery.isDeleted()).isTrue();
 		verify(userRepo).save(user);
 		verify(userRecoveryRepo).save(recovery);
@@ -243,7 +281,7 @@ class UserServiceImplTest {
 		when(userRepo.findByEmailIgnoreCase("user-1@toeic.local")).thenReturn(user);
 
 		ForgotPasswordRequest request = new ForgotPasswordRequest();
-		request.setEmail("user-1@toeic.local");
+		request.setEmail("  user-1@toeic.local  ");
 
 		assertThat(userService.forgotPassword(request)).isTrue();
 		ArgumentCaptor<UserRecovery> recovery = ArgumentCaptor.forClass(UserRecovery.class);
@@ -251,6 +289,23 @@ class UserServiceImplTest {
 		assertThat(recovery.getValue().getResetCode()).hasSize(8);
 		assertThat(recovery.getValue().getUserId()).isEqualTo("user-1");
 		verify(notificationSv).sendMailResetPwd("user-1@toeic.local", recovery.getValue().getResetCode());
+	}
+
+	@Test
+	void forgotPasswordRetiresOlderCodes() throws ExamBaseException {
+		User user = TestUsers.user("user-1", RoleEnum.ROLE_USER);
+		when(userRepo.findByEmailIgnoreCase("user-1@toeic.local")).thenReturn(user);
+		UserRecovery older = new UserRecovery();
+		older.setUserId("user-1");
+		older.setResetCode("old-code");
+		when(userRecoveryRepo.findAllByUserIdAndDeletedIsFalse("user-1")).thenReturn(new ArrayList<>(List.of(older)));
+
+		ForgotPasswordRequest request = new ForgotPasswordRequest();
+		request.setEmail("user-1@toeic.local");
+
+		assertThat(userService.forgotPassword(request)).isTrue();
+		assertThat(older.isDeleted()).isTrue();
+		verify(userRecoveryRepo).saveAll(List.of(older));
 	}
 
 	@Test
@@ -264,6 +319,18 @@ class UserServiceImplTest {
 		assertThat(userService.blockUser(request)).isTrue();
 		assertThat(target.isAccountNonLocked()).isFalse();
 		verify(userRepo).saveAll(List.of(target));
+	}
+
+	@Test
+	void blockUserRejectsCurrentAdmin() {
+		TestUsers.authenticate(TestUsers.user("admin-1", RoleEnum.ROLE_ADMIN));
+		BlockUserRequest request = new BlockUserRequest();
+		request.setIds(List.of("admin-1"));
+
+		assertThatThrownBy(() -> userService.blockUser(request))
+				.isInstanceOf(ExamBaseException.class)
+				.extracting(ex -> ((ExamBaseException) ex).getError().getCode())
+				.isEqualTo(ErrorInfo.CANNOT_BLOCK_SELF_CODE);
 	}
 
 	@Test

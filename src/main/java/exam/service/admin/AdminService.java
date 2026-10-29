@@ -9,13 +9,17 @@ import exam.db.dto.skill.ListSkillResponse;
 import exam.db.dto.topic.ListTopicRequest;
 import exam.db.dto.topic.ListTopicResponse;
 import exam.db.dto.user.BlockUserRequest;
+import exam.db.dto.user.CreateUserRequest;
 import exam.db.dto.user.ListUserRequest;
 import exam.db.dto.user.ListUserResponse;
 import exam.db.dto.user.UnblockUserRequest;
+import exam.db.dto.user.UserResponse;
 import exam.ultis.ExamBaseException;
 
 public interface AdminService {
 	ListUserResponse listUserForAdmin(ListUserRequest request) throws ExamBaseException;
+
+	UserResponse createUserForAdmin(CreateUserRequest request) throws ExamBaseException;
 
 	Boolean blockUser(BlockUserRequest request) throws ExamBaseException;
 

@@ -16,6 +16,8 @@ public interface CardRepository extends MongoRepository<Card, String> {
 
 	List<Card> findAllByDeletedIsFalse();
 
+	List<Card> findAllByTopicIdAndDeletedIsFalse(String topicId);
+
 	List<Card> findByExamIdAndDeletedIsFalse(String examId);
 
 	@Aggregation(pipeline = {

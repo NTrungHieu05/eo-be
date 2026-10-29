@@ -27,16 +27,34 @@ public class ExamUserDetailsService implements UserDetailsService {
 	}
 
 	public boolean userExists(String email) {
-		return userRepository.findByUserNameOrEmail(email).isPresent();
+		String normalized = normalize(email);
+		if (!StringUtils.hasText(normalized)) {
+			return false;
+		}
+		if (userRepository.findByUserNameOrEmail(normalized).isPresent()) {
+			return true;
+		}
+		return userRepository.findByEmailIgnoreCase(normalized) != null;
 	}
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Optional<User> byUsername = userRepository.findByUserNameOrEmail(username);
-		if (byUsername.isPresent()) {
-			return byUsername.get();
+		String normalized = normalize(username);
+		if (StringUtils.hasText(normalized)) {
+			Optional<User> byUsername = userRepository.findByUserNameOrEmail(normalized);
+			if (byUsername.isPresent()) {
+				return byUsername.get();
+			}
+			User byEmail = userRepository.findByEmailIgnoreCase(normalized);
+			if (byEmail != null) {
+				return byEmail;
+			}
 		}
 		throw new UsernameNotFoundException(ErrorInfo.USER_NOT_FOUND_ERROR.getMessage());
+	}
+
+	private String normalize(String value) {
+		return value == null ? "" : value.trim().toLowerCase();
 	}
 
 	public void validateUserDetails(User user) throws ExamBaseException {

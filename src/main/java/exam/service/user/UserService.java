@@ -19,6 +19,8 @@ public interface UserService {
 
 	User createUser(CreateUserRequest request, Role role) throws ExamBaseException;
 
+	UserResponse createUserForAdmin(CreateUserRequest request) throws ExamBaseException;
+
 	Boolean changePassword(ChangePasswordRequest request) throws ExamBaseException;
 
 	UserResponse updateUserInfo(UpdateUserRequest request) throws ExamBaseException;

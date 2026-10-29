@@ -38,6 +38,24 @@ class ExamUserDetailsServiceTest {
 	}
 
 	@Test
+	void loadUserByUsernameIgnoresEmailCaseAndSpaces() {
+		User user = TestUsers.user("user-1", RoleEnum.ROLE_USER);
+		when(userRepository.findByUserNameOrEmail("user-1@toeic.local")).thenReturn(Optional.empty());
+		when(userRepository.findByEmailIgnoreCase("user-1@toeic.local")).thenReturn(user);
+
+		assertThat(userDetailsService.loadUserByUsername("  User-1@Toeic.Local ")).isSameAs(user);
+	}
+
+	@Test
+	void userExistsMatchesEmailIgnoringCase() {
+		when(userRepository.findByUserNameOrEmail("user-1@toeic.local")).thenReturn(Optional.empty());
+		when(userRepository.findByEmailIgnoreCase("user-1@toeic.local"))
+				.thenReturn(TestUsers.user("user-1", RoleEnum.ROLE_USER));
+
+		assertThat(userDetailsService.userExists("User-1@Toeic.Local")).isTrue();
+	}
+
+	@Test
 	void loadUserByUsernameRejectsUnknownAccount() {
 		when(userRepository.findByUserNameOrEmail("missing@toeic.local")).thenReturn(Optional.empty());
 

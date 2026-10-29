@@ -1,5 +1,6 @@
 package exam.config;
 
+import exam.db.entity.User;
 import exam.service.ExamUserDetailsService;
 import exam.ultis.jwt.JwtUtils;
 import org.slf4j.Logger;
@@ -30,11 +31,21 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
+		String token = getTokenFromRequest(request);
+		if (StringUtils.hasText(token) && !jwtUtils.validateJwtToken(token)) {
+			SecurityContextHolder.clearContext();
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			return;
+		}
 		try {
-			String token = getTokenFromRequest(request);
-			if (token != null && jwtUtils.validateJwtToken(token)) {
+			if (StringUtils.hasText(token)) {
 				String username = jwtUtils.getUserNameFromJwtToken(token);
 				UserDetails userDetails = examUserDetailsService.loadUserByUsername(username);
+				if (!isActiveAccount(userDetails)) {
+					SecurityContextHolder.clearContext();
+					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+					return;
+				}
 				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
 						userDetails, null, userDetails.getAuthorities());
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -45,6 +56,13 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		filterChain.doFilter(request, response);
+	}
+
+	private boolean isActiveAccount(UserDetails userDetails) {
+		if (userDetails == null || !userDetails.isEnabled() || !userDetails.isAccountNonLocked()) {
+			return false;
+		}
+		return !(userDetails instanceof User) || !((User) userDetails).isDeleted();
 	}
 
 	private String getTokenFromRequest(HttpServletRequest request) {

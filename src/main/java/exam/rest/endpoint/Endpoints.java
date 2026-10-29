@@ -20,9 +20,6 @@ public interface Endpoints {
 	//=========================== LOGIN/ LOGOUT ======================
 	String LOGIN_URL = "/app/login";
 	String LOGOUT_URL = "/app/logout";
-	//=========================== NOTIFICATION ======================
-	public static final String NOTIFICATION = "/notification";
-	public static final String VERIFY_OTP = "/verify-otp";
 	//=========================== COMMONS =====================
 	public static final String PATH_VARIABLE_URL = "/{id}";
 	public static final String PATH_VARIABLE_EXAM_ID_URL = "/{examId}";

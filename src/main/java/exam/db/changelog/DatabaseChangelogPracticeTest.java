@@ -113,6 +113,33 @@ public class DatabaseChangelogPracticeTest {
 		log.info("Attached listening media to {} practice-test cards", updated);
 	}
 
+	@ChangeSet(id = "practice_test_multiple_exams", author = "system", order = "003")
+	public void seedMorePracticeTests(ExamRepository examRepo) {
+		Exam original = examRepo.findFirstByIdAndDeletedIsFalse(PRACTICE_EXAM_ID);
+		if (original == null) {
+			log.warn("Practice test {} not found, skip extra exam seed", PRACTICE_EXAM_ID);
+			return;
+		}
+		original.setName("Đề thi thử TOEIC 1");
+		original.setPracticeTest(true);
+		examRepo.save(original);
+		seedPracticeExamIfMissing(examRepo, "68cb00010000000000000002", "Đề thi thử TOEIC 2", original.getCardIds());
+		seedPracticeExamIfMissing(examRepo, "68cb00010000000000000003", "Đề thi thử TOEIC 3", original.getCardIds());
+	}
+
+	private void seedPracticeExamIfMissing(ExamRepository examRepo, String id, String name, List<String> cardIds) {
+		if (examRepo.findFirstByIdAndDeletedIsFalse(id) != null) {
+			return;
+		}
+		Exam exam = new Exam();
+		exam.setId(id);
+		exam.setName(name);
+		exam.setPracticeTest(true);
+		exam.setCardIds(cardIds == null ? new ArrayList<>() : new ArrayList<>(cardIds));
+		examRepo.save(exam);
+		log.info("Seeded practice test {} ({})", id, name);
+	}
+
 	private List<Card> buildPart1(String topicId) {
 		List<Card> cards = new ArrayList<>();
 		String[] stems = {
@@ -245,10 +272,17 @@ public class DatabaseChangelogPracticeTest {
 		question.setSound(sound == null ? "" : sound);
 
 		Answer answer = new Answer();
-		answer.setChoices(Arrays.asList(choices));
+		int index = correctIndex % choices.length;
+		List<String> wrong = new ArrayList<>();
+		for (int i = 0; i < choices.length; i++) {
+			if (i != index) {
+				wrong.add(choices[i]);
+			}
+		}
 		String[] letters = choices.length == 3 ? LETTERS_3 : LETTERS_4;
-		answer.setTexts(Collections.singletonList(letters[correctIndex % letters.length]));
-		answer.setHint(answer.getTexts().get(0));
+		answer.setChoices(wrong);
+		answer.setTexts(Collections.singletonList(choices[index]));
+		answer.setHint(letters[index]);
 		answer.setImage("");
 
 		Card card = new Card();

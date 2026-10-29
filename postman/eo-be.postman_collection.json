@@ -280,7 +280,7 @@
               ],
               "query": []
             },
-            "description": "OTP in console BE. Copy OTP vao {{otp}} roi goi Verify OTP truoc khi login user moi.",
+            "description": "Dang ky xong dang nhap duoc ngay, khong can ma OTP.",
             "auth": {
               "type": "noauth"
             },
@@ -310,37 +310,6 @@
               }
             }
           ]
-        },
-        {
-          "name": "Verify OTP",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/notification/verify-otp?email=tester@toeic.local&otp={{otp}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "notification",
-                "verify-otp"
-              ],
-              "query": [
-                {
-                  "key": "email",
-                  "value": "tester@toeic.local"
-                },
-                {
-                  "key": "otp",
-                  "value": "{{otp}}"
-                }
-              ]
-            },
-            "description": "Sua email cho khop user vua register. OTP lay tu log BE.",
-            "auth": {
-              "type": "noauth"
-            }
-          }
         },
         {
           "name": "Logout",
@@ -1948,7 +1917,7 @@
       "name": "08 Thi thu TOEIC",
       "item": [
         {
-          "name": "Get practice test (7 phan, 200 cau)",
+          "name": "List practice tests",
           "request": {
             "method": "GET",
             "header": [],
@@ -1962,7 +1931,43 @@
               ],
               "query": []
             },
-            "description": "De thi thu TOEIC Listening+Reading: Part 1-7, 200 cau, 120 phut. Can JWT. Restart BE de Mongock seed de nay."
+            "description": "Danh sach de thi thu. Can JWT. Restart BE de Mongock seed nhieu de."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));",
+                  "pm.test('has exams', () => pm.expect(json.responseData.exams.length).to.be.above(0));",
+                  "if (json.responseData && json.responseData.exams && json.responseData.exams[0]) {",
+                  "  pm.collectionVariables.set('practiceExamId', json.responseData.exams[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get practice test by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/practice-test/{{practiceExamId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "practice-test",
+                "{{practiceExamId}}"
+              ],
+              "query": []
+            },
+            "description": "Chi tiet 1 de thi thu: Part 1-7, 200 cau, 120 phut. Can JWT."
           },
           "event": [
             {
@@ -1974,10 +1979,7 @@
                   "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
                   "pm.test('no business error', () => pm.expect(json.error).to.eql(null));",
                   "pm.test('200 questions', () => pm.expect(json.responseData.questionCount).to.eql(200));",
-                  "pm.test('7 parts', () => pm.expect(json.responseData.parts.length).to.eql(7));",
-                  "if (json.responseData && json.responseData.id) {",
-                  "  pm.collectionVariables.set('practiceExamId', json.responseData.id);",
-                  "}"
+                  "pm.test('7 parts', () => pm.expect(json.responseData.parts.length).to.eql(7));"
                 ]
               }
             }

@@ -1,12 +1,14 @@
 package exam.service.media;
 
 import exam.db.dto.media.MediaResponse;
+import exam.db.dto.user.ExamUser;
 import exam.db.entity.Media;
 import exam.db.enums.Assert;
 import exam.db.enums.ErrorInfo;
 import exam.db.repository.media.MediaRepository;
 import exam.ultis.ExamBaseException;
 import exam.ultis.FileUploadHelper;
+import exam.ultis.SecurityContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ public class MediaServiceImpl implements MediaService {
 
 	@Override
 	public MediaResponse uploadMedia(MultipartFile file, Integer type) throws ExamBaseException {
+		requireAdmin();
 		Assert.notNull(file, ErrorInfo.BAD_REQUEST);
 		if (file.isEmpty()) {
 			throw new ExamBaseException(ErrorInfo.BAD_REQUEST);
@@ -37,15 +40,25 @@ public class MediaServiceImpl implements MediaService {
 		String originalName = file.getOriginalFilename();
 		Assert.notEmpty(originalName, ErrorInfo.BAD_REQUEST);
 		String fileName = Paths.get(originalName).getFileName().toString();
+		String safeName = fileName.replaceAll("[^A-Za-z0-9._-]", "_");
+		if (!StringUtils.hasText(safeName) || ".".equals(safeName) || "..".equals(safeName)) {
+			throw new ExamBaseException(ErrorInfo.BAD_REQUEST);
+		}
+		String storedName = System.currentTimeMillis() + "-" + safeName;
 
 		String folder = folderFor(fileName, type);
-		Path directory = Paths.get(uploadRoot, folder);
+		Path root = Paths.get(uploadRoot).toAbsolutePath().normalize();
+		Path directory = root.resolve(folder).normalize();
+		Path target = directory.resolve(storedName).normalize();
+		if (!target.startsWith(root)) {
+			throw new ExamBaseException(ErrorInfo.BAD_REQUEST);
+		}
 		try {
 			Files.createDirectories(directory);
-			File destination = directory.resolve(fileName).toFile();
+			File destination = target.toFile();
 			file.transferTo(destination);
 
-			String publicUrl = "/data/" + folder + "/" + fileName;
+			String publicUrl = "/data/" + folder + "/" + storedName;
 			Media media = new Media();
 			media.setMediaUrl(publicUrl);
 			media.setType(type);
@@ -68,11 +81,13 @@ public class MediaServiceImpl implements MediaService {
 			return null;
 		}
 		try {
-			String resolved = fileURL;
-			if (fileURL.startsWith("/data/")) {
-				resolved = Paths.get(uploadRoot, fileURL.substring("/data/".length())).toString();
+			Path root = Paths.get(uploadRoot).toAbsolutePath().normalize();
+			String relative = fileURL.startsWith("/data/") ? fileURL.substring("/data/".length()) : fileURL;
+			Path target = root.resolve(relative).normalize();
+			if (!target.startsWith(root)) {
+				return null;
 			}
-			return FileUploadHelper.downloadFileToBase64(resolved);
+			return FileUploadHelper.downloadFileToBase64(target.toString());
 		} catch (Exception ex) {
 			return null;
 		}
@@ -95,5 +110,11 @@ public class MediaServiceImpl implements MediaService {
 			return "sounds";
 		}
 		return "files";
+	}
+
+	private void requireAdmin() throws ExamBaseException {
+		ExamUser examUser = SecurityContextService.getUser();
+		Assert.notNull(examUser, ErrorInfo.ACCESS_DENIED_ERROR);
+		Assert.isTrue(examUser.isAdmin(), ErrorInfo.ACCESS_DENIED_ERROR);
 	}
 }

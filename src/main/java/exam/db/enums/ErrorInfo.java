@@ -46,7 +46,9 @@ public class ErrorInfo implements Serializable {
 	public static final int CARD_IS_NULL_CODE = 1014;
 	public static final int TOPIC_NOT_FOUND_ERROR_CODE = 1015;
 	public static final int EXAM_NOT_FOUND_ERROR_CODE = 1016;
-	public static final int PLEASE_VERIFY_OTP_CODE = 1017;
+	public static final int ACCOUNT_LOCKED_CODE = 1018;
+	public static final int CANNOT_BLOCK_SELF_CODE = 1019;
+	public static final int PASSWORD_TOO_SHORT_CODE = 1021;
 
 	private int code;
 	private List<String> messages = new ArrayList<>();
@@ -128,6 +130,12 @@ public class ErrorInfo implements Serializable {
 	public static final ErrorInfo EXAM_NOT_FOUND_ERROR = new ErrorInfo(EXAM_NOT_FOUND_ERROR_CODE,
 			properties.getProperty("exam.not.found"));
 
-	public static final ErrorInfo PLEASE_VERIFY_OTP = new ErrorInfo(PLEASE_VERIFY_OTP_CODE,
-			properties.getProperty("please.verify.otp"));
+	public static final ErrorInfo ACCOUNT_LOCKED = new ErrorInfo(ACCOUNT_LOCKED_CODE,
+			properties.getProperty("account.locked"));
+
+	public static final ErrorInfo CANNOT_BLOCK_SELF = new ErrorInfo(CANNOT_BLOCK_SELF_CODE,
+			properties.getProperty("cannot.block.self"));
+
+	public static final ErrorInfo PASSWORD_TOO_SHORT = new ErrorInfo(PASSWORD_TOO_SHORT_CODE,
+			properties.getProperty("password.too.short"));
 }

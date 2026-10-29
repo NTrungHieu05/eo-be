@@ -20,6 +20,10 @@ public class HistoryRequest {
 			this.progress = ((Number) progress).intValue();
 			return;
 		}
-		this.progress = Integer.parseInt(progress.toString());
+		try {
+			this.progress = Integer.parseInt(progress.toString().trim());
+		} catch (NumberFormatException ex) {
+			this.progress = null;
+		}
 	}
 }

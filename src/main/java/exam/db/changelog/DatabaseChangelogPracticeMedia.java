@@ -26,11 +26,10 @@ public class DatabaseChangelogPracticeMedia {
 		card.getQuestion().setSound("/data/sounds/part1-1.wav");
 		Answer answer = card.getAnswer();
 		answer.setChoices(Arrays.asList(
-				"He is sitting at a desk.",
 				"He is running in a park.",
 				"He is cooking in a kitchen.",
 				"He is driving a truck."));
-		answer.setTexts(Collections.singletonList("A"));
+		answer.setTexts(Collections.singletonList("He is sitting at a desk."));
 		answer.setHint("A");
 		cardRepo.save(card);
 		log.info("Attached Part 1 photo and audio to sample card {}", card.getId());

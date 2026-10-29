@@ -5,6 +5,7 @@ import exam.db.dto.exam.AddCardToExamRequest;
 import exam.db.dto.exam.CreateExamRequest;
 import exam.db.dto.exam.DeleteExamRequest;
 import exam.db.dto.exam.ExamResponse;
+import exam.db.dto.exam.ListPracticeTestResponse;
 import exam.db.dto.exam.PracticeTestResponse;
 import exam.db.dto.exam.ToeicScoreRequest;
 import exam.db.dto.exam.ToeicScoreResponse;
@@ -108,10 +109,21 @@ public class ExamController {
 	}
 
 	@GetMapping(Endpoints.PRACTICE_TEST_URL)
-	public final ResponseEntity<Object> getPracticeTest() {
+	public final ResponseEntity<Object> listPracticeTests() {
+		ResponseObject<ListPracticeTestResponse> response = new ResponseObject<>();
+		try {
+			response.setResponseData(examService.listPracticeTests());
+		} catch (ExamBaseException e) {
+			response.setError(e.getError());
+		}
+		return new ResponseEntity<>(response, new HttpHeaders(), HttpStatus.OK);
+	}
+
+	@GetMapping(Endpoints.PRACTICE_TEST_URL + Endpoints.PATH_VARIABLE_URL)
+	public final ResponseEntity<Object> getPracticeTest(@PathVariable(DBConst.ID) String id) {
 		ResponseObject<PracticeTestResponse> response = new ResponseObject<>();
 		try {
-			response.setResponseData(examService.getPracticeTest());
+			response.setResponseData(examService.getPracticeTest(id));
 		} catch (ExamBaseException e) {
 			response.setError(e.getError());
 		}

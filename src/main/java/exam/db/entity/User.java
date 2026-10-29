@@ -16,7 +16,6 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Data
 @Document(collection = CollectionConst.USER)
@@ -79,12 +78,21 @@ public class User extends AbstractVersion implements UserDetails, CredentialsCon
 	private String otp;
 
 	public Set<String> getRoleStrings() {
-		return this.roles.stream().map(Role::getName).collect(Collectors.toSet());
+		Set<String> names = new HashSet<>();
+		if (roles == null) {
+			return names;
+		}
+		for (Role role : roles) {
+			if (role != null && role.getName() != null) {
+				names.add(role.getName());
+			}
+		}
+		return names;
 	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return roles;
+		return roles == null ? new HashSet<>() : roles;
 	}
 
 	@Override

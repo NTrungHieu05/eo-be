@@ -78,4 +78,57 @@ public class DatabaseChangelogCleanup {
 		}
 		log.info("Linked part practice exams for {} topics, created {}", topics.size(), created);
 	}
+
+	@ChangeSet(id = "link_part_exams_from_practice_card_ids", author = "system", order = "002")
+	public void linkPartExamsFromPracticeCardIds(TopicRepository topicRepo, ExamRepository examRepo,
+			CardRepository cardRepo) {
+		List<Exam> practices = examRepo.findAllByPracticeTestIsTrueAndDeletedIsFalse();
+		if (practices == null || practices.isEmpty()) {
+			log.warn("Practice tests not found, skip part-exam link from cardIds");
+			return;
+		}
+		Exam practice = practices.get(0);
+		List<String> practiceCardIds = practice.getCardIds();
+		if (practiceCardIds == null || practiceCardIds.isEmpty()) {
+			return;
+		}
+		List<Card> practiceCards = cardRepo.findByIdInAndDeletedIsFalse(practiceCardIds);
+		Map<String, List<String>> cardIdsByTopic = new LinkedHashMap<>();
+		for (Card card : practiceCards) {
+			if (card.getTopicId() == null) {
+				continue;
+			}
+			cardIdsByTopic.computeIfAbsent(card.getTopicId(), key -> new ArrayList<>()).add(card.getId());
+		}
+
+		List<Topic> topics = topicRepo.findAllByDeletedIsFalse();
+		int index = 1;
+		int created = 0;
+		for (Topic topic : topics) {
+			List<String> cardIds = cardIdsByTopic.get(topic.getId());
+			if (cardIds == null || cardIds.isEmpty()) {
+				index++;
+				continue;
+			}
+			String examId = String.format("68cd0001000000000000000%d", index);
+			if (examRepo.findFirstByIdAndDeletedIsFalse(examId) == null) {
+				Exam exam = new Exam();
+				exam.setId(examId);
+				exam.setName("Luyện " + topic.getName());
+				exam.setTopicId(topic.getId());
+				exam.setPracticeTest(false);
+				exam.setCardIds(cardIds);
+				examRepo.save(exam);
+				created++;
+			}
+			List<String> examIds = topic.getExamIds() == null ? new ArrayList<>() : new ArrayList<>(topic.getExamIds());
+			if (!examIds.contains(examId)) {
+				examIds.add(examId);
+				topic.setExamIds(examIds);
+				topicRepo.save(topic);
+			}
+			index++;
+		}
+		log.info("Linked part exams from practice cardIds, created {}", created);
+	}
 }

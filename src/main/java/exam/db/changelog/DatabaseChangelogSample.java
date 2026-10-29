@@ -67,11 +67,10 @@ public class DatabaseChangelogSample {
 
 			Answer answer = new Answer();
 			answer.setChoices(Arrays.asList(
-					"A man is sitting.",
 					"A woman is walking.",
 					"A child is running.",
 					"A dog is sleeping."));
-			answer.setTexts(Collections.singletonList("A"));
+			answer.setTexts(Collections.singletonList("A man is sitting."));
 			answer.setHint("A");
 			answer.setImage("");
 

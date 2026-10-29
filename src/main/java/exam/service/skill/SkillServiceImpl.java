@@ -53,8 +53,12 @@ public class SkillServiceImpl implements SkillService {
 		requireUser();
 		Skill skill = skillRepo.findFirstByIdAndDeletedIsFalse(request.getId());
 		Assert.notNull(skill, ErrorInfo.SKILL_NOT_FOUND_ERROR);
-		skill.setName(request.getName());
-		skill.setTopicIds(request.getTopicIds());
+		if (StringUtils.hasText(request.getName())) {
+			skill.setName(request.getName());
+		}
+		if (request.getTopicIds() != null) {
+			skill.setTopicIds(request.getTopicIds());
+		}
 		skillRepo.save(skill);
 		return new SkillResponse(skill);
 	}
@@ -63,6 +67,9 @@ public class SkillServiceImpl implements SkillService {
 	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	public Boolean deleteMultiple(DeleteSkillRequest request) throws ExamBaseException {
 		requireUser();
+		if (request == null || request.getIds() == null) {
+			throw new ExamBaseException(ErrorInfo.BAD_REQUEST);
+		}
 		List<Skill> skillList = skillRepo.findByIdInAndDeletedIsFalse(request.getIds());
 		skillList.forEach(p -> p.setDeleted(true));
 		skillRepo.saveAll(skillList);
@@ -101,7 +108,9 @@ public class SkillServiceImpl implements SkillService {
 		List<Topic> topics = topicIds.isEmpty()
 				? new ArrayList<>()
 				: topicRepo.findAllByIdInAndDeletedIsFalse(topicIds);
-		return buildListSkillResponse(skills, topics);
+		return buildListSkillResponse(skills, topics).stream()
+				.filter(skill -> skill.getTopics() != null && !skill.getTopics().isEmpty())
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -135,9 +144,10 @@ public class SkillServiceImpl implements SkillService {
 						.filter(topic -> topic.getId().equals(topicId))
 						.forEach(topic -> {
 							SkillTopicResponse item = new SkillTopicResponse();
+							String topicName = topic.getName() == null ? "" : topic.getName();
 							item.setTopicId(topic.getId());
-							item.setTopicName(topic.getName());
-							item.setSlug(topic.getName().toLowerCase().replace(" ", "-"));
+							item.setTopicName(topicName);
+							item.setSlug(topicName.toLowerCase().replace(" ", "-"));
 							topicResponseList.add(item);
 						}));
 			}

@@ -8,7 +8,7 @@ Backend Spring Boot cho web luyện thi TOEIC Listening & Reading. API giữ cù
 | --- | --- |
 | MongoDB `exam_online`, Mongock seed Role / Skill / Topic Part 1–7 | Xong |
 | Entity User, Role, Skill, Topic, Exam, Card, History, Media | Xong |
-| Đăng nhập `/app/login`, đăng ký, OTP, đổi / quên / đặt lại mật khẩu | Xong |
+| Đăng nhập `/app/login`, đăng ký, đổi / quên / đặt lại mật khẩu | Xong |
 | CRUD skill, topic, exam, card và danh sách admin | Xong |
 | Thi thử `GET /practice-test` (7 phần, 120 phút) và `POST /exam/collect` | Xong |
 | Upload media, phục vụ file tĩnh | Xong |
@@ -53,12 +53,13 @@ Request tạo/sửa cùng tên field với response: `name`, danh sách id con (
 
 | Method | Path | Ý nghĩa |
 | --- | --- | --- |
-| POST | `/app/login` | Đăng nhập, trả JWT. Tài khoản còn OTP thì bị từ chối |
+| POST | `/app/login` | Đăng nhập, trả JWT |
 | POST | `/public/register/user` | Đăng ký, luôn gán `ROLE_USER` |
 | GET | `/skill/header` | Skill kèm topic cho trang chủ |
 | GET | `/topic/exam/{topicId}` | Danh sách bài trong một part |
 | GET | `/exam/card/{examId}` | Câu hỏi của một bài luyện |
-| GET | `/practice-test` | Đề thi thử, cần JWT |
+| GET | `/practice-test` | Danh sách đề thi thử, cần JWT |
+| GET | `/practice-test/{id}` | Chi tiết một đề thi thử, cần JWT |
 | POST | `/exam/score` | Quy đổi số câu đúng Listening/Reading sang điểm 5–495, tổng 10–990 |
 | POST | `/exam/collect` | Lưu điểm thi thử vào History của user đang đăng nhập |
 | POST | `/user/pwd/change` | Đổi mật khẩu, kiểm tra mật khẩu cũ và xác nhận |
@@ -73,13 +74,13 @@ Test nằm ở `src/test/java`, dùng JUnit 5 và Mockito. Không bật Spring c
 
 | Lớp test | Việc được kiểm |
 | --- | --- |
-| `AuthServiceImplTest` | Login thành công, từ chối khi còn OTP, sai mật khẩu, logout |
+| `AuthServiceImplTest` | Login thành công, tài khoản bị khóa, sai mật khẩu, logout |
 | `UserServiceImplTest` | Chuẩn hóa email, mã hóa mật khẩu, email trùng, đổi / reset mật khẩu, khóa user |
 | `RegistrationServiceImplTest` | Đăng ký luôn là học viên |
 | `ExamServiceImplTest` | Thời lượng thi thử, đếm câu, gộp Part 7, thứ tự card, xóa mềm, gọi bảng điểm |
 | `ToeicScoreTest` | 0 câu = 10 điểm, 200 câu = 990, mốc giữa bảng, điểm tăng dần |
 | `HistoryServiceImplTest` | Tạo lần làm bài, cập nhật progress, bắt buộc đăng nhập |
-| `NotificationServiceImplTest` | OTP 6 số, xác thực và xóa OTP |
+| `NotificationServiceImplTest` | Gửi mã đặt lại mật khẩu khi chưa cấu hình mail |
 | `ExamUserDetailsServiceTest` | Tìm user, email rỗng, role rỗng |
 | `JwtUtilsTest` | Ký và đọc JWT, token hỏng hoặc hết hạn |
 | `HistoryRequestTest` | Progress nhận số, chuỗi hoặc null |

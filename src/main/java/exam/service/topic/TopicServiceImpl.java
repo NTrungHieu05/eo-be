@@ -27,7 +27,13 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,8 +65,9 @@ public class TopicServiceImpl implements TopicService {
 		requireUser();
 		Topic topic = topicRepo.findFirstByIdAndDeletedIsFalse(request.getId());
 		Assert.notNull(topic, ErrorInfo.TOPIC_NOT_FOUND_ERROR);
-		topic.setName(request.getName());
-		topic.setExamIds(request.getExamIds());
+		if (StringUtils.hasText(request.getName())) {
+			topic.setName(request.getName());
+		}
 		topicRepo.save(topic);
 		return new TopicResponse(topic);
 	}
@@ -69,6 +76,9 @@ public class TopicServiceImpl implements TopicService {
 	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	public Boolean deleteMultiple(DeleteTopicRequest request) throws ExamBaseException {
 		requireUser();
+		if (request == null || request.getIds() == null) {
+			throw new ExamBaseException(ErrorInfo.BAD_REQUEST);
+		}
 		List<Topic> topicList = topicRepo.findByIdInAndDeletedIsFalse(request.getIds());
 		topicList.forEach(p -> p.setDeleted(true));
 		topicRepo.saveAll(topicList);
@@ -87,9 +97,15 @@ public class TopicServiceImpl implements TopicService {
 	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	public ListTopicResponse getListTopicForAdmin(ListTopicRequest request) throws ExamBaseException {
 		requireUser();
-		List<TopicResponse> topics = topicRepo.findAllByDeletedIsFalse().stream()
-				.map(TopicResponse::new)
-				.collect(Collectors.toList());
+		List<TopicResponse> topics = new ArrayList<>();
+		for (Topic topic : topicRepo.findAllByDeletedIsFalse()) {
+			TopicResponse item = new TopicResponse(topic);
+			List<String> liveExamIds = listPracticeExamsOfTopic(topic).stream()
+					.map(Exam::getId)
+					.collect(Collectors.toList());
+			item.setExamIds(liveExamIds);
+			topics.add(item);
+		}
 		return new ListTopicResponse(topics, topics.size());
 	}
 
@@ -99,10 +115,7 @@ public class TopicServiceImpl implements TopicService {
 		Assert.notNull(examUser, ErrorInfo.ACCESS_DENIED_ERROR);
 		Topic topic = topicRepo.findFirstByIdAndDeletedIsFalse(topicId);
 		Assert.notNull(topic, ErrorInfo.TOPIC_NOT_FOUND_ERROR);
-		List<String> examIds = topic.getExamIds() == null ? Collections.emptyList() : topic.getExamIds();
-		List<Exam> exams = examIds.isEmpty()
-				? new ArrayList<>()
-				: examRepo.findByIdInAndDeletedIsFalse(examIds);
+		List<Exam> exams = listPracticeExamsOfTopic(topic);
 		List<History> histories = historyRepo.findAllByUserIdAndDeletedIsFalse(examUser.getUserId());
 		if (histories == null) {
 			histories = new ArrayList<>();
@@ -123,26 +136,86 @@ public class TopicServiceImpl implements TopicService {
 			if (!StringUtils.hasText(examId) || examIds.contains(examId)) {
 				continue;
 			}
-			if (examRepo.findFirstByIdAndDeletedIsFalse(examId) != null) {
-				examIds.add(examId);
+			Exam exam = examRepo.findFirstByIdAndDeletedIsFalse(examId);
+			if (exam == null || Boolean.TRUE.equals(exam.getPracticeTest())) {
+				continue;
 			}
+			if (StringUtils.hasText(exam.getTopicId()) && !topic.getId().equals(exam.getTopicId())) {
+				continue;
+			}
+			if (!StringUtils.hasText(exam.getTopicId())) {
+				exam.setTopicId(topic.getId());
+				examRepo.save(exam);
+			}
+			examIds.add(examId);
 		}
 		topic.setExamIds(examIds);
 		topicRepo.save(topic);
 		return new TopicResponse(topic);
 	}
 
+	private List<Exam> listPracticeExamsOfTopic(Topic topic) {
+		List<Exam> exams = new ArrayList<>();
+		Set<String> seen = new LinkedHashSet<>();
+		List<String> examIds = topic.getExamIds() == null ? Collections.emptyList() : topic.getExamIds();
+		if (!examIds.isEmpty()) {
+			Map<String, Exam> byId = new HashMap<>();
+			List<Exam> byIds = examRepo.findByIdInAndDeletedIsFalse(examIds);
+			if (byIds != null) {
+				for (Exam exam : byIds) {
+					if (exam != null && StringUtils.hasText(exam.getId())) {
+						byId.put(exam.getId(), exam);
+					}
+				}
+			}
+			for (String examId : examIds) {
+				addPartExamOfTopic(exams, seen, byId.get(examId), topic.getId());
+			}
+		}
+		List<Exam> byTopic = examRepo.findAllByTopicIdAndDeletedIsFalse(topic.getId());
+		if (byTopic != null) {
+			for (Exam exam : byTopic) {
+				addPartExamOfTopic(exams, seen, exam, topic.getId());
+			}
+		}
+		return exams;
+	}
+
+	private void addPartExam(List<Exam> exams, Set<String> seen, Exam exam) {
+		if (exam == null || !StringUtils.hasText(exam.getId()) || Boolean.TRUE.equals(exam.getPracticeTest())) {
+			return;
+		}
+		if (seen.add(exam.getId())) {
+			exams.add(exam);
+		}
+	}
+
+	private void addPartExamOfTopic(List<Exam> exams, Set<String> seen, Exam exam, String topicId) {
+		if (exam == null || Boolean.TRUE.equals(exam.getPracticeTest())) {
+			return;
+		}
+		if (StringUtils.hasText(exam.getTopicId()) && !topicId.equals(exam.getTopicId())) {
+			return;
+		}
+		addPartExam(exams, seen, exam);
+	}
+
 	private TopicResponse buildTopicByIdResponse(Topic topic, List<Exam> exams, List<History> histories) {
 		TopicResponse topicResponse = new TopicResponse(topic);
+		List<History> orderedHistories = new ArrayList<>();
+		if (histories != null) {
+			orderedHistories.addAll(histories);
+		}
+		orderedHistories.sort(Comparator.comparing(History::getLastModifiedDate, Comparator.nullsFirst(Date::compareTo)));
 		List<ExamDataResponse> examDataResponse = new ArrayList<>();
 		exams.forEach(p -> {
 			ExamDataResponse response = new ExamDataResponse(p);
-			histories.forEach(h -> {
-				if (h.getExamResults() == null) {
+			orderedHistories.forEach(h -> {
+				if (h == null || h.getExamResults() == null) {
 					return;
 				}
 				h.getExamResults().forEach(e -> {
-					if (e.getId() != null && e.getId().equals(p.getId())) {
+					if (e != null && e.getId() != null && e.getId().equals(p.getId()) && e.getProgress() != null) {
 						response.setProgress(e.getProgress());
 					}
 				});

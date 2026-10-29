@@ -9,6 +9,8 @@ import exam.ultis.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -27,17 +29,19 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	public LoginResponse login(LoginRequest request) throws ExamBaseException {
 		try {
+			String password = request.getPassword() == null ? "" : request.getPassword().trim();
 			Authentication authentication = authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+					new UsernamePasswordAuthenticationToken(request.getEmail(), password));
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 			User user = (User) authentication.getPrincipal();
-			if (user.getOtp() != null) {
-				throw new ExamBaseException(ErrorInfo.PLEASE_VERIFY_OTP);
+			if (user.isDeleted()) {
+				SecurityContextHolder.clearContext();
+				throw new ExamBaseException(ErrorInfo.ACCOUNT_LOCKED);
 			}
 			String jwt = jwtUtils.generateJwtToken(user);
 			return new LoginResponse(jwt, user);
-		} catch (ExamBaseException e) {
-			throw e;
+		} catch (LockedException | DisabledException e) {
+			throw new ExamBaseException(ErrorInfo.ACCOUNT_LOCKED);
 		} catch (BadCredentialsException e) {
 			throw new ExamBaseException(ErrorInfo.INCORRECT_PASSWORD_ERROR);
 		} catch (AuthenticationException e) {

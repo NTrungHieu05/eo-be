@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -58,16 +59,39 @@ class AuthServiceImplTest {
 	}
 
 	@Test
-	void loginRejectsAccountThatStillHasOtp() {
+	void loginIgnoresLeftoverOtp() throws ExamBaseException {
 		User user = TestUsers.user("user-1", RoleEnum.ROLE_USER);
 		user.setOtp("123456");
-		when(authenticationManager.authenticate(any()))
-				.thenReturn(new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities()));
+		Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+		when(authenticationManager.authenticate(any())).thenReturn(authentication);
+		when(jwtUtils.generateJwtToken(user)).thenReturn("jwt-token");
+
+		LoginResponse response = authService.login(loginRequest());
+
+		assertThat(response.getAccess_token()).isEqualTo("jwt-token");
+	}
+
+	@Test
+	void loginRejectsDeletedAccount() {
+		User user = TestUsers.user("user-1", RoleEnum.ROLE_USER);
+		user.setDeleted(true);
+		Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+		when(authenticationManager.authenticate(any())).thenReturn(authentication);
 
 		assertThatThrownBy(() -> authService.login(loginRequest()))
 				.isInstanceOf(ExamBaseException.class)
 				.extracting(ex -> ((ExamBaseException) ex).getError().getCode())
-				.isEqualTo(ErrorInfo.PLEASE_VERIFY_OTP_CODE);
+				.isEqualTo(ErrorInfo.ACCOUNT_LOCKED_CODE);
+	}
+
+	@Test
+	void loginMapsLockedAccount() {
+		when(authenticationManager.authenticate(any())).thenThrow(new LockedException("locked"));
+
+		assertThatThrownBy(() -> authService.login(loginRequest()))
+				.isInstanceOf(ExamBaseException.class)
+				.extracting(ex -> ((ExamBaseException) ex).getError().getCode())
+				.isEqualTo(ErrorInfo.ACCOUNT_LOCKED_CODE);
 	}
 
 	@Test

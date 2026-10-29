@@ -10,9 +10,11 @@ import exam.db.dto.skill.ListSkillResponse;
 import exam.db.dto.topic.ListTopicRequest;
 import exam.db.dto.topic.ListTopicResponse;
 import exam.db.dto.user.BlockUserRequest;
+import exam.db.dto.user.CreateUserRequest;
 import exam.db.dto.user.ListUserRequest;
 import exam.db.dto.user.ListUserResponse;
 import exam.db.dto.user.UnblockUserRequest;
+import exam.db.dto.user.UserResponse;
 import exam.rest.endpoint.Endpoints;
 import exam.service.admin.AdminService;
 import exam.ultis.ExamBaseException;
@@ -36,6 +38,17 @@ public class AdminController {
 		ResponseObject<ListUserResponse> response = new ResponseObject<>();
 		try {
 			response.setResponseData(adminService.listUserForAdmin(request));
+		} catch (ExamBaseException e) {
+			response.setError(e.getError());
+		}
+		return new ResponseEntity<>(response, new HttpHeaders(), HttpStatus.OK);
+	}
+
+	@PostMapping(Endpoints.ADMIN_USERS_URL)
+	public final ResponseEntity<Object> createUser(@RequestBody CreateUserRequest request) {
+		ResponseObject<UserResponse> response = new ResponseObject<>();
+		try {
+			response.setResponseData(adminService.createUserForAdmin(request));
 		} catch (ExamBaseException e) {
 			response.setError(e.getError());
 		}

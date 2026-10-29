@@ -20,6 +20,8 @@ public class PracticeTestResponse {
 	private Integer listeningQuestionCount;
 	private Integer readingQuestionCount;
 	private Integer questionCount;
+	private Integer progress;
+	private Boolean scaledScore;
 	private long total;
 	private List<PracticeTestPartResponse> parts = new ArrayList<>();
 	private List<CardResponse> cards = new ArrayList<>();

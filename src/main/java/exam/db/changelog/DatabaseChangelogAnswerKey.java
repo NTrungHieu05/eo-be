@@ -3,8 +3,8 @@ package exam.db.changelog;
 import com.github.cloudyrock.mongock.ChangeLog;
 import com.github.cloudyrock.mongock.ChangeSet;
 import exam.db.entity.Answer;
-import exam.db.entity.Card;
-import exam.db.repository.card.CardRepository;
+import exam.db.entity.Question;
+import exam.db.repository.question.QuestionRepository;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -16,26 +16,26 @@ import java.util.List;
 public class DatabaseChangelogAnswerKey {
 
 	@ChangeSet(id = "repair_letter_answer_keys", author = "system", order = "001")
-	public void repairLetterAnswerKeys(CardRepository cardRepo) {
-		List<Card> cards = cardRepo.findAllByDeletedIsFalse();
+	public void repairLetterAnswerKeys(QuestionRepository questionRepo) {
+		List<Question> questions = questionRepo.findAllByDeletedIsFalse();
 		int updated = 0;
-		for (Card card : cards) {
-			boolean changed = repairCard(card);
+		for (Question question : questions) {
+			boolean changed = repairQuestion(question);
 			if (changed) {
-				cardRepo.save(card);
+				questionRepo.save(question);
 				updated++;
 			}
 		}
-		log.info("Repaired letter answer keys on {} cards", updated);
+		log.info("Repaired letter answer keys on {} questions", updated);
 	}
 
-	static boolean repairCard(Card card) {
-		if (card == null) {
+	static boolean repairQuestion(Question question) {
+		if (question == null) {
 			return false;
 		}
-		boolean changed = repairAnswer(card.getAnswer());
-		if (card.getChildCards() != null) {
-			for (Card child : card.getChildCards()) {
+		boolean changed = repairAnswer(question.getAnswer());
+		if (question.getChildQuestions() != null) {
+			for (Question child : question.getChildQuestions()) {
 				changed = repairAnswer(child == null ? null : child.getAnswer()) || changed;
 			}
 		}

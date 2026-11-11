@@ -47,7 +47,7 @@ public class FieldConst {
 	public static final String TEXT = "text";
 
 	public static final String TIME = "time";
-	public static final String CARD_IDS = "cardIds";
+	public static final String QUESTION_IDS = "questionIds";
 
 	public static final String CHOICES = "choices";
 	public static final String HINT = "hint";
@@ -57,7 +57,7 @@ public class FieldConst {
 	public static final String TOPIC_ID = "topicId";
 	public static final String EXAM_ID = "examId";
 	public static final String IS_QUESTION_GROUP = "isQuestionGroup";
-	public static final String CHILD_CARDS = "childCards";
+	public static final String CHILD_QUESTIONS = "childQuestions";
 
 	public static final String EXAM_IDS = "examIds";
 	public static final String TOPIC_IDS = "topicIds";

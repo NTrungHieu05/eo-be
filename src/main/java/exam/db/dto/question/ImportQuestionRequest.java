@@ -1,10 +1,10 @@
-package exam.db.dto.card;
+package exam.db.dto.question;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class ImportCardRequest {
+public class ImportQuestionRequest {
 	private String filePath;
 }

@@ -1,7 +1,7 @@
 package exam.rest.exam;
 
 import exam.db.dto.ResponseObject;
-import exam.db.dto.exam.AddCardToExamRequest;
+import exam.db.dto.exam.AddQuestionToExamRequest;
 import exam.db.dto.exam.CreateExamRequest;
 import exam.db.dto.exam.DeleteExamRequest;
 import exam.db.dto.exam.ExamResponse;
@@ -75,22 +75,22 @@ public class ExamController {
 		return new ResponseEntity<>(response, new HttpHeaders(), HttpStatus.OK);
 	}
 
-	@GetMapping(Endpoints.EXAM_CARD_URL + Endpoints.PATH_VARIABLE_EXAM_ID_URL)
-	public final ResponseEntity<Object> getListCard(@PathVariable(DBConst.EXAM_ID) String examId) {
+	@GetMapping(Endpoints.EXAM_QUESTION_URL + Endpoints.PATH_VARIABLE_EXAM_ID_URL)
+	public final ResponseEntity<Object> getListQuestion(@PathVariable(DBConst.EXAM_ID) String examId) {
 		ResponseObject<ExamResponse> response = new ResponseObject<>();
 		try {
-			response.setResponseData(examService.getAllCardsByExamId(examId));
+			response.setResponseData(examService.getAllQuestionsByExamId(examId));
 		} catch (ExamBaseException e) {
 			response.setError(e.getError());
 		}
 		return new ResponseEntity<>(response, new HttpHeaders(), HttpStatus.OK);
 	}
 
-	@PostMapping(Endpoints.EXAM_ADD_CARD_URL)
-	public final ResponseEntity<Object> addCard(@RequestBody AddCardToExamRequest request) {
+	@PostMapping(Endpoints.EXAM_ADD_QUESTION_URL)
+	public final ResponseEntity<Object> addQuestion(@RequestBody AddQuestionToExamRequest request) {
 		ResponseObject<ExamResponse> response = new ResponseObject<>();
 		try {
-			response.setResponseData(examService.addCard(request));
+			response.setResponseData(examService.addQuestion(request));
 		} catch (ExamBaseException e) {
 			response.setError(e.getError());
 		}

@@ -1,7 +1,7 @@
 package exam.db.changelog;
 
 import exam.db.entity.Answer;
-import exam.db.entity.Card;
+import exam.db.entity.Question;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -43,16 +43,16 @@ class DatabaseChangelogAnswerKeyTest {
 	}
 
 	@Test
-	void repairAlsoFixesChildCards() {
+	void repairAlsoFixesChildQuestions() {
 		Answer childAnswer = new Answer();
 		childAnswer.setChoices(Arrays.asList("At the office.", "Tomorrow morning.", "Yes, she did."));
 		childAnswer.setTexts(Collections.singletonList("(B)"));
-		Card child = new Card();
+		Question child = new Question();
 		child.setAnswer(childAnswer);
-		Card parent = new Card();
-		parent.setChildCards(Collections.singletonList(child));
+		Question parent = new Question();
+		parent.setChildQuestions(Collections.singletonList(child));
 
-		assertThat(DatabaseChangelogAnswerKey.repairCard(parent)).isTrue();
+		assertThat(DatabaseChangelogAnswerKey.repairQuestion(parent)).isTrue();
 		assertThat(childAnswer.getTexts()).containsExactly("Tomorrow morning.");
 		assertThat(childAnswer.getChoices()).containsExactly("At the office.", "Yes, she did.");
 		assertThat(childAnswer.getHint()).isEqualTo("B");

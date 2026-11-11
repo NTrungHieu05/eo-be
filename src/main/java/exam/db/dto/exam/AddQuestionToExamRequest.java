@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class AddCardToExamRequest {
+public class AddQuestionToExamRequest {
 	private String id;
-	private List<String> cardIds;
+	private List<String> questionIds;
 }

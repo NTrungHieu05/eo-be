@@ -11,7 +11,7 @@ public class CollectionConst {
 	public static final String MEDIA = "media";
 	public static final String USER_RECOVERY = "user_recovery";
 	public static final String EXAM = "exam";
-	public static final String CARD = "card";
+	public static final String QUESTION = "question";
 	public static final String TOPIC = "topic";
 	public static final String SKILL = "skill";
 	public static final String HISTORY = "history";

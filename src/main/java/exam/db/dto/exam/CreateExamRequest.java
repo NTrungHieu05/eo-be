@@ -10,6 +10,6 @@ import java.util.List;
 public class CreateExamRequest {
 	private String name;
 	private String topicId;
-	private List<String> cardIds;
+	private List<String> questionIds;
 	private Boolean practiceTest;
 }

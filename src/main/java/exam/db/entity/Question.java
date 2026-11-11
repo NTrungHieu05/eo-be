@@ -1,13 +1,45 @@
 package exam.db.entity;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import exam.db.enums.CollectionConst;
+import exam.db.enums.FieldConst;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.List;
+
+@Document(collection = CollectionConst.QUESTION)
 @Data
 @NoArgsConstructor
-public class Question {
-	private String sound;
-	private String image;
-	private String hint;
-	private String text;
+@EqualsAndHashCode(callSuper = false)
+public class Question extends AbstractVersion {
+	@Id
+	private String id;
+
+	@Field(FieldConst.QUESTION)
+	private QuestionContent question;
+
+	@Field(FieldConst.ANSWER)
+	private Answer answer;
+
+	@Field(FieldConst.TOPIC_ID)
+	private String topicId;
+
+	@Field(FieldConst.CHILD_QUESTIONS)
+	private List<Question> childQuestions;
+
+	@Field(FieldConst.EXAM_ID)
+	private String examId;
+
+	@Field(FieldConst.IS_QUESTION_GROUP)
+	private Boolean isQuestionGroup;
+
+	@JsonGetter("_id")
+	public String getJsonId() {
+		return id;
+	}
 }

@@ -1,6 +1,6 @@
 package exam.service.exam;
 
-import exam.db.dto.exam.AddCardToExamRequest;
+import exam.db.dto.exam.AddQuestionToExamRequest;
 import exam.db.dto.exam.CreateExamRequest;
 import exam.db.dto.exam.DeleteExamRequest;
 import exam.db.dto.exam.ExamResponse;
@@ -12,16 +12,16 @@ import exam.db.dto.exam.PracticeTestResponse;
 import exam.db.dto.exam.ToeicScoreRequest;
 import exam.db.dto.exam.ToeicScoreResponse;
 import exam.db.dto.exam.UpdateExamRequest;
-import exam.db.dto.card.CardResponse;
+import exam.db.dto.question.QuestionResponse;
 import exam.db.dto.user.ExamUser;
-import exam.db.entity.Card;
+import exam.db.entity.Question;
 import exam.db.entity.Exam;
 import exam.db.entity.ExamResult;
 import exam.db.entity.History;
 import exam.db.entity.Topic;
 import exam.db.enums.Assert;
 import exam.db.enums.ErrorInfo;
-import exam.db.repository.card.CardRepository;
+import exam.db.repository.question.QuestionRepository;
 import exam.db.repository.exam.ExamRepository;
 import exam.db.repository.history.HistoryRepository;
 import exam.db.repository.topic.TopicRepository;
@@ -54,7 +54,7 @@ public class ExamServiceImpl implements ExamService {
 	private ExamRepository examRepo;
 
 	@Autowired
-	private CardRepository cardRepo;
+	private QuestionRepository questionRepo;
 
 	@Autowired
 	private TopicRepository topicRepo;
@@ -77,7 +77,7 @@ public class ExamServiceImpl implements ExamService {
 			exam.setTopicId(null);
 			exam.setPracticeTest(true);
 		}
-		exam.setCardIds(filterCardIds(request.getCardIds(), exam.getTopicId(), practiceTest));
+		exam.setQuestionIds(filterQuestionIds(request.getQuestionIds(), exam.getTopicId(), practiceTest));
 		examRepo.save(exam);
 		attachExamToTopic(exam.getId(), exam.getTopicId());
 		return new ExamResponse(exam);
@@ -112,8 +112,8 @@ public class ExamServiceImpl implements ExamService {
 				attachExamToTopic(exam.getId(), exam.getTopicId());
 			}
 		}
-		if (request.getCardIds() != null) {
-			exam.setCardIds(filterCardIds(request.getCardIds(), exam.getTopicId(), practiceTest));
+		if (request.getQuestionIds() != null) {
+			exam.setQuestionIds(filterQuestionIds(request.getQuestionIds(), exam.getTopicId(), practiceTest));
 		}
 		examRepo.save(exam);
 		return new ExamResponse(exam);
@@ -154,17 +154,17 @@ public class ExamServiceImpl implements ExamService {
 	}
 
 	@Override
-	public ExamResponse getAllCardsByExamId(String examId) throws ExamBaseException {
+	public ExamResponse getAllQuestionsByExamId(String examId) throws ExamBaseException {
 		requireUser();
 		Exam exam = examRepo.findFirstByIdAndDeletedIsFalse(examId);
 		Assert.notNull(exam, ErrorInfo.EXAM_NOT_FOUND_ERROR);
 		Assert.isTrue(!Boolean.TRUE.equals(exam.getPracticeTest()), ErrorInfo.EXAM_NOT_FOUND_ERROR);
-		List<String> cardIds = exam.getCardIds() == null ? Collections.emptyList() : exam.getCardIds();
-		List<Card> cards = cardIds.isEmpty()
+		List<String> questionIds = exam.getQuestionIds() == null ? Collections.emptyList() : exam.getQuestionIds();
+		List<Question> questions = questionIds.isEmpty()
 				? new ArrayList<>()
-				: cardRepo.findByIdInAndDeletedIsFalse(cardIds);
+				: questionRepo.findByIdInAndDeletedIsFalse(questionIds);
 		ExamResponse response = new ExamResponse(exam);
-		response.setCards(orderCards(exam.getCardIds(), cards));
+		response.setQuestions(orderQuestions(exam.getQuestionIds(), questions));
 		return response;
 	}
 
@@ -216,41 +216,41 @@ public class ExamServiceImpl implements ExamService {
 
 	@Override
 	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
-	public ExamResponse addCard(AddCardToExamRequest request) throws ExamBaseException {
+	public ExamResponse addQuestion(AddQuestionToExamRequest request) throws ExamBaseException {
 		requireUser();
 		Assert.notEmpty(request.getId(), ErrorInfo.EXAM_NOT_FOUND_ERROR);
-		Assert.notEmpty(request.getCardIds(), ErrorInfo.BAD_REQUEST);
+		Assert.notEmpty(request.getQuestionIds(), ErrorInfo.BAD_REQUEST);
 		Exam exam = examRepo.findFirstByIdAndDeletedIsFalse(request.getId());
 		Assert.notNull(exam, ErrorInfo.EXAM_NOT_FOUND_ERROR);
-		List<String> cardIds = exam.getCardIds() == null ? new ArrayList<>() : new ArrayList<>(exam.getCardIds());
-		for (String cardId : request.getCardIds()) {
-			if (!StringUtils.hasText(cardId) || cardIds.contains(cardId)) {
+		List<String> questionIds = exam.getQuestionIds() == null ? new ArrayList<>() : new ArrayList<>(exam.getQuestionIds());
+		for (String questionId : request.getQuestionIds()) {
+			if (!StringUtils.hasText(questionId) || questionIds.contains(questionId)) {
 				continue;
 			}
-			Card card = cardRepo.findFirstByIdAndDeletedIsFalse(cardId);
-			if (card == null) {
+			Question question = questionRepo.findFirstByIdAndDeletedIsFalse(questionId);
+			if (question == null) {
 				continue;
 			}
 			if (!Boolean.TRUE.equals(exam.getPracticeTest())
 					&& StringUtils.hasText(exam.getTopicId())
-					&& !exam.getTopicId().equals(card.getTopicId())) {
+					&& !exam.getTopicId().equals(question.getTopicId())) {
 				continue;
 			}
-			cardIds.add(cardId);
+			questionIds.add(questionId);
 		}
-		exam.setCardIds(cardIds);
+		exam.setQuestionIds(questionIds);
 		examRepo.save(exam);
 		return new ExamResponse(exam);
 	}
 
-	private List<PracticeTestPartResponse> buildParts(List<Card> cards, Map<String, Integer> partByTopic) {
-		Map<String, List<Card>> byTopic = new LinkedHashMap<>();
-		for (Card card : cards) {
-			byTopic.computeIfAbsent(card.getTopicId(), key -> new ArrayList<>()).add(card);
+	private List<PracticeTestPartResponse> buildParts(List<Question> questions, Map<String, Integer> partByTopic) {
+		Map<String, List<Question>> byTopic = new LinkedHashMap<>();
+		for (Question question : questions) {
+			byTopic.computeIfAbsent(question.getTopicId(), key -> new ArrayList<>()).add(question);
 		}
 		Map<Integer, PracticePartBucket> buckets = new TreeMap<>();
 		int sequence = 1;
-		for (Map.Entry<String, List<Card>> entry : byTopic.entrySet()) {
+		for (Map.Entry<String, List<Question>> entry : byTopic.entrySet()) {
 			int parsed = partByTopic.getOrDefault(entry.getKey(), 0);
 			int part;
 			if (parsed > 0) {
@@ -263,7 +263,7 @@ public class ExamServiceImpl implements ExamService {
 			}
 			PracticePartBucket bucket = buckets.computeIfAbsent(part, key -> new PracticePartBucket());
 			bucket.questionCount += countQuestions(entry.getValue());
-			bucket.cardCount += entry.getValue().size();
+			bucket.questionRecordCount += entry.getValue().size();
 			if (bucket.topicId == null) {
 				bucket.topicId = entry.getKey();
 			}
@@ -272,7 +272,7 @@ public class ExamServiceImpl implements ExamService {
 		for (Map.Entry<Integer, PracticePartBucket> entry : buckets.entrySet()) {
 			PracticePartBucket bucket = entry.getValue();
 			parts.add(new PracticeTestPartResponse(
-					entry.getKey(), partName(entry.getKey()), bucket.topicId, bucket.questionCount, bucket.cardCount));
+					entry.getKey(), partName(entry.getKey()), bucket.topicId, bucket.questionCount, bucket.questionRecordCount));
 		}
 		return parts;
 	}
@@ -298,24 +298,24 @@ public class ExamServiceImpl implements ExamService {
 		}
 	}
 
-	private List<String> filterCardIds(List<String> cardIds, String topicId, boolean practiceTest) {
-		if (cardIds == null || cardIds.isEmpty()) {
-			return cardIds == null ? new ArrayList<>() : cardIds;
+	private List<String> filterQuestionIds(List<String> questionIds, String topicId, boolean practiceTest) {
+		if (questionIds == null || questionIds.isEmpty()) {
+			return questionIds == null ? new ArrayList<>() : questionIds;
 		}
-		List<Card> found = cardRepo.findByIdInAndDeletedIsFalse(cardIds);
+		List<Question> found = questionRepo.findByIdInAndDeletedIsFalse(questionIds);
 		if (found == null) {
 			found = new ArrayList<>();
 		}
-		Map<String, Card> byId = found.stream()
+		Map<String, Question> byId = found.stream()
 				.filter(Objects::nonNull)
-				.collect(Collectors.toMap(Card::getId, card -> card, (left, right) -> left));
+				.collect(Collectors.toMap(Question::getId, question -> question, (left, right) -> left));
 		List<String> filtered = new ArrayList<>();
-		for (String id : cardIds) {
-			Card card = byId.get(id);
-			if (card == null) {
+		for (String id : questionIds) {
+			Question question = byId.get(id);
+			if (question == null) {
 				continue;
 			}
-			if (!practiceTest && StringUtils.hasText(topicId) && !topicId.equals(card.getTopicId())) {
+			if (!practiceTest && StringUtils.hasText(topicId) && !topicId.equals(question.getTopicId())) {
 				continue;
 			}
 			filtered.add(id);
@@ -354,11 +354,11 @@ public class ExamServiceImpl implements ExamService {
 		}
 	}
 
-	private PracticeTestResponse toPracticeTestResponse(Exam exam, boolean includeCards) {
-		List<String> cardIds = exam.getCardIds() == null ? Collections.emptyList() : exam.getCardIds();
-		List<Card> cards = cardIds.isEmpty()
+	private PracticeTestResponse toPracticeTestResponse(Exam exam, boolean includeQuestions) {
+		List<String> questionIds = exam.getQuestionIds() == null ? Collections.emptyList() : exam.getQuestionIds();
+		List<Question> questions = questionIds.isEmpty()
 				? new ArrayList<>()
-				: orderCards(cardIds, cardRepo.findByIdInAndDeletedIsFalse(cardIds));
+				: orderQuestions(questionIds, questionRepo.findByIdInAndDeletedIsFalse(questionIds));
 
 		PracticeTestResponse response = new PracticeTestResponse(exam);
 		response.setDurationMinutes(120);
@@ -366,58 +366,58 @@ public class ExamServiceImpl implements ExamService {
 		response.setReadingMinutes(75);
 		response.setListeningQuestionCount(100);
 		response.setReadingQuestionCount(100);
-		int questionCount = countQuestions(cards);
+		int questionCount = countQuestions(questions);
 		response.setQuestionCount(questionCount);
 		response.setTotal(questionCount);
-		response.setScaledScore(isOfficialScale(cards));
-		if (includeCards) {
-			Map<String, Integer> partByTopic = partNumbers(cards);
-			cards = orderCardsByToeicPart(cards, partByTopic);
-			response.setCards(cards.stream()
-					.map(card -> toCardResponse(card, partByTopic))
+		response.setScaledScore(isOfficialScale(questions));
+		if (includeQuestions) {
+			Map<String, Integer> partByTopic = partNumbers(questions);
+			questions = orderQuestionsByToeicPart(questions, partByTopic);
+			response.setQuestions(questions.stream()
+					.map(question -> toQuestionResponse(question, partByTopic))
 					.collect(Collectors.toList()));
-			response.setParts(buildParts(cards, partByTopic));
+			response.setParts(buildParts(questions, partByTopic));
 		}
 		return response;
 	}
 
-	private CardResponse toCardResponse(Card card, Map<String, Integer> partByTopic) {
-		CardResponse response = new CardResponse(card);
-		int part = partByTopic.getOrDefault(card.getTopicId(), 0);
+	private QuestionResponse toQuestionResponse(Question question, Map<String, Integer> partByTopic) {
+		QuestionResponse response = new QuestionResponse(question);
+		int part = partByTopic.getOrDefault(question.getTopicId(), 0);
 		if (part > 0) {
 			response.setPartNumber(part);
 		}
 		return response;
 	}
 
-	private List<Card> orderCardsByToeicPart(List<Card> cards, Map<String, Integer> partByTopic) {
-		if (cards == null || cards.size() < 2 || partByTopic.values().stream().noneMatch(part -> part > 0)) {
-			return cards;
+	private List<Question> orderQuestionsByToeicPart(List<Question> questions, Map<String, Integer> partByTopic) {
+		if (questions == null || questions.size() < 2 || partByTopic.values().stream().noneMatch(part -> part > 0)) {
+			return questions;
 		}
 		Map<String, Integer> firstIndex = new HashMap<>();
 		List<Integer> order = new ArrayList<>();
-		for (int i = 0; i < cards.size(); i++) {
+		for (int i = 0; i < questions.size(); i++) {
 			order.add(i);
-			firstIndex.putIfAbsent(cards.get(i).getTopicId(), i);
+			firstIndex.putIfAbsent(questions.get(i).getTopicId(), i);
 		}
 		order.sort(Comparator
 				.comparingInt((Integer index) -> {
-					int part = partByTopic.getOrDefault(cards.get(index).getTopicId(), 0);
+					int part = partByTopic.getOrDefault(questions.get(index).getTopicId(), 0);
 					return part > 0 ? part : 99;
 				})
-				.thenComparingInt(index -> firstIndex.getOrDefault(cards.get(index).getTopicId(), index))
+				.thenComparingInt(index -> firstIndex.getOrDefault(questions.get(index).getTopicId(), index))
 				.thenComparingInt(index -> index));
-		List<Card> sorted = new ArrayList<>();
+		List<Question> sorted = new ArrayList<>();
 		for (Integer index : order) {
-			sorted.add(cards.get(index));
+			sorted.add(questions.get(index));
 		}
 		return sorted;
 	}
 
-	private Map<String, Integer> partNumbers(List<Card> cards) {
+	private Map<String, Integer> partNumbers(List<Question> questions) {
 		Map<String, Integer> parts = new HashMap<>();
-		for (Card card : cards) {
-			String topicId = card.getTopicId();
+		for (Question question : questions) {
+			String topicId = question.getTopicId();
 			if (topicId == null || parts.containsKey(topicId)) {
 				continue;
 			}
@@ -442,20 +442,20 @@ public class ExamServiceImpl implements ExamService {
 	private static class PracticePartBucket {
 		private String topicId;
 		private int questionCount;
-		private int cardCount;
+		private int questionRecordCount;
 	}
 
-	private int countQuestions(List<Card> cards) {
+	private int countQuestions(List<Question> questions) {
 		int total = 0;
-		if (cards == null) {
+		if (questions == null) {
 			return 0;
 		}
-		for (Card card : cards) {
-			if (card == null) {
+		for (Question question : questions) {
+			if (question == null) {
 				continue;
 			}
-			if (isQuestionGroup(card)) {
-				total += card.getChildCards() == null ? 0 : card.getChildCards().size();
+			if (isQuestionGroup(question)) {
+				total += question.getChildQuestions() == null ? 0 : question.getChildQuestions().size();
 			} else {
 				total += 1;
 			}
@@ -463,23 +463,23 @@ public class ExamServiceImpl implements ExamService {
 		return total;
 	}
 
-	private boolean isQuestionGroup(Card card) {
-		return Boolean.TRUE.equals(card.getIsQuestionGroup())
-				|| (card.getChildCards() != null && !card.getChildCards().isEmpty());
+	private boolean isQuestionGroup(Question question) {
+		return Boolean.TRUE.equals(question.getIsQuestionGroup())
+				|| (question.getChildQuestions() != null && !question.getChildQuestions().isEmpty());
 	}
 
-	private List<Card> orderCards(List<String> cardIds, List<Card> cards) {
-		if (cardIds == null || cardIds.isEmpty()) {
-			return cards == null ? new ArrayList<>() : cards;
+	private List<Question> orderQuestions(List<String> questionIds, List<Question> questions) {
+		if (questionIds == null || questionIds.isEmpty()) {
+			return questions == null ? new ArrayList<>() : questions;
 		}
-		Map<String, Card> byId = cards.stream()
+		Map<String, Question> byId = questions.stream()
 				.filter(Objects::nonNull)
-				.collect(Collectors.toMap(Card::getId, card -> card, (left, right) -> left));
-		List<Card> ordered = new ArrayList<>();
-		for (String id : cardIds) {
-			Card card = byId.get(id);
-			if (card != null) {
-				ordered.add(card);
+				.collect(Collectors.toMap(Question::getId, question -> question, (left, right) -> left));
+		List<Question> ordered = new ArrayList<>();
+		for (String id : questionIds) {
+			Question question = byId.get(id);
+			if (question != null) {
+				ordered.add(question);
 			}
 		}
 		return ordered;
@@ -506,23 +506,23 @@ public class ExamServiceImpl implements ExamService {
 		return progress;
 	}
 
-	private boolean isOfficialScale(List<Card> cards) {
-		if (cards == null) {
+	private boolean isOfficialScale(List<Question> questions) {
+		if (questions == null) {
 			return false;
 		}
-		Map<String, Integer> partByTopic = partNumbers(cards);
+		Map<String, Integer> partByTopic = partNumbers(questions);
 		int listening = 0;
 		int reading = 0;
 		int questionNo = 0;
-		for (Card card : cards) {
-			if (card == null) {
+		for (Question question : questions) {
+			if (question == null) {
 				continue;
 			}
-			int part = partByTopic.getOrDefault(card.getTopicId(), 0);
-			int questions = isQuestionGroup(card)
-					? (card.getChildCards() == null ? 0 : card.getChildCards().size())
+			int part = partByTopic.getOrDefault(question.getTopicId(), 0);
+			int leaves = isQuestionGroup(question)
+					? (question.getChildQuestions() == null ? 0 : question.getChildQuestions().size())
 					: 1;
-			for (int i = 0; i < questions; i++) {
+			for (int i = 0; i < leaves; i++) {
 				questionNo++;
 				if (isListening(part, questionNo)) {
 					listening++;

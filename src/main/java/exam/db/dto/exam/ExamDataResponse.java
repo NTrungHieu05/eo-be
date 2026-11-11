@@ -12,11 +12,11 @@ public class ExamDataResponse {
 	private String id;
 	private String name;
 	private Integer progress;
-	private List<String> cardIds;
+	private List<String> questionIds;
 
 	public ExamDataResponse(Exam exam) {
 		this.id = exam.getId();
 		this.name = exam.getName();
-		this.cardIds = exam.getCardIds();
+		this.questionIds = exam.getQuestionIds();
 	}
 }

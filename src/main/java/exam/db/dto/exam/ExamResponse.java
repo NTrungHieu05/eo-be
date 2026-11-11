@@ -1,6 +1,6 @@
 package exam.db.dto.exam;
 
-import exam.db.entity.Card;
+import exam.db.entity.Question;
 import exam.db.entity.Exam;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,8 +14,8 @@ public class ExamResponse {
 	private String id;
 	private String name;
 	private String topicId;
-	private List<String> cardIds;
-	private List<Card> cards;
+	private List<String> questionIds;
+	private List<Question> questions;
 	private Boolean practiceTest;
 
 	public ExamResponse(Exam exam) {

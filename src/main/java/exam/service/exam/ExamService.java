@@ -1,6 +1,6 @@
 package exam.service.exam;
 
-import exam.db.dto.exam.AddCardToExamRequest;
+import exam.db.dto.exam.AddQuestionToExamRequest;
 import exam.db.dto.exam.CreateExamRequest;
 import exam.db.dto.exam.DeleteExamRequest;
 import exam.db.dto.exam.ListExamRequest;
@@ -24,7 +24,7 @@ public interface ExamService {
 
 	ListExamResponse getListExamForAdmin(ListExamRequest request) throws ExamBaseException;
 
-	ExamResponse getAllCardsByExamId(String examId) throws ExamBaseException;
+	ExamResponse getAllQuestionsByExamId(String examId) throws ExamBaseException;
 
 	ListPracticeTestResponse listPracticeTests() throws ExamBaseException;
 
@@ -32,5 +32,5 @@ public interface ExamService {
 
 	ToeicScoreResponse score(ToeicScoreRequest request) throws ExamBaseException;
 
-	ExamResponse addCard(AddCardToExamRequest request) throws ExamBaseException;
+	ExamResponse addQuestion(AddQuestionToExamRequest request) throws ExamBaseException;
 }

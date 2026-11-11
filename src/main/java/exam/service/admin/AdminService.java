@@ -1,7 +1,7 @@
 package exam.service.admin;
 
-import exam.db.dto.card.ListCardRequest;
-import exam.db.dto.card.ListCardResponse;
+import exam.db.dto.question.ListQuestionRequest;
+import exam.db.dto.question.ListQuestionResponse;
 import exam.db.dto.exam.ListExamRequest;
 import exam.db.dto.exam.ListExamResponse;
 import exam.db.dto.skill.ListSkillRequest;
@@ -25,7 +25,7 @@ public interface AdminService {
 
 	Boolean unblockUser(UnblockUserRequest request) throws ExamBaseException;
 
-	ListCardResponse getListCardForAdmin(ListCardRequest request) throws ExamBaseException;
+	ListQuestionResponse getListQuestionForAdmin(ListQuestionRequest request) throws ExamBaseException;
 
 	ListSkillResponse getListSkillForAdmin(ListSkillRequest request) throws ExamBaseException;
 

@@ -2,11 +2,11 @@ package exam.db.changelog;
 
 import com.github.cloudyrock.mongock.ChangeLog;
 import com.github.cloudyrock.mongock.ChangeSet;
-import exam.db.entity.Card;
+import exam.db.entity.Question;
 import exam.db.entity.Exam;
 import exam.db.entity.Skill;
 import exam.db.entity.Topic;
-import exam.db.repository.card.CardRepository;
+import exam.db.repository.question.QuestionRepository;
 import exam.db.repository.exam.ExamRepository;
 import exam.db.repository.skill.SkillRepository;
 import exam.db.repository.topic.TopicRepository;
@@ -23,7 +23,7 @@ public class DatabaseChangelogCleanup {
 
 	@ChangeSet(id = "dedupe_skills_and_link_part_exams", author = "system", order = "001")
 	public void dedupeSkillsAndLinkPartExams(SkillRepository skillRepo, TopicRepository topicRepo,
-			ExamRepository examRepo, CardRepository cardRepo) {
+			ExamRepository examRepo, QuestionRepository questionRepo) {
 		int removed = 0;
 		for (Skill skill : skillRepo.findAllByDeletedIsFalse()) {
 			if (skill.getTopicIds() == null || skill.getTopicIds().isEmpty()) {
@@ -39,21 +39,21 @@ public class DatabaseChangelogCleanup {
 			log.warn("Practice test not found, skip part-exam link");
 			return;
 		}
-		List<Card> practiceCards = cardRepo.findByExamIdAndDeletedIsFalse(practice.getId());
-		Map<String, List<String>> cardIdsByTopic = new LinkedHashMap<>();
-		for (Card card : practiceCards) {
-			if (card.getTopicId() == null) {
+		List<Question> practiceQuestions = questionRepo.findByExamIdAndDeletedIsFalse(practice.getId());
+		Map<String, List<String>> questionIdsByTopic = new LinkedHashMap<>();
+		for (Question question : practiceQuestions) {
+			if (question.getTopicId() == null) {
 				continue;
 			}
-			cardIdsByTopic.computeIfAbsent(card.getTopicId(), key -> new ArrayList<>()).add(card.getId());
+			questionIdsByTopic.computeIfAbsent(question.getTopicId(), key -> new ArrayList<>()).add(question.getId());
 		}
 
 		List<Topic> topics = topicRepo.findAllByDeletedIsFalse();
 		int index = 1;
 		int created = 0;
 		for (Topic topic : topics) {
-			List<String> cardIds = cardIdsByTopic.get(topic.getId());
-			if (cardIds == null || cardIds.isEmpty()) {
+			List<String> questionIds = questionIdsByTopic.get(topic.getId());
+			if (questionIds == null || questionIds.isEmpty()) {
 				index++;
 				continue;
 			}
@@ -64,7 +64,7 @@ public class DatabaseChangelogCleanup {
 				exam.setName("Luyện " + topic.getName());
 				exam.setTopicId(topic.getId());
 				exam.setPracticeTest(false);
-				exam.setCardIds(cardIds);
+				exam.setQuestionIds(questionIds);
 				examRepo.save(exam);
 				created++;
 			}
@@ -80,33 +80,33 @@ public class DatabaseChangelogCleanup {
 	}
 
 	@ChangeSet(id = "link_part_exams_from_practice_card_ids", author = "system", order = "002")
-	public void linkPartExamsFromPracticeCardIds(TopicRepository topicRepo, ExamRepository examRepo,
-			CardRepository cardRepo) {
+	public void linkPartExamsFromPracticeQuestionIds(TopicRepository topicRepo, ExamRepository examRepo,
+			QuestionRepository questionRepo) {
 		List<Exam> practices = examRepo.findAllByPracticeTestIsTrueAndDeletedIsFalse();
 		if (practices == null || practices.isEmpty()) {
-			log.warn("Practice tests not found, skip part-exam link from cardIds");
+			log.warn("Practice tests not found, skip part-exam link from questionIds");
 			return;
 		}
 		Exam practice = practices.get(0);
-		List<String> practiceCardIds = practice.getCardIds();
-		if (practiceCardIds == null || practiceCardIds.isEmpty()) {
+		List<String> practiceQuestionIds = practice.getQuestionIds();
+		if (practiceQuestionIds == null || practiceQuestionIds.isEmpty()) {
 			return;
 		}
-		List<Card> practiceCards = cardRepo.findByIdInAndDeletedIsFalse(practiceCardIds);
-		Map<String, List<String>> cardIdsByTopic = new LinkedHashMap<>();
-		for (Card card : practiceCards) {
-			if (card.getTopicId() == null) {
+		List<Question> practiceQuestions = questionRepo.findByIdInAndDeletedIsFalse(practiceQuestionIds);
+		Map<String, List<String>> questionIdsByTopic = new LinkedHashMap<>();
+		for (Question question : practiceQuestions) {
+			if (question.getTopicId() == null) {
 				continue;
 			}
-			cardIdsByTopic.computeIfAbsent(card.getTopicId(), key -> new ArrayList<>()).add(card.getId());
+			questionIdsByTopic.computeIfAbsent(question.getTopicId(), key -> new ArrayList<>()).add(question.getId());
 		}
 
 		List<Topic> topics = topicRepo.findAllByDeletedIsFalse();
 		int index = 1;
 		int created = 0;
 		for (Topic topic : topics) {
-			List<String> cardIds = cardIdsByTopic.get(topic.getId());
-			if (cardIds == null || cardIds.isEmpty()) {
+			List<String> questionIds = questionIdsByTopic.get(topic.getId());
+			if (questionIds == null || questionIds.isEmpty()) {
 				index++;
 				continue;
 			}
@@ -117,7 +117,7 @@ public class DatabaseChangelogCleanup {
 				exam.setName("Luyện " + topic.getName());
 				exam.setTopicId(topic.getId());
 				exam.setPracticeTest(false);
-				exam.setCardIds(cardIds);
+				exam.setQuestionIds(questionIds);
 				examRepo.save(exam);
 				created++;
 			}
@@ -129,6 +129,6 @@ public class DatabaseChangelogCleanup {
 			}
 			index++;
 		}
-		log.info("Linked part exams from practice cardIds, created {}", created);
+		log.info("Linked part exams from practice questionIds, created {}", created);
 	}
 }

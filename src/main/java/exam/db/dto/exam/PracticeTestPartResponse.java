@@ -12,5 +12,5 @@ public class PracticeTestPartResponse {
 	private String name;
 	private String topicId;
 	private Integer questionCount;
-	private Integer cardCount;
+	private Integer questionRecordCount;
 }

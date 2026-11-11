@@ -3,11 +3,11 @@ package exam.db.changelog;
 import com.github.cloudyrock.mongock.ChangeLog;
 import com.github.cloudyrock.mongock.ChangeSet;
 import exam.db.entity.Answer;
-import exam.db.entity.Card;
-import exam.db.entity.Exam;
 import exam.db.entity.Question;
+import exam.db.entity.Exam;
+import exam.db.entity.QuestionContent;
 import exam.db.entity.Topic;
-import exam.db.repository.card.CardRepository;
+import exam.db.repository.question.QuestionRepository;
 import exam.db.repository.exam.ExamRepository;
 import exam.db.repository.topic.TopicRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ public class DatabaseChangelogPracticeTest {
 	private static final String[] LETTERS_3 = {"A", "B", "C"};
 
 	@ChangeSet(id = "practice_test_full_toeic", author = "system", order = "001")
-	public void seedPracticeTest(TopicRepository topicRepo, ExamRepository examRepo, CardRepository cardRepo) {
+	public void seedPracticeTest(TopicRepository topicRepo, ExamRepository examRepo, QuestionRepository questionRepo) {
 		if (examRepo.findFirstByIdAndDeletedIsFalse(PRACTICE_EXAM_ID) != null) {
 			log.info("Practice test {} already exists, skip seed", PRACTICE_EXAM_ID);
 			return;
@@ -49,68 +49,68 @@ public class DatabaseChangelogPracticeTest {
 		String part7b = requireTopic(topicIdByName, "Phần 7:Đọc Hiểu - Đoạn Kép");
 		String part7c = requireTopic(topicIdByName, "Phần 7:Đọc Hiểu - Đoạn Ba");
 
-		List<Card> cards = new ArrayList<>();
-		cards.addAll(buildPart1(part1));
-		cards.addAll(buildPart2(part2));
-		cards.addAll(buildPart3(part3));
-		cards.addAll(buildPart4(part4));
-		cards.addAll(buildPart5(part5));
-		cards.addAll(buildPart6(part6));
-		cards.addAll(buildPart7Single(part7a));
-		cards.addAll(buildPart7Double(part7b));
-		cards.addAll(buildPart7Triple(part7c));
+		List<Question> questions = new ArrayList<>();
+		questions.addAll(buildPart1(part1));
+		questions.addAll(buildPart2(part2));
+		questions.addAll(buildPart3(part3));
+		questions.addAll(buildPart4(part4));
+		questions.addAll(buildPart5(part5));
+		questions.addAll(buildPart6(part6));
+		questions.addAll(buildPart7Single(part7a));
+		questions.addAll(buildPart7Double(part7b));
+		questions.addAll(buildPart7Triple(part7c));
 
-		cardRepo.saveAll(cards);
+		questionRepo.saveAll(questions);
 
-		List<String> cardIds = cards.stream().map(Card::getId).collect(Collectors.toList());
+		List<String> questionIds = questions.stream().map(Question::getId).collect(Collectors.toList());
 		Exam exam = new Exam();
 		exam.setId(PRACTICE_EXAM_ID);
 		exam.setName(PRACTICE_EXAM_NAME);
 		exam.setPracticeTest(true);
-		exam.setCardIds(cardIds);
+		exam.setQuestionIds(questionIds);
 		examRepo.save(exam);
-		log.info("Seeded full TOEIC practice test {} with {} parent cards", PRACTICE_EXAM_ID, cardIds.size());
+		log.info("Seeded full TOEIC practice test {} with {} parent questions", PRACTICE_EXAM_ID, questionIds.size());
 	}
 
 	@ChangeSet(id = "practice_test_listening_media", author = "system", order = "002")
-	public void attachListeningMedia(ExamRepository examRepo, CardRepository cardRepo) {
+	public void attachListeningMedia(ExamRepository examRepo, QuestionRepository questionRepo) {
 		Exam exam = examRepo.findFirstByIdAndDeletedIsFalse(PRACTICE_EXAM_ID);
-		if (exam == null || exam.getCardIds() == null || exam.getCardIds().isEmpty()) {
+		if (exam == null || exam.getQuestionIds() == null || exam.getQuestionIds().isEmpty()) {
 			log.warn("Practice test {} not found, skip media attach", PRACTICE_EXAM_ID);
 			return;
 		}
-		List<Card> found = cardRepo.findByIdInAndDeletedIsFalse(exam.getCardIds());
-		Map<String, Card> byId = found.stream().collect(Collectors.toMap(Card::getId, card -> card, (a, b) -> a));
+		List<Question> found = questionRepo.findByIdInAndDeletedIsFalse(exam.getQuestionIds());
+		Map<String, Question> byId = found.stream().collect(Collectors.toMap(Question::getId, question -> question, (a, b) -> a));
 		int part1 = 0;
 		int part2 = 0;
 		int part3 = 0;
 		int part4 = 0;
 		int updated = 0;
-		for (String id : exam.getCardIds()) {
-			Card card = byId.get(id);
-			if (card == null || card.getQuestion() == null) {
+		for (String id : exam.getQuestionIds()) {
+			Question question = byId.get(id);
+			if (question == null || question.getQuestion() == null) {
 				continue;
 			}
 			if (part1 < 6) {
 				part1++;
-				card.getQuestion().setImage("/data/images/part1-" + part1 + ".png");
-				card.getQuestion().setSound("/data/sounds/part1-" + part1 + ".wav");
+				question.getQuestion().setImage("/data/images/part1-" + part1 + ".png");
+				question.getQuestion().setSound("/data/sounds/part1-" + part1 + ".wav");
 			} else if (part2 < 25) {
 				part2++;
-				card.getQuestion().setSound("/data/sounds/part2-" + part2 + ".wav");
+				question.getQuestion().setSound("/data/sounds/part2-" + part2 + ".wav");
 			} else if (part3 < 13) {
 				part3++;
-				card.getQuestion().setSound("/data/sounds/part3-" + part3 + ".wav");
+				question.getQuestion().setSound("/data/sounds/part3-" + part3 + ".wav");
 			} else if (part4 < 10) {
 				part4++;
-				card.getQuestion().setSound("/data/sounds/part4-" + part4 + ".wav");
+				question.getQuestion().setSound("/data/sounds/part4-" + part4 + ".wav");
 			} else {
 				break;
 			}
-			cardRepo.save(card);
+			questionRepo.save(question);
 			updated++;
 		}
-		log.info("Attached listening media to {} practice-test cards", updated);
+		log.info("Attached listening media to {} practice-test questions", updated);
 	}
 
 	@ChangeSet(id = "practice_test_multiple_exams", author = "system", order = "003")
@@ -123,11 +123,11 @@ public class DatabaseChangelogPracticeTest {
 		original.setName("Đề thi thử TOEIC 1");
 		original.setPracticeTest(true);
 		examRepo.save(original);
-		seedPracticeExamIfMissing(examRepo, "68cb00010000000000000002", "Đề thi thử TOEIC 2", original.getCardIds());
-		seedPracticeExamIfMissing(examRepo, "68cb00010000000000000003", "Đề thi thử TOEIC 3", original.getCardIds());
+		seedPracticeExamIfMissing(examRepo, "68cb00010000000000000002", "Đề thi thử TOEIC 2", original.getQuestionIds());
+		seedPracticeExamIfMissing(examRepo, "68cb00010000000000000003", "Đề thi thử TOEIC 3", original.getQuestionIds());
 	}
 
-	private void seedPracticeExamIfMissing(ExamRepository examRepo, String id, String name, List<String> cardIds) {
+	private void seedPracticeExamIfMissing(ExamRepository examRepo, String id, String name, List<String> questionIds) {
 		if (examRepo.findFirstByIdAndDeletedIsFalse(id) != null) {
 			return;
 		}
@@ -135,13 +135,13 @@ public class DatabaseChangelogPracticeTest {
 		exam.setId(id);
 		exam.setName(name);
 		exam.setPracticeTest(true);
-		exam.setCardIds(cardIds == null ? new ArrayList<>() : new ArrayList<>(cardIds));
+		exam.setQuestionIds(questionIds == null ? new ArrayList<>() : new ArrayList<>(questionIds));
 		examRepo.save(exam);
 		log.info("Seeded practice test {} ({})", id, name);
 	}
 
-	private List<Card> buildPart1(String topicId) {
-		List<Card> cards = new ArrayList<>();
+	private List<Question> buildPart1(String topicId) {
+		List<Question> questions = new ArrayList<>();
 		String[] stems = {
 				"Look at the picture. What is the man doing?",
 				"Look at the picture. Where are the people?",
@@ -152,124 +152,124 @@ public class DatabaseChangelogPracticeTest {
 		};
 		for (int i = 0; i < 6; i++) {
 			int n = i + 1;
-			cards.add(singleCard(topicId, stems[i], new String[]{
+			questions.add(singleQuestion(topicId, stems[i], new String[]{
 					"He is sitting at a desk.",
 					"He is running in a park.",
 					"He is cooking in a kitchen.",
 					"He is driving a truck."
 			}, i % 4, false, "/data/images/part1-" + n + ".png", "/data/sounds/part1-" + n + ".wav"));
 		}
-		return cards;
+		return questions;
 	}
 
-	private List<Card> buildPart2(String topicId) {
-		List<Card> cards = new ArrayList<>();
+	private List<Question> buildPart2(String topicId) {
+		List<Question> questions = new ArrayList<>();
 		for (int i = 1; i <= 25; i++) {
-			cards.add(singleCard(topicId, "When will the meeting start? (Q" + i + ")", new String[]{
+			questions.add(singleQuestion(topicId, "When will the meeting start? (Q" + i + ")", new String[]{
 					"In the conference room.",
 					"At nine o'clock.",
 					"Yes, I received it."
 			}, i % 3, false, "", "/data/sounds/part2-" + i + ".wav"));
 		}
-		return cards;
+		return questions;
 	}
 
-	private List<Card> buildPart3(String topicId) {
-		List<Card> cards = new ArrayList<>();
+	private List<Question> buildPart3(String topicId) {
+		List<Question> questions = new ArrayList<>();
 		for (int i = 1; i <= 13; i++) {
-			cards.add(groupCard(topicId,
+			questions.add(groupQuestion(topicId,
 					"Conversation " + i + ": A man and a woman talk about a workplace schedule.",
 					buildChildren(3, "According to the conversation, what will they do?", 4),
 					"", "/data/sounds/part3-" + i + ".wav"));
 		}
-		return cards;
+		return questions;
 	}
 
-	private List<Card> buildPart4(String topicId) {
-		List<Card> cards = new ArrayList<>();
+	private List<Question> buildPart4(String topicId) {
+		List<Question> questions = new ArrayList<>();
 		for (int i = 1; i <= 10; i++) {
-			cards.add(groupCard(topicId,
+			questions.add(groupQuestion(topicId,
 					"Talk " + i + ": A short announcement at a train station.",
 					buildChildren(3, "What is the purpose of the talk?", 4),
 					"", "/data/sounds/part4-" + i + ".wav"));
 		}
-		return cards;
+		return questions;
 	}
 
-	private List<Card> buildPart5(String topicId) {
-		List<Card> cards = new ArrayList<>();
+	private List<Question> buildPart5(String topicId) {
+		List<Question> questions = new ArrayList<>();
 		for (int i = 1; i <= 30; i++) {
-			cards.add(singleCard(topicId,
+			questions.add(singleQuestion(topicId,
 					"The manager asked the staff to submit the report _____ Friday.",
 					new String[]{"by", "until", "during", "within"},
 					i % 4, false));
 		}
-		return cards;
+		return questions;
 	}
 
-	private List<Card> buildPart6(String topicId) {
-		List<Card> cards = new ArrayList<>();
+	private List<Question> buildPart6(String topicId) {
+		List<Question> questions = new ArrayList<>();
 		for (int i = 1; i <= 4; i++) {
-			cards.add(groupCard(topicId,
+			questions.add(groupQuestion(topicId,
 					"Memo " + i + ": All employees must complete the training before the deadline. Please _____ the attached form.",
 					buildChildren(4, "Choose the best word or phrase for the blank.", 4)));
 		}
-		return cards;
+		return questions;
 	}
 
-	private List<Card> buildPart7Single(String topicId) {
+	private List<Question> buildPart7Single(String topicId) {
 		int[] childCounts = {2, 2, 3, 3, 3, 3, 3, 3, 4, 3};
-		List<Card> cards = new ArrayList<>();
+		List<Question> questions = new ArrayList<>();
 		for (int i = 0; i < childCounts.length; i++) {
-			cards.add(groupCard(topicId,
+			questions.add(groupQuestion(topicId,
 					"Single passage " + (i + 1) + ": A notice about office hours and visitor registration.",
 					buildChildren(childCounts[i], "What is indicated in the passage?", 4)));
 		}
-		return cards;
+		return questions;
 	}
 
-	private List<Card> buildPart7Double(String topicId) {
-		List<Card> cards = new ArrayList<>();
+	private List<Question> buildPart7Double(String topicId) {
+		List<Question> questions = new ArrayList<>();
 		for (int i = 1; i <= 2; i++) {
-			cards.add(groupCard(topicId,
+			questions.add(groupQuestion(topicId,
 					"Double passage " + i + ": An email and a related schedule.",
 					buildChildren(5, "What is suggested about the two texts?", 4)));
 		}
-		return cards;
+		return questions;
 	}
 
-	private List<Card> buildPart7Triple(String topicId) {
-		List<Card> cards = new ArrayList<>();
+	private List<Question> buildPart7Triple(String topicId) {
+		List<Question> questions = new ArrayList<>();
 		for (int i = 1; i <= 3; i++) {
-			cards.add(groupCard(topicId,
+			questions.add(groupQuestion(topicId,
 					"Triple passage " + i + ": An advertisement, a review, and a customer email.",
 					buildChildren(5, "What is true according to the three texts?", 4)));
 		}
-		return cards;
+		return questions;
 	}
 
-	private List<Card> buildChildren(int count, String stem, int choiceCount) {
-		List<Card> children = new ArrayList<>();
+	private List<Question> buildChildren(int count, String stem, int choiceCount) {
+		List<Question> children = new ArrayList<>();
 		for (int i = 0; i < count; i++) {
 			String[] choices = choiceCount == 3
 					? new String[]{"At the office.", "Tomorrow morning.", "Yes, she did."}
 					: new String[]{"To request a refund.", "To confirm a reservation.", "To cancel an order.", "To apply for a job."};
-			children.add(singleCard(null, stem + " (" + (i + 1) + ")", choices, i % choiceCount, true));
+			children.add(singleQuestion(null, stem + " (" + (i + 1) + ")", choices, i % choiceCount, true));
 		}
 		return children;
 	}
 
-	private Card singleCard(String topicId, String text, String[] choices, int correctIndex, boolean child) {
-		return singleCard(topicId, text, choices, correctIndex, child, "", "");
+	private Question singleQuestion(String topicId, String text, String[] choices, int correctIndex, boolean child) {
+		return singleQuestion(topicId, text, choices, correctIndex, child, "", "");
 	}
 
-	private Card singleCard(String topicId, String text, String[] choices, int correctIndex, boolean child,
+	private Question singleQuestion(String topicId, String text, String[] choices, int correctIndex, boolean child,
 			String image, String sound) {
-		Question question = new Question();
-		question.setText(text);
-		question.setHint("");
-		question.setImage(image == null ? "" : image);
-		question.setSound(sound == null ? "" : sound);
+		QuestionContent content = new QuestionContent();
+		content.setText(text);
+		content.setHint("");
+		content.setImage(image == null ? "" : image);
+		content.setSound(sound == null ? "" : sound);
 
 		Answer answer = new Answer();
 		int index = correctIndex % choices.length;
@@ -285,28 +285,28 @@ public class DatabaseChangelogPracticeTest {
 		answer.setHint(letters[index]);
 		answer.setImage("");
 
-		Card card = new Card();
-		card.setExamId(PRACTICE_EXAM_ID);
-		card.setTopicId(topicId);
-		card.setQuestion(question);
-		card.setAnswer(answer);
-		card.setIsQuestionGroup(false);
-		if (!child) {
-			card.setChildCards(new ArrayList<>());
-		}
-		return card;
-	}
-
-	private Card groupCard(String topicId, String passage, List<Card> children) {
-		return groupCard(topicId, passage, children, "", "");
-	}
-
-	private Card groupCard(String topicId, String passage, List<Card> children, String image, String sound) {
 		Question question = new Question();
-		question.setText(passage);
-		question.setHint("");
-		question.setImage(image == null ? "" : image);
-		question.setSound(sound == null ? "" : sound);
+		question.setExamId(PRACTICE_EXAM_ID);
+		question.setTopicId(topicId);
+		question.setQuestion(content);
+		question.setAnswer(answer);
+		question.setIsQuestionGroup(false);
+		if (!child) {
+			question.setChildQuestions(new ArrayList<>());
+		}
+		return question;
+	}
+
+	private Question groupQuestion(String topicId, String passage, List<Question> children) {
+		return groupQuestion(topicId, passage, children, "", "");
+	}
+
+	private Question groupQuestion(String topicId, String passage, List<Question> children, String image, String sound) {
+		QuestionContent content = new QuestionContent();
+		content.setText(passage);
+		content.setHint("");
+		content.setImage(image == null ? "" : image);
+		content.setSound(sound == null ? "" : sound);
 
 		Answer answer = new Answer();
 		answer.setChoices(new ArrayList<>());
@@ -314,14 +314,14 @@ public class DatabaseChangelogPracticeTest {
 		answer.setHint("");
 		answer.setImage("");
 
-		Card card = new Card();
-		card.setExamId(PRACTICE_EXAM_ID);
-		card.setTopicId(topicId);
-		card.setQuestion(question);
-		card.setAnswer(answer);
-		card.setIsQuestionGroup(true);
-		card.setChildCards(children);
-		return card;
+		Question question = new Question();
+		question.setExamId(PRACTICE_EXAM_ID);
+		question.setTopicId(topicId);
+		question.setQuestion(content);
+		question.setAnswer(answer);
+		question.setIsQuestionGroup(true);
+		question.setChildQuestions(children);
+		return question;
 	}
 
 	private String requireTopic(Map<String, String> topicIdByName, String name) {

@@ -1,8 +1,8 @@
 package exam.rest.admin;
 
 import exam.db.dto.ResponseObject;
-import exam.db.dto.card.ListCardRequest;
-import exam.db.dto.card.ListCardResponse;
+import exam.db.dto.question.ListQuestionRequest;
+import exam.db.dto.question.ListQuestionResponse;
 import exam.db.dto.exam.ListExamRequest;
 import exam.db.dto.exam.ListExamResponse;
 import exam.db.dto.skill.ListSkillRequest;
@@ -77,11 +77,11 @@ public class AdminController {
 		return new ResponseEntity<>(response, new HttpHeaders(), HttpStatus.OK);
 	}
 
-	@GetMapping(Endpoints.ADMIN_CARD_URL)
-	public final ResponseEntity<Object> getListCard(ListCardRequest request) {
-		ResponseObject<ListCardResponse> responses = new ResponseObject<>();
+	@GetMapping(Endpoints.ADMIN_QUESTION_URL)
+	public final ResponseEntity<Object> getListQuestion(ListQuestionRequest request) {
+		ResponseObject<ListQuestionResponse> responses = new ResponseObject<>();
 		try {
-			responses.setResponseData(adminService.getListCardForAdmin(request));
+			responses.setResponseData(adminService.getListQuestionForAdmin(request));
 		} catch (ExamBaseException e) {
 			responses.setError(e.getError());
 		}

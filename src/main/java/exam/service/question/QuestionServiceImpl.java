@@ -1,22 +1,22 @@
-package exam.service.card;
+package exam.service.question;
 
-import exam.db.dto.card.CardResponse;
-import exam.db.dto.card.CreateCardRequest;
-import exam.db.dto.card.DeleteCardRequest;
-import exam.db.dto.card.ImportCardRequest;
-import exam.db.dto.card.ListCardRequest;
-import exam.db.dto.card.ListCardResponse;
-import exam.db.dto.card.UpdateCardRequest;
+import exam.db.dto.question.QuestionResponse;
+import exam.db.dto.question.CreateQuestionRequest;
+import exam.db.dto.question.DeleteQuestionRequest;
+import exam.db.dto.question.ImportQuestionRequest;
+import exam.db.dto.question.ListQuestionRequest;
+import exam.db.dto.question.ListQuestionResponse;
+import exam.db.dto.question.UpdateQuestionRequest;
 import exam.db.dto.user.ExamUser;
 import exam.db.entity.Answer;
-import exam.db.entity.Card;
-import exam.db.entity.Exam;
 import exam.db.entity.Question;
+import exam.db.entity.Exam;
+import exam.db.entity.QuestionContent;
 import exam.db.entity.Topic;
 import exam.db.repository.topic.TopicRepository;
 import exam.db.enums.Assert;
 import exam.db.enums.ErrorInfo;
-import exam.db.repository.card.CardRepository;
+import exam.db.repository.question.QuestionRepository;
 import exam.db.repository.exam.ExamRepository;
 import exam.ultis.ExamBaseException;
 import exam.ultis.SecurityContextService;
@@ -43,13 +43,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class CardServiceImpl implements CardService {
+public class QuestionServiceImpl implements QuestionService {
 
 	@Value("${app.upload.root:D:/DATN/eo-be/data}")
 	private String uploadRoot;
 
 	@Autowired
-	private CardRepository cardRepo;
+	private QuestionRepository questionRepo;
 
 	@Autowired
 	private ExamRepository examRepo;
@@ -59,97 +59,97 @@ public class CardServiceImpl implements CardService {
 
 	@Override
 	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
-	public CardResponse create(CreateCardRequest request) throws ExamBaseException {
+	public QuestionResponse create(CreateQuestionRequest request) throws ExamBaseException {
 		requireUser();
 		Assert.notEmpty(request.getTopicId(), ErrorInfo.TOPIC_NOT_FOUND_ERROR);
 		Topic topic = topicRepo.findFirstByIdAndDeletedIsFalse(request.getTopicId());
 		Assert.notNull(topic, ErrorInfo.TOPIC_NOT_FOUND_ERROR);
-		Card card = new Card();
-		BeanUtils.copyProperties(request, card);
-		card.setTopicId(request.getTopicId());
-		cardRepo.save(card);
+		Question question = new Question();
+		BeanUtils.copyProperties(request, question);
+		question.setTopicId(request.getTopicId());
+		questionRepo.save(question);
 		if (StringUtils.hasText(request.getExamId())) {
 			Exam exam = examRepo.findFirstByIdAndDeletedIsFalse(request.getExamId());
-			if (exam != null && canPutCardInExam(card, exam)) {
-				List<String> cardIds = exam.getCardIds() == null ? new ArrayList<>() : new ArrayList<>(exam.getCardIds());
-				cardIds.add(card.getId());
-				exam.setCardIds(cardIds);
+			if (exam != null && canPutQuestionInExam(question, exam)) {
+				List<String> questionIds = exam.getQuestionIds() == null ? new ArrayList<>() : new ArrayList<>(exam.getQuestionIds());
+				questionIds.add(question.getId());
+				exam.setQuestionIds(questionIds);
 				examRepo.save(exam);
 			}
 		}
-		return new CardResponse(card);
+		return new QuestionResponse(question);
 	}
 
 	@Override
 	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
-	public CardResponse update(UpdateCardRequest request) throws ExamBaseException {
+	public QuestionResponse update(UpdateQuestionRequest request) throws ExamBaseException {
 		requireUser();
-		Card card = cardRepo.findFirstByIdAndDeletedIsFalse(request.getId());
-		Assert.notNull(card, ErrorInfo.CARD_IS_NULL);
-		String topicId = StringUtils.hasText(request.getTopicId()) ? request.getTopicId() : card.getTopicId();
+		Question question = questionRepo.findFirstByIdAndDeletedIsFalse(request.getId());
+		Assert.notNull(question, ErrorInfo.QUESTION_IS_NULL);
+		String topicId = StringUtils.hasText(request.getTopicId()) ? request.getTopicId() : question.getTopicId();
 		Assert.notEmpty(topicId, ErrorInfo.TOPIC_NOT_FOUND_ERROR);
 		Topic topic = topicRepo.findFirstByIdAndDeletedIsFalse(topicId);
 		Assert.notNull(topic, ErrorInfo.TOPIC_NOT_FOUND_ERROR);
-		String examId = card.getExamId();
-		Answer answer = card.getAnswer();
-		Question question = card.getQuestion();
-		List<Card> childCards = card.getChildCards();
-		BeanUtils.copyProperties(request, card);
-		card.setId(request.getId());
-		card.setTopicId(topicId);
+		String examId = question.getExamId();
+		Answer answer = question.getAnswer();
+		QuestionContent content = question.getQuestion();
+		List<Question> childQuestions = question.getChildQuestions();
+		BeanUtils.copyProperties(request, question);
+		question.setId(request.getId());
+		question.setTopicId(topicId);
 		if (!StringUtils.hasText(request.getExamId())) {
-			card.setExamId(examId);
+			question.setExamId(examId);
 		}
 		if (request.getQuestion() == null) {
-			card.setQuestion(question);
+			question.setQuestion(content);
 		}
 		if (request.getAnswer() == null) {
-			card.setAnswer(answer);
+			question.setAnswer(answer);
 		}
 		if (Boolean.FALSE.equals(request.getIsQuestionGroup())) {
-			card.setChildCards(new ArrayList<>());
-		} else if (request.getChildCards() == null) {
-			card.setChildCards(childCards);
+			question.setChildQuestions(new ArrayList<>());
+		} else if (request.getChildQuestions() == null) {
+			question.setChildQuestions(childQuestions);
 		}
-		cardRepo.save(card);
-		return new CardResponse(card);
+		questionRepo.save(question);
+		return new QuestionResponse(question);
 	}
 
 	@Override
 	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
-	public Boolean deleteMultiple(DeleteCardRequest request) throws ExamBaseException {
+	public Boolean deleteMultiple(DeleteQuestionRequest request) throws ExamBaseException {
 		requireUser();
 		if (request == null || request.getIds() == null) {
 			throw new ExamBaseException(ErrorInfo.BAD_REQUEST);
 		}
-		List<Card> cardList = cardRepo.findByIdInAndDeletedIsFalse(request.getIds());
-		cardList.forEach(p -> p.setDeleted(true));
-		cardRepo.saveAll(cardList);
-		detachCardsFromExams(request.getIds());
+		List<Question> questionList = questionRepo.findByIdInAndDeletedIsFalse(request.getIds());
+		questionList.forEach(p -> p.setDeleted(true));
+		questionRepo.saveAll(questionList);
+		detachQuestionsFromExams(request.getIds());
 		return Boolean.TRUE;
 	}
 
 	@Override
-	public CardResponse getDetail(String id) throws ExamBaseException {
+	public QuestionResponse getDetail(String id) throws ExamBaseException {
 		requireUser();
-		Card card = cardRepo.findFirstByIdAndDeletedIsFalse(id);
-		Assert.notNull(card, ErrorInfo.CARD_IS_NULL);
-		return new CardResponse(card);
+		Question question = questionRepo.findFirstByIdAndDeletedIsFalse(id);
+		Assert.notNull(question, ErrorInfo.QUESTION_IS_NULL);
+		return new QuestionResponse(question);
 	}
 
 	@Override
 	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
-	public ListCardResponse getListCardForAdmin(ListCardRequest request) throws ExamBaseException {
+	public ListQuestionResponse getListQuestionForAdmin(ListQuestionRequest request) throws ExamBaseException {
 		requireUser();
-		List<CardResponse> cards = cardRepo.findAllByDeletedIsFalse().stream()
-				.map(CardResponse::new)
+		List<QuestionResponse> questions = questionRepo.findAllByDeletedIsFalse().stream()
+				.map(QuestionResponse::new)
 				.collect(Collectors.toList());
-		return new ListCardResponse(cards, cards.size());
+		return new ListQuestionResponse(questions, questions.size());
 	}
 
 	@Override
 	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
-	public Boolean importCard(ImportCardRequest request) throws ExamBaseException {
+	public Boolean importQuestion(ImportQuestionRequest request) throws ExamBaseException {
 		requireUser();
 		Assert.notNull(request, ErrorInfo.BAD_REQUEST);
 		Assert.notEmpty(request.getFilePath(), ErrorInfo.BAD_REQUEST);
@@ -167,16 +167,16 @@ public class CardServiceImpl implements CardService {
 					if (row == null || isHeaderRow(row)) {
 						continue;
 					}
-					Card card = createCardFromExcelRow(row);
-					if (!hasQuestionText(card) || !hasCorrectAnswer(card) || !StringUtils.hasText(card.getTopicId())) {
+					Question question = createQuestionFromExcelRow(row);
+					if (!hasQuestionText(question) || !hasCorrectAnswer(question) || !StringUtils.hasText(question.getTopicId())) {
 						continue;
 					}
-					Topic topic = topicRepo.findFirstByIdAndDeletedIsFalse(card.getTopicId());
+					Topic topic = topicRepo.findFirstByIdAndDeletedIsFalse(question.getTopicId());
 					if (topic == null) {
 						continue;
 					}
-					cardRepo.save(card);
-					linkCardToExam(card);
+					questionRepo.save(question);
+					linkQuestionToExam(question);
 					saved++;
 				}
 			}
@@ -213,23 +213,23 @@ public class CardServiceImpl implements CardService {
 				|| first.equals("text");
 	}
 
-	private boolean hasCorrectAnswer(Card card) {
-		if (card.getChildCards() != null && !card.getChildCards().isEmpty()) {
-			for (Card child : card.getChildCards()) {
+	private boolean hasCorrectAnswer(Question question) {
+		if (question.getChildQuestions() != null && !question.getChildQuestions().isEmpty()) {
+			for (Question child : question.getChildQuestions()) {
 				if (!hasTextAnswer(child)) {
 					return false;
 				}
 			}
 			return true;
 		}
-		return hasTextAnswer(card);
+		return hasTextAnswer(question);
 	}
 
-	private boolean hasTextAnswer(Card card) {
-		if (card == null || card.getAnswer() == null || card.getAnswer().getTexts() == null) {
+	private boolean hasTextAnswer(Question question) {
+		if (question == null || question.getAnswer() == null || question.getAnswer().getTexts() == null) {
 			return false;
 		}
-		for (String text : card.getAnswer().getTexts()) {
+		for (String text : question.getAnswer().getTexts()) {
 			if (StringUtils.hasText(text)) {
 				return true;
 			}
@@ -237,14 +237,14 @@ public class CardServiceImpl implements CardService {
 		return false;
 	}
 
-	private boolean hasQuestionText(Card card) {
-		if (card.getQuestion() != null && StringUtils.hasText(card.getQuestion().getText())) {
+	private boolean hasQuestionText(Question question) {
+		if (question.getQuestion() != null && StringUtils.hasText(question.getQuestion().getText())) {
 			return true;
 		}
-		if (card.getChildCards() == null) {
+		if (question.getChildQuestions() == null) {
 			return false;
 		}
-		for (Card child : card.getChildCards()) {
+		for (Question child : question.getChildQuestions()) {
 			if (child.getQuestion() != null && StringUtils.hasText(child.getQuestion().getText())) {
 				return true;
 			}
@@ -252,8 +252,8 @@ public class CardServiceImpl implements CardService {
 		return false;
 	}
 
-	private void detachCardsFromExams(List<String> cardIds) {
-		if (cardIds == null || cardIds.isEmpty()) {
+	private void detachQuestionsFromExams(List<String> questionIds) {
+		if (questionIds == null || questionIds.isEmpty()) {
 			return;
 		}
 		List<Exam> exams = examRepo.findAllByDeletedIsFalse();
@@ -261,43 +261,43 @@ public class CardServiceImpl implements CardService {
 			return;
 		}
 		for (Exam exam : exams) {
-			if (exam.getCardIds() == null || exam.getCardIds().isEmpty()) {
+			if (exam.getQuestionIds() == null || exam.getQuestionIds().isEmpty()) {
 				continue;
 			}
-			List<String> next = new ArrayList<>(exam.getCardIds());
-			if (next.removeAll(cardIds)) {
-				exam.setCardIds(next);
+			List<String> next = new ArrayList<>(exam.getQuestionIds());
+			if (next.removeAll(questionIds)) {
+				exam.setQuestionIds(next);
 				examRepo.save(exam);
 			}
 		}
 	}
 
-	private void linkCardToExam(Card card) {
-		if (!StringUtils.hasText(card.getExamId())) {
+	private void linkQuestionToExam(Question question) {
+		if (!StringUtils.hasText(question.getExamId())) {
 			return;
 		}
-		Exam exam = examRepo.findFirstByIdAndDeletedIsFalse(card.getExamId());
-		if (exam == null || !canPutCardInExam(card, exam)) {
+		Exam exam = examRepo.findFirstByIdAndDeletedIsFalse(question.getExamId());
+		if (exam == null || !canPutQuestionInExam(question, exam)) {
 			return;
 		}
-		List<String> cardIds = exam.getCardIds() == null ? new ArrayList<>() : new ArrayList<>(exam.getCardIds());
-		if (!cardIds.contains(card.getId())) {
-			cardIds.add(card.getId());
-			exam.setCardIds(cardIds);
+		List<String> questionIds = exam.getQuestionIds() == null ? new ArrayList<>() : new ArrayList<>(exam.getQuestionIds());
+		if (!questionIds.contains(question.getId())) {
+			questionIds.add(question.getId());
+			exam.setQuestionIds(questionIds);
 			examRepo.save(exam);
 		}
 	}
 
-	private boolean canPutCardInExam(Card card, Exam exam) {
+	private boolean canPutQuestionInExam(Question question, Exam exam) {
 		if (Boolean.TRUE.equals(exam.getPracticeTest()) || !StringUtils.hasText(exam.getTopicId())) {
 			return true;
 		}
-		return exam.getTopicId().equals(card.getTopicId());
+		return exam.getTopicId().equals(question.getTopicId());
 	}
 
-	private Card createCardFromExcelRow(Row row) {
-		Card card = new Card();
+	private Question createQuestionFromExcelRow(Row row) {
 		Question question = new Question();
+		QuestionContent content = new QuestionContent();
 		Answer answer = new Answer();
 		int cellIndex = 0;
 
@@ -306,18 +306,18 @@ public class CardServiceImpl implements CardService {
 		answer.setImage(cellText(row.getCell(cellIndex++)));
 		answer.setTexts(cellList(row.getCell(cellIndex++)));
 
-		question.setHint(cellText(row.getCell(cellIndex++)));
-		question.setImage(cellText(row.getCell(cellIndex++)));
-		question.setSound(cellText(row.getCell(cellIndex++)));
-		question.setText(cellText(row.getCell(cellIndex++)));
+		content.setHint(cellText(row.getCell(cellIndex++)));
+		content.setImage(cellText(row.getCell(cellIndex++)));
+		content.setSound(cellText(row.getCell(cellIndex++)));
+		content.setText(cellText(row.getCell(cellIndex++)));
 
 		String examId = cellText(row.getCell(cellIndex++));
 		String topicId = cellText(row.getCell(cellIndex++));
 
-		List<Card> childCards = new ArrayList<>();
+		List<Question> childQuestions = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
 			Answer childAnswer = new Answer();
-			Question childQuestion = new Question();
+			QuestionContent childQuestion = new QuestionContent();
 			childAnswer.setChoices(cellList(row.getCell(cellIndex++)));
 			childAnswer.setHint(cellText(row.getCell(cellIndex++)));
 			childAnswer.setImage(cellText(row.getCell(cellIndex++)));
@@ -329,20 +329,20 @@ public class CardServiceImpl implements CardService {
 			if (!StringUtils.hasText(childQuestion.getText())) {
 				continue;
 			}
-			Card child = new Card();
+			Question child = new Question();
 			child.setQuestion(childQuestion);
 			child.setAnswer(childAnswer);
 			child.setIsQuestionGroup(false);
-			childCards.add(child);
+			childQuestions.add(child);
 		}
 
-		card.setQuestion(question);
-		card.setAnswer(answer);
-		card.setExamId(examId);
-		card.setTopicId(topicId);
-		card.setChildCards(childCards);
-		card.setIsQuestionGroup(!childCards.isEmpty());
-		return card;
+		question.setQuestion(content);
+		question.setAnswer(answer);
+		question.setExamId(examId);
+		question.setTopicId(topicId);
+		question.setChildQuestions(childQuestions);
+		question.setIsQuestionGroup(!childQuestions.isEmpty());
+		return question;
 	}
 
 	private final DataFormatter cellFormatter = new DataFormatter();

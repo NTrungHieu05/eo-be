@@ -49,7 +49,7 @@
       "value": ""
     },
     {
-      "key": "cardId",
+      "key": "questionId",
       "value": "68ca00020000000000000001"
     },
     {
@@ -65,7 +65,7 @@
       "value": ""
     },
     {
-      "key": "createdCardId",
+      "key": "createdQuestionId",
       "value": ""
     },
     {
@@ -180,7 +180,7 @@
               ],
               "query": []
             },
-            "description": "User mau ROLE_USER. Cac API create skill/topic/exam/card se bi tu choi. Dung de so sanh voi admin.",
+            "description": "User mau ROLE_USER. Cac API create skill/topic/exam/question se bi tu choi. Dung de so sanh voi admin.",
             "auth": {
               "type": "noauth"
             },
@@ -1121,7 +1121,7 @@
             "description": "topicId lay tu Skill header. Exam se duoc append vao topic.examIds.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Exam test Part 1 {{$timestamp}}\",\n  \"topicId\": \"{{topicId}}\",\n  \"cardIds\": []\n}",
+              "raw": "{\n  \"name\": \"Exam test Part 1 {{$timestamp}}\",\n  \"topicId\": \"{{topicId}}\",\n  \"questionIds\": []\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1180,18 +1180,18 @@
           ]
         },
         {
-          "name": "Get cards by exam",
+          "name": "Get questions by exam",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/exam/card/{{examId}}",
+              "raw": "{{baseUrl}}/exam/question/{{examId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "exam",
-                "card",
+                "question",
                 "{{examId}}"
               ],
               "query": []
@@ -1235,7 +1235,7 @@
             "description": "",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": \"{{examId}}\",\n  \"name\": \"Exam test updated\",\n  \"topicId\": \"{{topicId}}\",\n  \"cardIds\": []\n}",
+              "raw": "{\n  \"id\": \"{{examId}}\",\n  \"name\": \"Exam test updated\",\n  \"topicId\": \"{{topicId}}\",\n  \"questionIds\": []\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1258,7 +1258,7 @@
           ]
         },
         {
-          "name": "Add card to exam",
+          "name": "Add question to exam",
           "request": {
             "method": "POST",
             "header": [
@@ -1268,20 +1268,20 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/exam/add-card",
+              "raw": "{{baseUrl}}/exam/add-question",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "exam",
-                "add-card"
+                "add-question"
               ],
               "query": []
             },
-            "description": "Gan card vao de thi. Chay Create exam + Create card truoc.",
+            "description": "Gan question vao de thi. Chay Create exam + Create question truoc.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": \"{{examId}}\",\n  \"cardIds\": [\n    \"{{cardId}}\"\n  ]\n}",
+              "raw": "{\n  \"id\": \"{{examId}}\",\n  \"questionIds\": [\n    \"{{questionId}}\"\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1325,7 +1325,7 @@
               ],
               "query": []
             },
-            "description": "Chay sau khi da test xong card. Soft-delete exam vua tao.",
+            "description": "Chay sau khi da test xong question. Soft-delete exam vua tao.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"ids\": [\n    \"{{createdExamId}}\"\n  ]\n}",
@@ -1353,10 +1353,10 @@
       ]
     },
     {
-      "name": "06 Card",
+      "name": "06 Question",
       "item": [
         {
-          "name": "Create card (gan vao exam)",
+          "name": "Create question (gan vao exam)",
           "request": {
             "method": "POST",
             "header": [
@@ -1366,19 +1366,19 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/card",
+              "raw": "{{baseUrl}}/question",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "card"
+                "question"
               ],
               "query": []
             },
-            "description": "Card duoc append vao exam.cardIds. Dung Create exam truoc.",
+            "description": "Question duoc append vao exam.questionIds. Dung Create exam truoc.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"examId\": \"{{examId}}\",\n  \"topicId\": \"{{topicId}}\",\n  \"isQuestionGroup\": false,\n  \"question\": {\n    \"text\": \"What is in the picture?\",\n    \"hint\": \"Look at the photo\",\n    \"image\": \"\",\n    \"sound\": \"\"\n  },\n  \"answer\": {\n    \"choices\": [\n      \"A man is sitting\",\n      \"A woman is walking\",\n      \"A child is running\",\n      \"A dog is sleeping\"\n    ],\n    \"texts\": [\n      \"A\"\n    ],\n    \"hint\": \"A\",\n    \"image\": \"\"\n  },\n  \"childCards\": []\n}",
+              "raw": "{\n  \"examId\": \"{{examId}}\",\n  \"topicId\": \"{{topicId}}\",\n  \"isQuestionGroup\": false,\n  \"question\": {\n    \"text\": \"What is in the picture?\",\n    \"hint\": \"Look at the photo\",\n    \"image\": \"\",\n    \"sound\": \"\"\n  },\n  \"answer\": {\n    \"choices\": [\n      \"A man is sitting\",\n      \"A woman is walking\",\n      \"A child is running\",\n      \"A dog is sleeping\"\n    ],\n    \"texts\": [\n      \"A\"\n    ],\n    \"hint\": \"A\",\n    \"image\": \"\"\n  },\n  \"childQuestions\": []\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1396,27 +1396,27 @@
                   "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
                   "pm.test('no business error', () => pm.expect(json.error).to.eql(null));",
                   "if (json.responseData && json.responseData.id) {",
-                  "  pm.collectionVariables.set('cardId', json.responseData.id);",
+                  "  pm.collectionVariables.set('questionId', json.responseData.id);",
                   "}",
-                  "pm.collectionVariables.set('createdCardId', json.responseData.id);"
+                  "pm.collectionVariables.set('createdQuestionId', json.responseData.id);"
                 ]
               }
             }
           ]
         },
         {
-          "name": "Get card detail",
+          "name": "Get question detail",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/card/{{cardId}}",
+              "raw": "{{baseUrl}}/question/{{questionId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "card",
-                "{{cardId}}"
+                "question",
+                "{{questionId}}"
               ],
               "query": []
             },
@@ -1437,7 +1437,7 @@
           ]
         },
         {
-          "name": "Update card",
+          "name": "Update question",
           "request": {
             "method": "PUT",
             "header": [
@@ -1447,19 +1447,19 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/card",
+              "raw": "{{baseUrl}}/question",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "card"
+                "question"
               ],
               "query": []
             },
             "description": "",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": \"{{cardId}}\",\n  \"examId\": \"{{examId}}\",\n  \"topicId\": \"{{topicId}}\",\n  \"isQuestionGroup\": false,\n  \"question\": {\n    \"text\": \"What is the man doing?\",\n    \"hint\": \"Updated\",\n    \"image\": \"\",\n    \"sound\": \"\"\n  },\n  \"answer\": {\n    \"choices\": [\n      \"Sitting\",\n      \"Walking\",\n      \"Running\",\n      \"Sleeping\"\n    ],\n    \"texts\": [\n      \"A\"\n    ],\n    \"hint\": \"A\",\n    \"image\": \"\"\n  },\n  \"childCards\": []\n}",
+              "raw": "{\n  \"id\": \"{{questionId}}\",\n  \"examId\": \"{{examId}}\",\n  \"topicId\": \"{{topicId}}\",\n  \"isQuestionGroup\": false,\n  \"question\": {\n    \"text\": \"What is the man doing?\",\n    \"hint\": \"Updated\",\n    \"image\": \"\",\n    \"sound\": \"\"\n  },\n  \"answer\": {\n    \"choices\": [\n      \"Sitting\",\n      \"Walking\",\n      \"Running\",\n      \"Sleeping\"\n    ],\n    \"texts\": [\n      \"A\"\n    ],\n    \"hint\": \"A\",\n    \"image\": \"\"\n  },\n  \"childQuestions\": []\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1482,7 +1482,7 @@
           ]
         },
         {
-          "name": "Import card from Excel",
+          "name": "Import question from Excel",
           "request": {
             "method": "POST",
             "header": [
@@ -1492,12 +1492,12 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/card/import",
+              "raw": "{{baseUrl}}/question/import",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "card",
+                "question",
                 "import"
               ],
               "query": []
@@ -1528,7 +1528,7 @@
           ]
         },
         {
-          "name": "Delete card (createdCardId)",
+          "name": "Delete question (createdQuestionId)",
           "request": {
             "method": "PUT",
             "header": [
@@ -1538,12 +1538,12 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/card/delete/multiple",
+              "raw": "{{baseUrl}}/question/delete/multiple",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "card",
+                "question",
                 "delete",
                 "multiple"
               ],
@@ -1552,7 +1552,7 @@
             "description": "",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ids\": [\n    \"{{createdCardId}}\"\n  ]\n}",
+              "raw": "{\n  \"ids\": [\n    \"{{createdQuestionId}}\"\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1769,18 +1769,18 @@
           ]
         },
         {
-          "name": "List cards",
+          "name": "List questions",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/admin/card?pageIndex=0&pageSize=20&keyword=&examId={{examId}}",
+              "raw": "{{baseUrl}}/admin/question?pageIndex=0&pageSize=20&keyword=&examId={{examId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "admin",
-                "card"
+                "question"
               ],
               "query": [
                 {

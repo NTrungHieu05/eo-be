@@ -1,7 +1,7 @@
 package exam.service.admin;
 
-import exam.db.dto.card.ListCardRequest;
-import exam.db.dto.card.ListCardResponse;
+import exam.db.dto.question.ListQuestionRequest;
+import exam.db.dto.question.ListQuestionResponse;
 import exam.db.dto.exam.ListExamRequest;
 import exam.db.dto.exam.ListExamResponse;
 import exam.db.dto.skill.ListSkillRequest;
@@ -14,7 +14,7 @@ import exam.db.dto.user.ListUserRequest;
 import exam.db.dto.user.ListUserResponse;
 import exam.db.dto.user.UnblockUserRequest;
 import exam.db.dto.user.UserResponse;
-import exam.service.card.CardService;
+import exam.service.question.QuestionService;
 import exam.service.exam.ExamService;
 import exam.service.skill.SkillService;
 import exam.service.topic.TopicService;
@@ -30,7 +30,7 @@ public class AdminServiceImpl implements AdminService {
 	private UserService userService;
 
 	@Autowired
-	private CardService cardService;
+	private QuestionService questionService;
 
 	@Autowired
 	private SkillService skillService;
@@ -62,8 +62,8 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	@Override
-	public ListCardResponse getListCardForAdmin(ListCardRequest request) throws ExamBaseException {
-		return cardService.getListCardForAdmin(request);
+	public ListQuestionResponse getListQuestionForAdmin(ListQuestionRequest request) throws ExamBaseException {
+		return questionService.getListQuestionForAdmin(request);
 	}
 
 	@Override

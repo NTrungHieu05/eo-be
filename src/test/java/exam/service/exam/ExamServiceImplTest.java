@@ -1,6 +1,6 @@
 package exam.service.exam;
 
-import exam.db.dto.exam.AddCardToExamRequest;
+import exam.db.dto.exam.AddQuestionToExamRequest;
 import exam.db.dto.exam.CreateExamRequest;
 import exam.db.dto.exam.DeleteExamRequest;
 import exam.db.dto.exam.ExamResponse;
@@ -9,14 +9,14 @@ import exam.db.dto.exam.PracticeTestResponse;
 import exam.db.dto.exam.UpdateExamRequest;
 import exam.db.dto.exam.ToeicScoreRequest;
 import exam.db.dto.exam.ToeicScoreResponse;
-import exam.db.entity.Card;
+import exam.db.entity.Question;
 import exam.db.entity.Exam;
 import exam.db.entity.ExamResult;
 import exam.db.entity.History;
 import exam.db.entity.Topic;
 import exam.db.enums.ErrorInfo;
 import exam.db.enums.RoleEnum;
-import exam.db.repository.card.CardRepository;
+import exam.db.repository.question.QuestionRepository;
 import exam.db.repository.exam.ExamRepository;
 import exam.db.repository.history.HistoryRepository;
 import exam.db.repository.topic.TopicRepository;
@@ -47,7 +47,7 @@ class ExamServiceImplTest {
 	private ExamRepository examRepo;
 
 	@Mock
-	private CardRepository cardRepo;
+	private QuestionRepository questionRepo;
 
 	@Mock
 	private TopicRepository topicRepo;
@@ -66,7 +66,7 @@ class ExamServiceImplTest {
 	@Test
 	void practiceTestUsesToeicTimingAndMergesReadingIntoPart7() throws ExamBaseException {
 		TestUsers.authenticate(TestUsers.user("user-1", RoleEnum.ROLE_USER));
-		List<Card> cards = Arrays.asList(
+		List<Question> questions = Arrays.asList(
 				single("c1", "t1"),
 				group("c2", "t2", 3),
 				single("c3", "t3"),
@@ -75,9 +75,9 @@ class ExamServiceImplTest {
 				single("c6", "t6"),
 				single("c7", "t7"),
 				group("c8", "t8", 2));
-		Exam exam = practiceExam(idsOf(cards));
+		Exam exam = practiceExam(idsOf(questions));
 		when(examRepo.findFirstByIdAndDeletedIsFalse(exam.getId())).thenReturn(exam);
-		when(cardRepo.findByIdInAndDeletedIsFalse(exam.getCardIds())).thenReturn(new ArrayList<>(reversed(cards)));
+		when(questionRepo.findByIdInAndDeletedIsFalse(exam.getQuestionIds())).thenReturn(new ArrayList<>(reversed(questions)));
 
 		PracticeTestResponse response = examService.getPracticeTest(exam.getId());
 
@@ -87,7 +87,7 @@ class ExamServiceImplTest {
 		assertThat(response.getListeningQuestionCount()).isEqualTo(100);
 		assertThat(response.getReadingQuestionCount()).isEqualTo(100);
 		assertThat(response.getQuestionCount()).isEqualTo(11);
-		assertThat(response.getCards()).extracting("id")
+		assertThat(response.getQuestions()).extracting("id")
 				.containsExactly("c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8");
 		assertThat(response.getParts()).hasSize(7);
 		assertThat(response.getParts().get(0).getName()).isEqualTo("Photographs");
@@ -99,28 +99,28 @@ class ExamServiceImplTest {
 		assertThat(response.getParts().get(6).getName()).isEqualTo("Reading Comprehension");
 		assertThat(response.getParts().get(6).getTopicId()).isEqualTo("t7");
 		assertThat(response.getParts().get(6).getQuestionCount()).isEqualTo(3);
-		assertThat(response.getParts().get(6).getCardCount()).isEqualTo(2);
+		assertThat(response.getParts().get(6).getQuestionRecordCount()).isEqualTo(2);
 	}
 
 	@Test
-	void practiceTestOrdersNamedPartsEvenWhenCardsWerePickedOutOfOrder() throws ExamBaseException {
+	void practiceTestOrdersNamedPartsEvenWhenQuestionsWerePickedOutOfOrder() throws ExamBaseException {
 		TestUsers.authenticate(TestUsers.user("user-1", RoleEnum.ROLE_USER));
 		Topic reading = new Topic("Phần 5:Hoàn Thành Câu");
 		reading.setId("t5");
 		Topic listening = new Topic("Phần 1:Mô Tả Tranh");
 		listening.setId("t1");
-		Card readingCard = single("c5", "t5");
-		Card listeningCard = single("c1", "t1");
+		Question readingQuestion = single("c5", "t5");
+		Question listeningQuestion = single("c1", "t1");
 		Exam exam = practiceExam(List.of("c5", "c1"));
 		when(examRepo.findFirstByIdAndDeletedIsFalse(exam.getId())).thenReturn(exam);
-		when(cardRepo.findByIdInAndDeletedIsFalse(exam.getCardIds())).thenReturn(List.of(readingCard, listeningCard));
+		when(questionRepo.findByIdInAndDeletedIsFalse(exam.getQuestionIds())).thenReturn(List.of(readingQuestion, listeningQuestion));
 		when(topicRepo.findFirstByIdAndDeletedIsFalse("t5")).thenReturn(reading);
 		when(topicRepo.findFirstByIdAndDeletedIsFalse("t1")).thenReturn(listening);
 
 		PracticeTestResponse response = examService.getPracticeTest(exam.getId());
 
-		assertThat(response.getCards()).extracting("id").containsExactly("c1", "c5");
-		assertThat(response.getCards()).extracting("partNumber").containsExactly(1, 5);
+		assertThat(response.getQuestions()).extracting("id").containsExactly("c1", "c5");
+		assertThat(response.getQuestions()).extracting("partNumber").containsExactly(1, 5);
 		assertThat(response.getParts()).extracting("partNumber").containsExactly(1, 5);
 		assertThat(response.getParts()).extracting("name")
 				.containsExactly("Photographs", "Incomplete Sentences");
@@ -171,14 +171,14 @@ class ExamServiceImplTest {
 		second.setId("exam-2");
 		second.setName("Đề thi thử TOEIC 2");
 		when(examRepo.findAllByPracticeTestIsTrueAndDeletedIsFalse()).thenReturn(List.of(first, second));
-		when(cardRepo.findByIdInAndDeletedIsFalse(first.getCardIds())).thenReturn(List.of(single("c1", "t1")));
-		when(cardRepo.findByIdInAndDeletedIsFalse(second.getCardIds())).thenReturn(List.of(single("c2", "t1")));
+		when(questionRepo.findByIdInAndDeletedIsFalse(first.getQuestionIds())).thenReturn(List.of(single("c1", "t1")));
+		when(questionRepo.findByIdInAndDeletedIsFalse(second.getQuestionIds())).thenReturn(List.of(single("c2", "t1")));
 
 		ListPracticeTestResponse response = examService.listPracticeTests();
 
 		assertThat(response.getExams()).extracting(PracticeTestResponse::getName)
 				.containsExactly("Thi thử TOEIC", "Đề thi thử TOEIC 2");
-		assertThat(response.getExams()).allMatch(item -> item.getCards() == null || item.getCards().isEmpty());
+		assertThat(response.getExams()).allMatch(item -> item.getQuestions() == null || item.getQuestions().isEmpty());
 		assertThat(response.getTotal()).isEqualTo(2);
 	}
 
@@ -187,7 +187,7 @@ class ExamServiceImplTest {
 		TestUsers.authenticate(TestUsers.user("user-1", RoleEnum.ROLE_USER));
 		Exam exam = practiceExam(List.of("c1"));
 		when(examRepo.findAllByPracticeTestIsTrueAndDeletedIsFalse()).thenReturn(List.of(exam));
-		when(cardRepo.findByIdInAndDeletedIsFalse(exam.getCardIds())).thenReturn(List.of(single("c1", "t1")));
+		when(questionRepo.findByIdInAndDeletedIsFalse(exam.getQuestionIds())).thenReturn(List.of(single("c1", "t1")));
 		History newer = history(exam.getId(), 630, new Date(2_000L));
 		History older = history(exam.getId(), 100, new Date(1_000L));
 		when(historyRepo.findAllByUserIdAndDeletedIsFalse("user-1")).thenReturn(List.of(newer, older));
@@ -214,28 +214,28 @@ class ExamServiceImplTest {
 	}
 
 	@Test
-	void getAllCardsKeepsExamCardOrder() throws ExamBaseException {
+	void getAllQuestionsKeepsExamQuestionOrder() throws ExamBaseException {
 		TestUsers.authenticate(TestUsers.user("user-1", RoleEnum.ROLE_USER));
 		Exam exam = new Exam();
 		exam.setId("exam-1");
-		exam.setCardIds(List.of("b", "a"));
-		Card first = single("a", "t1");
-		Card second = single("b", "t1");
+		exam.setQuestionIds(List.of("b", "a"));
+		Question first = single("a", "t1");
+		Question second = single("b", "t1");
 		when(examRepo.findFirstByIdAndDeletedIsFalse("exam-1")).thenReturn(exam);
-		when(cardRepo.findByIdInAndDeletedIsFalse(exam.getCardIds())).thenReturn(List.of(first, second));
+		when(questionRepo.findByIdInAndDeletedIsFalse(exam.getQuestionIds())).thenReturn(List.of(first, second));
 
-		ExamResponse response = examService.getAllCardsByExamId("exam-1");
+		ExamResponse response = examService.getAllQuestionsByExamId("exam-1");
 
-		assertThat(response.getCards()).extracting(Card::getId).containsExactly("b", "a");
+		assertThat(response.getQuestions()).extracting(Question::getId).containsExactly("b", "a");
 	}
 
 	@Test
-	void getAllCardsRejectsPracticeTest() {
+	void getAllQuestionsRejectsPracticeTest() {
 		TestUsers.authenticate(TestUsers.user("user-1", RoleEnum.ROLE_USER));
 		Exam exam = practiceExam(List.of("c1"));
 		when(examRepo.findFirstByIdAndDeletedIsFalse(exam.getId())).thenReturn(exam);
 
-		assertThatThrownBy(() -> examService.getAllCardsByExamId(exam.getId()))
+		assertThatThrownBy(() -> examService.getAllQuestionsByExamId(exam.getId()))
 				.isInstanceOf(ExamBaseException.class)
 				.extracting(ex -> ((ExamBaseException) ex).getError().getCode())
 				.isEqualTo(ErrorInfo.EXAM_NOT_FOUND_ERROR_CODE);
@@ -265,13 +265,13 @@ class ExamServiceImplTest {
 	}
 
 	@Test
-	void createKeepsOnlyCardsOfSelectedTopic() throws ExamBaseException {
+	void createKeepsOnlyQuestionsOfSelectedTopic() throws ExamBaseException {
 		TestUsers.authenticate(TestUsers.user("admin-1", RoleEnum.ROLE_ADMIN));
 		Topic topic = new Topic("Part 5");
 		topic.setId("topic-5");
 		topic.setExamIds(new ArrayList<>());
 		when(topicRepo.findFirstByIdAndDeletedIsFalse("topic-5")).thenReturn(topic);
-		when(cardRepo.findByIdInAndDeletedIsFalse(List.of("keep", "drop")))
+		when(questionRepo.findByIdInAndDeletedIsFalse(List.of("keep", "drop")))
 				.thenReturn(List.of(single("keep", "topic-5"), single("drop", "topic-other")));
 		when(examRepo.save(any(Exam.class))).thenAnswer(invocation -> {
 			Exam saved = invocation.getArgument(0);
@@ -282,10 +282,10 @@ class ExamServiceImplTest {
 		CreateExamRequest request = new CreateExamRequest();
 		request.setName("Part 5 đề 1");
 		request.setTopicId("topic-5");
-		request.setCardIds(List.of("keep", "drop"));
+		request.setQuestionIds(List.of("keep", "drop"));
 		ExamResponse response = examService.create(request);
 
-		assertThat(response.getCardIds()).containsExactly("keep");
+		assertThat(response.getQuestionIds()).containsExactly("keep");
 		assertThat(response.getTopicId()).isEqualTo("topic-5");
 		assertThat(response.getPracticeTest()).isNotEqualTo(Boolean.TRUE);
 	}
@@ -325,12 +325,12 @@ class ExamServiceImplTest {
 	}
 
 	@Test
-	void updateKeepsCardsWhenCardIdsOmitted() throws ExamBaseException {
+	void updateKeepsQuestionsWhenQuestionIdsOmitted() throws ExamBaseException {
 		TestUsers.authenticate(TestUsers.user("admin-1", RoleEnum.ROLE_ADMIN));
 		Exam exam = new Exam();
 		exam.setId("exam-1");
 		exam.setTopicId("topic-5");
-		exam.setCardIds(new ArrayList<>(List.of("keep")));
+		exam.setQuestionIds(new ArrayList<>(List.of("keep")));
 		Topic topic = new Topic("Part 5");
 		topic.setId("topic-5");
 		when(examRepo.findFirstByIdAndDeletedIsFalse("exam-1")).thenReturn(exam);
@@ -346,68 +346,68 @@ class ExamServiceImplTest {
 		ExamResponse response = examService.update(request);
 
 		assertThat(response.getName()).isEqualTo("Renamed");
-		assertThat(response.getCardIds()).containsExactly("keep");
+		assertThat(response.getQuestionIds()).containsExactly("keep");
 	}
 
 	@Test
-	void addCardAppendsExistingCardsUsingTheSameIdsField() throws ExamBaseException {
+	void addQuestionAppendsExistingQuestionsUsingTheSameIdsField() throws ExamBaseException {
 		TestUsers.authenticate(TestUsers.user("admin-1", RoleEnum.ROLE_ADMIN));
 		Exam exam = new Exam();
 		exam.setId("exam-1");
-		exam.setCardIds(new ArrayList<>(List.of("a")));
-		Card card = single("b", "t1");
+		exam.setQuestionIds(new ArrayList<>(List.of("a")));
+		Question question = single("b", "t1");
 		when(examRepo.findFirstByIdAndDeletedIsFalse("exam-1")).thenReturn(exam);
-		when(cardRepo.findFirstByIdAndDeletedIsFalse("b")).thenReturn(card);
+		when(questionRepo.findFirstByIdAndDeletedIsFalse("b")).thenReturn(question);
 		when(examRepo.save(exam)).thenReturn(exam);
 
-		AddCardToExamRequest request = new AddCardToExamRequest();
+		AddQuestionToExamRequest request = new AddQuestionToExamRequest();
 		request.setId("exam-1");
-		request.setCardIds(List.of("b", "missing"));
+		request.setQuestionIds(List.of("b", "missing"));
 
-		ExamResponse response = examService.addCard(request);
+		ExamResponse response = examService.addQuestion(request);
 
-		assertThat(response.getCardIds()).containsExactly("a", "b");
-		assertThat(card.getExamId()).isNull();
+		assertThat(response.getQuestionIds()).containsExactly("a", "b");
+		assertThat(question.getExamId()).isNull();
 	}
 
-	private Exam practiceExam(List<String> cardIds) {
+	private Exam practiceExam(List<String> questionIds) {
 		Exam exam = new Exam();
 		exam.setId("68cb00010000000000000001");
 		exam.setName("Thi thử TOEIC");
 		exam.setPracticeTest(true);
-		exam.setCardIds(cardIds);
+		exam.setQuestionIds(questionIds);
 		return exam;
 	}
 
-	private Card single(String id, String topicId) {
-		Card card = new Card();
-		card.setId(id);
-		card.setTopicId(topicId);
-		card.setIsQuestionGroup(false);
-		return card;
+	private Question single(String id, String topicId) {
+		Question question = new Question();
+		question.setId(id);
+		question.setTopicId(topicId);
+		question.setIsQuestionGroup(false);
+		return question;
 	}
 
-	private Card group(String id, String topicId, int childCount) {
-		Card card = single(id, topicId);
-		card.setIsQuestionGroup(true);
-		List<Card> children = new ArrayList<>();
+	private Question group(String id, String topicId, int childCount) {
+		Question question = single(id, topicId);
+		question.setIsQuestionGroup(true);
+		List<Question> children = new ArrayList<>();
 		for (int i = 0; i < childCount; i++) {
 			children.add(single(id + "-" + i, topicId));
 		}
-		card.setChildCards(children);
-		return card;
+		question.setChildQuestions(children);
+		return question;
 	}
 
-	private List<String> idsOf(List<Card> cards) {
+	private List<String> idsOf(List<Question> questions) {
 		List<String> ids = new ArrayList<>();
-		for (Card card : cards) {
-			ids.add(card.getId());
+		for (Question question : questions) {
+			ids.add(question.getId());
 		}
 		return ids;
 	}
 
-	private List<Card> reversed(List<Card> cards) {
-		List<Card> copy = new ArrayList<>(cards);
+	private List<Question> reversed(List<Question> questions) {
+		List<Question> copy = new ArrayList<>(questions);
 		java.util.Collections.reverse(copy);
 		return copy;
 	}

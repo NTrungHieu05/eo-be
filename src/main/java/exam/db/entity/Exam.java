@@ -25,8 +25,8 @@ public class Exam extends AbstractVersion {
 	@Field(FieldConst.TOPIC_ID)
 	private String topicId;
 
-	@Field(FieldConst.CARD_IDS)
-	private List<String> cardIds;
+	@Field(FieldConst.QUESTION_IDS)
+	private List<String> questionIds;
 
 	@Field(FieldConst.PRACTICE_TEST)
 	private Boolean practiceTest;

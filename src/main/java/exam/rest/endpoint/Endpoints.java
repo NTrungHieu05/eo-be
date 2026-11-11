@@ -11,7 +11,7 @@ public interface Endpoints {
 	public static final String ADMIN_USERS_URL = "/admin/users";
 	public static final String ADMIN_USERS_BLOCK = "/admin/users/block";
 	public static final String ADMIN_USERS_UNBLOCK = "/admin/users/unblock";
-	public static final String ADMIN_CARD_URL = "/admin/card";
+	public static final String ADMIN_QUESTION_URL = "/admin/question";
 	public static final String ADMIN_SKILL_URL = "/admin/skill";
 	public static final String ADMIN_TOPIC_URL = "/admin/topic";
 	public static final String ADMIN_EXAM_URL = "/admin/exam";
@@ -27,10 +27,10 @@ public interface Endpoints {
 	//=========================== MEDIA =====================
 	public static final String MEDIA_URL_BASE64 = "/media/url/base64";
 	public static final String UPLOAD_URL = "/upload";
-	//=========================== CARD =====================
-	public static final String CARD_URL = "/card";
-	public static final String CARD_IMPORT_URL = "/card/import";
-	public static final String CARD_DELETE_MULTIPLE = "/card/delete/multiple";
+	//=========================== QUESTION =====================
+	public static final String QUESTION_URL = "/question";
+	public static final String QUESTION_IMPORT_URL = "/question/import";
+	public static final String QUESTION_DELETE_MULTIPLE = "/question/delete/multiple";
 	public static final String PRACTICE_TEST_URL = "/practice-test";
 	//=========================== SKILL =====================
 	public static final String SKILL_URL = "/skill";
@@ -44,8 +44,8 @@ public interface Endpoints {
 	public static final String TOPIC_DELETE_MULTIPLE = "/topic/delete/multiple";
 	//=========================== EXAM =====================
 	public static final String EXAM_URL = "/exam";
-	public static final String EXAM_CARD_URL = "/exam/card";
-	public static final String EXAM_ADD_CARD_URL = "/exam/add-card";
+	public static final String EXAM_QUESTION_URL = "/exam/question";
+	public static final String EXAM_ADD_QUESTION_URL = "/exam/add-question";
 	public static final String EXAM_DELETE_MULTIPLE = "/exam/delete/multiple";
 	public static final String EXAM_SCORE_URL = "/exam/score";
 	//=========================== HISTORY =====================

@@ -43,7 +43,7 @@ public class ErrorInfo implements Serializable {
 	public static final int AUTHORITY_CODE_IS_NULL_ERROR_CODE = 1011;
 	public static final int SKILL_NOT_FOUND_ERROR_CODE = 1012;
 	public static final int VERIFY_RECAPTCHA_ERROR_CODE = 1013;
-	public static final int CARD_IS_NULL_CODE = 1014;
+	public static final int QUESTION_IS_NULL_CODE = 1014;
 	public static final int TOPIC_NOT_FOUND_ERROR_CODE = 1015;
 	public static final int EXAM_NOT_FOUND_ERROR_CODE = 1016;
 	public static final int ACCOUNT_LOCKED_CODE = 1018;
@@ -121,8 +121,8 @@ public class ErrorInfo implements Serializable {
 	public static final ErrorInfo VERIFY_RECAPTCHA_ERROR = new ErrorInfo(VERIFY_RECAPTCHA_ERROR_CODE,
 			properties.getProperty("verify.recaptcha.error"));
 
-	public static final ErrorInfo CARD_IS_NULL = new ErrorInfo(CARD_IS_NULL_CODE,
-			properties.getProperty("card.is.null"));
+	public static final ErrorInfo QUESTION_IS_NULL = new ErrorInfo(QUESTION_IS_NULL_CODE,
+			properties.getProperty("question.is.null"));
 
 	public static final ErrorInfo TOPIC_NOT_FOUND_ERROR = new ErrorInfo(TOPIC_NOT_FOUND_ERROR_CODE,
 			properties.getProperty("topic.not.found"));

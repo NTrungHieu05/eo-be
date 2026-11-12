@@ -3,7 +3,6 @@ package exam.rest.question;
 import exam.db.dto.ResponseObject;
 import exam.db.dto.question.QuestionResponse;
 import exam.db.dto.question.CreateQuestionRequest;
-import exam.db.dto.question.ImportQuestionRequest;
 import exam.db.dto.question.DeleteQuestionRequest;
 import exam.db.dto.question.UpdateQuestionRequest;
 import exam.db.enums.DBConst;
@@ -65,17 +64,6 @@ public class QuestionController {
 		ResponseObject<QuestionResponse> response = new ResponseObject<>();
 		try {
 			response.setResponseData(questionSv.getDetail(id));
-		} catch (ExamBaseException e) {
-			response.setError(e.getError());
-		}
-		return new ResponseEntity<>(response, new HttpHeaders(), HttpStatus.OK);
-	}
-
-	@PostMapping(Endpoints.QUESTION_IMPORT_URL)
-	public final ResponseEntity<Object> importQuestion(@RequestBody ImportQuestionRequest request) {
-		ResponseObject<Boolean> response = new ResponseObject<>();
-		try {
-			response.setResponseData(questionSv.importQuestion(request));
 		} catch (ExamBaseException e) {
 			response.setError(e.getError());
 		}

@@ -95,10 +95,6 @@
     {
       "key": "adminPassword",
       "value": "Admin@123"
-    },
-    {
-      "key": "importFilePath",
-      "value": ""
     }
   ],
   "item": [
@@ -1460,52 +1456,6 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"id\": \"{{questionId}}\",\n  \"examId\": \"{{examId}}\",\n  \"topicId\": \"{{topicId}}\",\n  \"isQuestionGroup\": false,\n  \"question\": {\n    \"text\": \"What is the man doing?\",\n    \"hint\": \"Updated\",\n    \"image\": \"\",\n    \"sound\": \"\"\n  },\n  \"answer\": {\n    \"choices\": [\n      \"Sitting\",\n      \"Walking\",\n      \"Running\",\n      \"Sleeping\"\n    ],\n    \"texts\": [\n      \"A\"\n    ],\n    \"hint\": \"A\",\n    \"image\": \"\"\n  },\n  \"childQuestions\": []\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const json = pm.response.json();",
-                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
-                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Import question from Excel",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/question/import",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "question",
-                "import"
-              ],
-              "query": []
-            },
-            "description": "filePath la path Excel da upload (POST /upload) hoac file trong data/files. ROLE_ADMIN.",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"filePath\": \"{{importFilePath}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

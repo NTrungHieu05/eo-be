@@ -101,28 +101,52 @@ function Save-Speech([string]$path, [string]$text) {
   $synth.Dispose()
 }
 
-$part1 = @(
-  'Look at the picture. Number one. What is the man doing?',
-  'Look at the picture. Number two. Where are the people?',
-  'Look at the picture. Number three. What is on the table?',
-  'Look at the picture. Number four. What is the woman holding?',
-  'Look at the picture. Number five. How is the weather?',
-  'Look at the picture. Number six. What is next to the building?'
+$bankPath = 'D:\DATN\eo-be\src\main\resources\practice\practice-questions.json'
+$bank = Get-Content -Raw -Encoding UTF8 $bankPath | ConvertFrom-Json
+$targets = @(
+  @{ Exam = $bank.exams[0]; Dir = $sndDir },
+  @{ Exam = $bank.exams[1]; Dir = (Join-Path $sndDir 'exam2') },
+  @{ Exam = $bank.exams[2]; Dir = (Join-Path $sndDir 'exam3') }
 )
-for ($i = 0; $i -lt $part1.Count; $i++) {
-  Save-Speech (Join-Path $sndDir ("part1-{0}.wav" -f ($i + 1))) $part1[$i]
+
+function Join-SpokenSingle([string]$prefix, $item) {
+  $letters = @('A', 'B', 'C', 'D')
+  $pieces = New-Object System.Collections.Generic.List[string]
+  [void]$pieces.Add($prefix + $item.text)
+  for ($i = 0; $i -lt $item.options.Count; $i++) {
+    [void]$pieces.Add(('{0}. {1}' -f $letters[$i], $item.options[$i]))
+  }
+  return ($pieces -join ' ')
 }
 
-for ($i = 1; $i -le 25; $i++) {
-  Save-Speech (Join-Path $sndDir ("part2-{0}.wav" -f $i)) ("Question {0}. When will the meeting start?" -f $i)
+function Join-SpokenGroup($group) {
+  $pieces = New-Object System.Collections.Generic.List[string]
+  [void]$pieces.Add([string]$group.passage)
+  $number = 1
+  foreach ($question in $group.questions) {
+    [void]$pieces.Add(('Number {0}. {1}' -f $number, $question.text))
+    $number++
+  }
+  return ($pieces -join ' ')
 }
 
-for ($i = 1; $i -le 13; $i++) {
-  Save-Speech (Join-Path $sndDir ("part3-{0}.wav" -f $i)) ("Questions. Conversation {0}. A man and a woman talk about a workplace schedule." -f $i)
-}
-
-for ($i = 1; $i -le 10; $i++) {
-  Save-Speech (Join-Path $sndDir ("part4-{0}.wav" -f $i)) ("Questions. Talk {0}. A short announcement at a train station." -f $i)
+foreach ($target in $targets) {
+  New-Item -ItemType Directory -Force -Path $target.Dir | Out-Null
+  $exam = $target.Exam
+  for ($i = 0; $i -lt $exam.part1.Count; $i++) {
+    $spoken = Join-SpokenSingle ("Look at the picture. Number {0}. " -f ($i + 1)) $exam.part1[$i]
+    Save-Speech (Join-Path $target.Dir ("part1-{0}.wav" -f ($i + 1))) $spoken
+  }
+  for ($i = 0; $i -lt $exam.part2.Count; $i++) {
+    $spoken = Join-SpokenSingle ("Question {0}. " -f ($i + 1)) $exam.part2[$i]
+    Save-Speech (Join-Path $target.Dir ("part2-{0}.wav" -f ($i + 1))) $spoken
+  }
+  for ($i = 0; $i -lt $exam.part3.Count; $i++) {
+    Save-Speech (Join-Path $target.Dir ("part3-{0}.wav" -f ($i + 1))) (Join-SpokenGroup $exam.part3[$i])
+  }
+  for ($i = 0; $i -lt $exam.part4.Count; $i++) {
+    Save-Speech (Join-Path $target.Dir ("part4-{0}.wav" -f ($i + 1))) (Join-SpokenGroup $exam.part4[$i])
+  }
 }
 
 Write-Output 'Practice media generated.'

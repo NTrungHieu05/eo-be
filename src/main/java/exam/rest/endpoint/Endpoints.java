@@ -29,7 +29,6 @@ public interface Endpoints {
 	public static final String UPLOAD_URL = "/upload";
 	//=========================== QUESTION =====================
 	public static final String QUESTION_URL = "/question";
-	public static final String QUESTION_IMPORT_URL = "/question/import";
 	public static final String QUESTION_DELETE_MULTIPLE = "/question/delete/multiple";
 	public static final String PRACTICE_TEST_URL = "/practice-test";
 	//=========================== SKILL =====================

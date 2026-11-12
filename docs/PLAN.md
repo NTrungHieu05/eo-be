@@ -51,7 +51,7 @@ Mọi phần nội dung dùng cùng một khung. Body luôn bọc trong `respons
 | Xóa nhiều | `PUT /skill/delete/multiple` | `PUT /topic/delete/multiple` | `PUT /exam/delete/multiple` | `PUT /question/delete/multiple` |
 | Chi tiết | `GET /skill/{id}` | `GET /topic/{id}` | `GET /exam/{id}` | `GET /question/{id}` |
 | Danh sách admin | `GET /admin/skill` | `GET /admin/topic` | `GET /admin/exam` | `GET /admin/question` |
-| Gắn phần con | `POST /skill/add-topic` `{id, topicIds}` | `POST /topic/add-exam` `{id, examIds}` | `POST /exam/add-question` `{id, questionIds}` | `POST /question/import` `{filePath}` |
+| Gắn phần con | `POST /skill/add-topic` `{id, topicIds}` | `POST /topic/add-exam` `{id, examIds}` | `POST /exam/add-question` `{id, questionIds}` | |
 
 Request tạo/sửa cùng tên field với response: `name`, danh sách id con (`topicIds`, `examIds`, `questionIds`). Xóa nhiều luôn gửi `{ "ids": [] }` và trả `true`.
 

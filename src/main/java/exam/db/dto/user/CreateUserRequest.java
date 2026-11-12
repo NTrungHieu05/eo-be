@@ -16,7 +16,7 @@ public class CreateUserRequest {
 	@NotBlank
 	private String email;
 	@NotBlank
-	@Size(min = 8, message = "must have at least 8 characters")
+	@Size(min = 8, message = "Mật khẩu phải từ 8 ký tự")
 	private String password;
 	private String username;
 	private String firstName;

@@ -3,7 +3,6 @@ package exam.service.question;
 import exam.db.dto.question.QuestionResponse;
 import exam.db.dto.question.CreateQuestionRequest;
 import exam.db.dto.question.DeleteQuestionRequest;
-import exam.db.dto.question.ImportQuestionRequest;
 import exam.db.dto.question.ListQuestionRequest;
 import exam.db.dto.question.ListQuestionResponse;
 import exam.db.dto.question.UpdateQuestionRequest;
@@ -19,6 +18,4 @@ public interface QuestionService {
 	QuestionResponse getDetail(String id) throws ExamBaseException;
 
 	ListQuestionResponse getListQuestionForAdmin(ListQuestionRequest request) throws ExamBaseException;
-
-	Boolean importQuestion(ImportQuestionRequest request) throws ExamBaseException;
 }

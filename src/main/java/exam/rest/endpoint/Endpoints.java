@@ -5,8 +5,6 @@ public interface Endpoints {
 	public static final String USER_URL = "/user";
 	public static final String CHANGE_PASSWORD_URL = "/user/pwd/change";
 	public static final String USER_INFO_URL = "/user/info";
-	public static final String FORGOT_PASSWORD_URL = "/user/pwd/forgot";
-	public static final String RESET_PASSWORD_URL = "/user/pwd/reset";
 	// ==================== ADMIN =======================
 	public static final String ADMIN_USERS_URL = "/admin/users";
 	public static final String ADMIN_USERS_BLOCK = "/admin/users/block";

@@ -65,6 +65,10 @@ SEED_USER_PASSWORD=$(openssl rand -hex 12)
 SITE_ADDRESS=:80
 MONGO_IMAGE=$MONGO_IMAGE
 DATA_DIR=$APP_DIR/data
+# Gửi mail quên mật khẩu (Gmail App Password). Để trống thì mã reset chỉ ghi vào log.
+MAIL_USERNAME=
+MAIL_PASSWORD=
+MAIL_FROM=
 EOF
   chown deploy:deploy "$ENV_FILE"
   chmod 600 "$ENV_FILE"

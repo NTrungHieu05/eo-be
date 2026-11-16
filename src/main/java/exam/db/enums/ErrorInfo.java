@@ -35,6 +35,7 @@ public class ErrorInfo implements Serializable {
 
 	public static final int UNKNOWN_ERROR_CODE = 1001;
 	public static final int USER_NOT_FOUND_ERROR_CODE = 1002;
+	public static final int RESET_PASSWORD_ERROR_CODE = 1003;
 	public static final int INCORRECT_PASSWORD_ERROR_CODE = 1004;
 	public static final int INCORRECT_CONFIRM_PASSWORD_ERROR_CODE = 1005;
 	public static final int ACCESS_DENIED_ERROR_CODE = 1006;
@@ -89,6 +90,9 @@ public class ErrorInfo implements Serializable {
 
 	public static final ErrorInfo BAD_REQUEST = new ErrorInfo(BAD_REQUEST_ERROR_CODE,
 			properties.getProperty("request.error"));
+
+	public static final ErrorInfo RESET_PASSWORD_CODE_ERROR = new ErrorInfo(RESET_PASSWORD_ERROR_CODE,
+			properties.getProperty("reset.password.code.error"));
 
 	public static final ErrorInfo INCORRECT_PASSWORD_ERROR = new ErrorInfo(INCORRECT_PASSWORD_ERROR_CODE,
 			properties.getProperty("incorrect.password"));

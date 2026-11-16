@@ -2,6 +2,8 @@ package exam.rest.user;
 
 import exam.db.dto.ResponseObject;
 import exam.db.dto.user.ChangePasswordRequest;
+import exam.db.dto.user.ForgotPasswordRequest;
+import exam.db.dto.user.ResetPasswordRequest;
 import exam.db.dto.user.UpdateUserRequest;
 import exam.db.dto.user.UserResponse;
 import exam.db.enums.DBConst;
@@ -43,6 +45,29 @@ public class UserController {
 		ResponseObject<Object> response = new ResponseObject<>();
 		try {
 			userService.changePassword(request);
+			response.setResponseData("Change password success!");
+		} catch (ExamBaseException e) {
+			response.setError(e.getError());
+		}
+		return new ResponseEntity<>(response, new HttpHeaders(), HttpStatus.OK);
+	}
+
+	@PostMapping(Endpoints.FORGOT_PASSWORD_URL)
+	public final ResponseEntity<Object> forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
+		ResponseObject<Boolean> response = new ResponseObject<>();
+		try {
+			response.setResponseData(userService.forgotPassword(request));
+		} catch (ExamBaseException e) {
+			response.setError(e.getError());
+		}
+		return new ResponseEntity<>(response, new HttpHeaders(), HttpStatus.OK);
+	}
+
+	@PostMapping(Endpoints.RESET_PASSWORD_URL)
+	public final ResponseEntity<Object> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
+		ResponseObject<Object> response = new ResponseObject<>();
+		try {
+			userService.resetPassword(request);
 			response.setResponseData("Change password success!");
 		} catch (ExamBaseException e) {
 			response.setError(e.getError());

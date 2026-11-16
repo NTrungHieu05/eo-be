@@ -3,16 +3,21 @@ package exam.service.user;
 import exam.db.dto.user.BlockUserRequest;
 import exam.db.dto.user.ChangePasswordRequest;
 import exam.db.dto.user.CreateUserRequest;
+import exam.db.dto.user.ForgotPasswordRequest;
+import exam.db.dto.user.ResetPasswordRequest;
 import exam.db.dto.user.UnblockUserRequest;
 import exam.db.dto.user.UpdateUserRequest;
 import exam.db.dto.user.UserResponse;
 import exam.db.entity.Role;
 import exam.db.entity.User;
+import exam.db.entity.UserRecovery;
 import exam.db.enums.ErrorInfo;
 import exam.db.enums.RoleEnum;
 import exam.db.repository.role.RoleRepository;
+import exam.db.repository.user.UserRecoveryRepository;
 import exam.db.repository.user.UserRepository;
 import exam.service.ExamUserDetailsService;
+import exam.service.notification.NotificationService;
 import exam.support.TestUsers;
 import exam.ultis.ExamBaseException;
 import org.junit.jupiter.api.AfterEach;
@@ -25,6 +30,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,6 +55,12 @@ class UserServiceImplTest {
 
 	@Mock
 	private ExamUserDetailsService userDetailSv;
+
+	@Mock
+	private UserRecoveryRepository userRecoveryRepo;
+
+	@Mock
+	private NotificationService notificationSv;
 
 	@InjectMocks
 	private UserServiceImpl userService;
@@ -90,6 +102,7 @@ class UserServiceImplTest {
 		assertThat(response.getEmail()).isEqualTo("user@toeic.local");
 		assertThat(response.getOtp()).isNull();
 		assertThat(response.getRoles()).containsExactly(RoleEnum.ROLE_USER.getName());
+		verify(notificationSv, never()).sendMailResetPwd(anyString(), anyString());
 	}
 
 	@Test
@@ -224,6 +237,75 @@ class UserServiceImplTest {
 		assertThat(changed).isTrue();
 		assertThat(user.getPassword()).isEqualTo("hashed-new");
 		verify(userRepo).save(user);
+	}
+
+	@Test
+	void resetPasswordMarksRecoveryUsed() throws ExamBaseException {
+		User user = TestUsers.user("user-1", RoleEnum.ROLE_USER);
+		user.setOtp("123456");
+		UserRecovery recovery = new UserRecovery();
+		recovery.setUserId("user-1");
+		recovery.setResetCode("abc12345");
+		when(userRecoveryRepo.findByResetCodeAndDeletedIsFalse("abc12345")).thenReturn(recovery);
+		when(userRepo.findByUserIdAndDeletedIsFalse("user-1")).thenReturn(user);
+		when(passwordEncoder.encode("New@1234")).thenReturn("hashed-new");
+
+		ResetPasswordRequest request = new ResetPasswordRequest();
+		request.setResetCode("  abc12345  ");
+		request.setNewPassword("New@1234");
+		request.setConfirmPassword("New@1234");
+
+		assertThat(userService.resetPassword(request)).isTrue();
+		assertThat(user.getPassword()).isEqualTo("hashed-new");
+		assertThat(user.getOtp()).isNull();
+		assertThat(recovery.isDeleted()).isTrue();
+		verify(userRepo).save(user);
+		verify(userRecoveryRepo).save(recovery);
+	}
+
+	@Test
+	void resetPasswordRejectsUnknownCode() {
+		when(userRecoveryRepo.findByResetCodeAndDeletedIsFalse("missing")).thenReturn(null);
+		ResetPasswordRequest request = new ResetPasswordRequest();
+		request.setResetCode("missing");
+
+		assertThatThrownBy(() -> userService.resetPassword(request))
+				.isInstanceOf(ExamBaseException.class)
+				.extracting(ex -> ((ExamBaseException) ex).getError().getCode())
+				.isEqualTo(ErrorInfo.RESET_PASSWORD_ERROR_CODE);
+	}
+
+	@Test
+	void forgotPasswordStoresResetCode() throws ExamBaseException {
+		User user = TestUsers.user("user-1", RoleEnum.ROLE_USER);
+		when(userRepo.findByEmailIgnoreCase("user-1@toeic.local")).thenReturn(user);
+
+		ForgotPasswordRequest request = new ForgotPasswordRequest();
+		request.setEmail("  user-1@toeic.local  ");
+
+		assertThat(userService.forgotPassword(request)).isTrue();
+		ArgumentCaptor<UserRecovery> recovery = ArgumentCaptor.forClass(UserRecovery.class);
+		verify(userRecoveryRepo).save(recovery.capture());
+		assertThat(recovery.getValue().getResetCode()).hasSize(8);
+		assertThat(recovery.getValue().getUserId()).isEqualTo("user-1");
+		verify(notificationSv).sendMailResetPwd("user-1@toeic.local", recovery.getValue().getResetCode());
+	}
+
+	@Test
+	void forgotPasswordRetiresOlderCodes() throws ExamBaseException {
+		User user = TestUsers.user("user-1", RoleEnum.ROLE_USER);
+		when(userRepo.findByEmailIgnoreCase("user-1@toeic.local")).thenReturn(user);
+		UserRecovery older = new UserRecovery();
+		older.setUserId("user-1");
+		older.setResetCode("old-code");
+		when(userRecoveryRepo.findAllByUserIdAndDeletedIsFalse("user-1")).thenReturn(new ArrayList<>(List.of(older)));
+
+		ForgotPasswordRequest request = new ForgotPasswordRequest();
+		request.setEmail("user-1@toeic.local");
+
+		assertThat(userService.forgotPassword(request)).isTrue();
+		assertThat(older.isDeleted()).isTrue();
+		verify(userRecoveryRepo).saveAll(List.of(older));
 	}
 
 	@Test

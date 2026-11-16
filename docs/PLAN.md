@@ -8,7 +8,7 @@ Backend Spring Boot cho web luyện thi TOEIC Listening & Reading. API giữ cù
 | --- | --- |
 | MongoDB `exam_online`, Mongock seed Role / Skill / Topic Part 1–7 | Xong |
 | Entity User, Role, Skill, Topic, Exam, Question, History, Media | Xong |
-| Đăng nhập `/app/login`, đăng ký, đổi mật khẩu | Xong |
+| Đăng nhập `/app/login`, đăng ký, đổi / quên / đặt lại mật khẩu | Xong |
 | CRUD skill, topic, exam, question và danh sách admin | Xong |
 | Thi thử `GET /practice-test` (7 phần, 120 phút) và nộp bài `POST /exam/submit` | Xong |
 | Upload media, phục vụ file tĩnh | Xong |
@@ -40,7 +40,7 @@ Thời gian đề đủ 100 câu nghe và 100 câu đọc: 45 phút nghe + 75 ph
 
 Ba đề seed `Đề thi thử TOEIC 1/2/3` hiện trỏ cùng một danh sách `questionIds`. Đề 1 đủ 200 câu. Đề 2 và đề 3 là dữ liệu mẫu, chưa có bộ câu riêng.
 
-Đăng ký `POST /public/register/user` gán `ROLE_USER` và đăng nhập được ngay. Không còn API xác minh OTP. Trường `otp` trên document User chỉ để đọc dữ liệu cũ; login bỏ qua giá trị đó. Mật khẩu được trim và phải còn ít nhất 8 ký tự. Hệ thống không có chức năng quên mật khẩu và không gửi email.
+Đăng ký `POST /public/register/user` gán `ROLE_USER` và đăng nhập được ngay. Không còn API xác minh OTP. Trường `otp` trên document User chỉ để đọc dữ liệu cũ; login bỏ qua giá trị đó. Mật khẩu được trim và phải còn ít nhất 8 ký tự. Mã đặt lại mật khẩu hết hạn sau 15 phút; mã cũ bị hủy khi có yêu cầu mới. Email `*.local` không gửi mail, mã được ghi ra log. `GET /actuator/health` có thể trả 503 khi Gmail chưa cấu hình, trong khi API đăng nhập và làm bài vẫn chạy.
 
 ## API dùng khi kiểm tra
 
@@ -69,6 +69,7 @@ Request tạo/sửa cùng tên field với response: `name`, danh sách id con (
 | POST | `/exam/score` | Quy đổi số câu đúng Listening/Reading sang điểm 5–495, tổng 10–990 |
 | POST | `/exam/submit` | Nộp bài `{examId, answers: [{questionId, childIndex, answer}]}`. Server chấm, lưu History của user đang đăng nhập và trả đáp án đúng, giải thích từng câu. Luyện Part lưu phần trăm 0–100. Đề đủ 100 nghe và 100 đọc lưu điểm 10–990. Đề ngắn lưu số câu đúng. |
 | POST | `/user/pwd/change` | Đổi mật khẩu, kiểm tra mật khẩu cũ và xác nhận |
+| POST | `/user/pwd/forgot`, `/user/pwd/reset` | Quên mật khẩu bằng mã reset |
 | POST | `/admin/users/block`, `/admin/users/unblock` | Khóa / mở tài khoản, chỉ admin |
 
 Collection Postman nằm ở `postman/`.
@@ -80,13 +81,14 @@ Test nằm ở `src/test/java`, dùng JUnit 5 và Mockito. Không bật Spring c
 | Lớp test | Việc được kiểm |
 | --- | --- |
 | `AuthServiceImplTest` | Login thành công, bỏ qua OTP cũ, tài khoản đã xóa hoặc bị khóa, sai mật khẩu, logout |
-| `UserServiceImplTest` | Chuẩn hóa email, mã hóa mật khẩu, email trùng, mật khẩu ngắn hơn 8 ký tự sau trim, đổi mật khẩu, khóa chính mình, khóa user |
+| `UserServiceImplTest` | Chuẩn hóa email, mã hóa mật khẩu, email trùng, mật khẩu ngắn hơn 8 ký tự sau trim, đổi / quên / reset mật khẩu, khóa chính mình, khóa user |
 | `RegistrationServiceImplTest` | Đăng ký luôn là học viên |
 | `ExamServiceImplTest` | Thời lượng thi thử, thứ tự Part, điểm mới nhất, từ chối mở đề thi thử qua `/exam/question`, gắn đề vào topic |
 | `TopicServiceImplTest` | Giữ thứ tự đề trong topic và lấy tiến độ mới nhất, kể cả 0 |
 | `ToeicScoreTest` | 0 câu = 10 điểm, 200 câu = 990, mốc bảng, điểm nằm trên bước 5 |
 | `HistoryServiceImplTest` | Gộp history trùng, giữ điểm cũ khi lần nộp không có progress, thay điểm mới |
 | `DatabaseChangelogAnswerKeyTest` | Sửa đáp án đang lưu chữ cái A–D thành câu đúng |
+| `NotificationServiceImplTest` | Gửi mã đặt lại mật khẩu khi chưa cấu hình mail |
 | `ExamUserDetailsServiceTest` | Tìm user, bỏ qua hoa thường và khoảng trắng, email rỗng, role rỗng |
 | `JwtUtilsTest` | Ký và đọc JWT, token hỏng hoặc hết hạn |
 | `HistoryRequestTest` | Progress nhận số, chuỗi hoặc null |
@@ -105,3 +107,4 @@ CI (`.github/workflows/ci.yml`) chạy cùng lệnh `gradle test` trên mỗi pu
 
 Ảnh Part 1 và file nghe Part 1–4 nằm ở `data/images`, `data/sounds`. Script tạo lại: `scripts/generate-practice-media.ps1`. Câu chữ trong đề vẫn là nội dung luyện tập, không phải đề ETS chính thức.
 
+Màn quên / đặt lại mật khẩu của frontend đã gọi `/user/pwd/forgot` và `/user/pwd/reset`.

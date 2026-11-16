@@ -36,7 +36,6 @@ public class FieldConst {
 	public static final String IMAGES = "images";
 	public static final String IMAGE = "image";
 	public static final String MEDIA_URL = "mediaUrl";
-	public static final String RESET_CODE = "resetCode";
 	public static final String TYPE = "type";
 	public static final String LABEL = "label";
 	public static final String DATA = "data";

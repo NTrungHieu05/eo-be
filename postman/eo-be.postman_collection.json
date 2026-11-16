@@ -85,10 +85,6 @@
       "value": ""
     },
     {
-      "key": "resetCode",
-      "value": ""
-    },
-    {
       "key": "adminEmail",
       "value": "admin@toeic.local"
     },
@@ -448,106 +444,6 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"oldPassword\": \"{{adminPassword}}\",\n  \"newPassword\": \"{{adminPassword}}\",\n  \"confirmPassword\": \"{{adminPassword}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const json = pm.response.json();",
-                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
-                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Forgot password",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/user/pwd/forgot",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "user",
-                "pwd",
-                "forgot"
-              ],
-              "query": []
-            },
-            "description": "Reset code in console BE (Temporary password for ...). Gan vao {{resetCode}}.",
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{adminEmail}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const json = pm.response.json();",
-                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
-                  "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Reset password",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/user/pwd/reset",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "user",
-                "pwd",
-                "reset"
-              ],
-              "query": []
-            },
-            "description": "",
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"resetCode\": \"{{resetCode}}\",\n  \"newPassword\": \"{{adminPassword}}\",\n  \"confirmPassword\": \"{{adminPassword}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

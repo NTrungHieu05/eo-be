@@ -4,26 +4,21 @@ import exam.db.dto.user.BlockUserRequest;
 import exam.db.dto.user.ChangePasswordRequest;
 import exam.db.dto.user.CreateUserRequest;
 import exam.db.dto.user.ExamUser;
-import exam.db.dto.user.ForgotPasswordRequest;
 import exam.db.dto.user.ListUserRequest;
 import exam.db.dto.user.ListUserResponse;
-import exam.db.dto.user.ResetPasswordRequest;
 import exam.db.dto.user.UnblockUserRequest;
 import exam.db.dto.user.UpdateUserRequest;
 import exam.db.dto.user.UserResponse;
 import exam.db.entity.Role;
 import exam.db.entity.User;
-import exam.db.entity.UserRecovery;
 import exam.db.enums.Assert;
 import exam.db.enums.RoleEnum;
 import exam.db.enums.DBConst;
 import exam.db.enums.ErrorInfo;
 import exam.db.enums.FieldConst;
 import exam.db.repository.role.RoleRepository;
-import exam.db.repository.user.UserRecoveryRepository;
 import exam.db.repository.user.UserRepository;
 import exam.service.ExamUserDetailsService;
-import exam.service.notification.NotificationService;
 import exam.ultis.ExamBaseException;
 import exam.ultis.SecurityContextService;
 import org.springframework.beans.BeanUtils;
@@ -36,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,12 +47,6 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private ExamUserDetailsService userDetailSv;
-
-	@Autowired
-	private UserRecoveryRepository userRecoveryRepo;
-
-	@Autowired
-	private NotificationService notificationSv;
 
 	@Override
 	public UserResponse createUser(CreateUserRequest request) throws ExamBaseException {
@@ -207,55 +195,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Boolean forgotPassword(ForgotPasswordRequest request) throws ExamBaseException {
-		String email = request.getEmail() == null ? "" : request.getEmail().trim();
-		User user = userRepo.findByEmailIgnoreCase(email);
-		Assert.notNull(user, ErrorInfo.USER_NOT_FOUND_ERROR);
-		if (user.isDeleted()) {
-			throw new ExamBaseException(ErrorInfo.USER_NOT_FOUND_ERROR);
-		}
-		retireOtherResetCodes(user.getUserId(), null);
-		String resetCode = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
-		UserRecovery recovery = new UserRecovery();
-		recovery.setUserId(user.getUserId());
-		recovery.setEmail(user.getEmail());
-		recovery.setResetCode(resetCode);
-		recovery.setCreatedDate(new Date());
-		userRecoveryRepo.save(recovery);
-		notificationSv.sendMailResetPwd(user.getEmail(), resetCode);
-		return Boolean.TRUE;
-	}
-
-	@Override
-	public Boolean resetPassword(ResetPasswordRequest request) throws ExamBaseException {
-		String resetCode = request.getResetCode() == null ? "" : request.getResetCode().trim();
-		UserRecovery userRecovery = userRecoveryRepo.findByResetCodeAndDeletedIsFalse(resetCode);
-		Assert.notNull(userRecovery, ErrorInfo.RESET_PASSWORD_CODE_ERROR);
-		if (isResetCodeExpired(userRecovery)) {
-			userRecovery.setDeleted(true);
-			userRecoveryRepo.save(userRecovery);
-			throw new ExamBaseException(ErrorInfo.RESET_PASSWORD_CODE_ERROR);
-		}
-		User user = userRepo.findByUserIdAndDeletedIsFalse(userRecovery.getUserId());
-		Assert.notNull(user, ErrorInfo.USER_NOT_FOUND_ERROR);
-		String newPassword = request.getNewPassword() == null ? "" : request.getNewPassword().trim();
-		String confirmPassword = request.getConfirmPassword() == null ? "" : request.getConfirmPassword().trim();
-		if (!newPassword.equals(confirmPassword)) {
-			throw new ExamBaseException(ErrorInfo.INCORRECT_CONFIRM_PASSWORD_ERROR);
-		}
-		requirePasswordLength(newPassword);
-		user.setPassword(passwordEncoder.encode(newPassword));
-		user.setOtp(null);
-		// Đặt lại mật khẩu thì đăng xuất mọi phiên cũ.
-		user.setTokensValidAfter(new Date());
-		userRepo.save(user);
-		userRecovery.setDeleted(true);
-		userRecoveryRepo.save(userRecovery);
-		retireOtherResetCodes(user.getUserId(), userRecovery);
-		return true;
-	}
-
-	@Override
 	public ListUserResponse listUserForAdmin(ListUserRequest request) throws ExamBaseException {
 		requireAdmin();
 		List<User> users = userRepo.findAllByDeletedIsFalse();
@@ -293,32 +232,6 @@ public class UserServiceImpl implements UserService {
 			userRepo.saveAll(users);
 		}
 		return Boolean.TRUE;
-	}
-
-	private void retireOtherResetCodes(String userId, UserRecovery current) {
-		List<UserRecovery> recoveries = userRecoveryRepo.findAllByUserIdAndDeletedIsFalse(userId);
-		if (recoveries == null || recoveries.isEmpty()) {
-			return;
-		}
-		List<UserRecovery> stale = new ArrayList<>();
-		for (UserRecovery item : recoveries) {
-			if (item == null || item == current || item.isDeleted()) {
-				continue;
-			}
-			item.setDeleted(true);
-			stale.add(item);
-		}
-		if (!stale.isEmpty()) {
-			userRecoveryRepo.saveAll(stale);
-		}
-	}
-
-	private boolean isResetCodeExpired(UserRecovery recovery) {
-		Date created = recovery.getCreatedDate();
-		if (created == null) {
-			return false;
-		}
-		return System.currentTimeMillis() - created.getTime() > 15 * 60 * 1000L;
 	}
 
 	private void requirePasswordLength(String password) throws ExamBaseException {

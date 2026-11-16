@@ -23,27 +23,41 @@ public class PracticeQuestionBank {
 	private static final String[] LETTERS = {"A", "B", "C", "D"};
 
 	private final List<ExamSet> exams;
+	private int expectedExamCount = 3;
+	private String soundFolder;
 
 	private PracticeQuestionBank(List<ExamSet> exams) {
 		this.exams = exams;
 	}
 
 	public static PracticeQuestionBank load() {
+		return read("/practice/practice-questions.json", 3, null);
+	}
+
+	public static PracticeQuestionBank loadSingle(String resourcePath, String soundFolder) {
+		String folder = soundFolder.endsWith("/") ? soundFolder : soundFolder + "/";
+		return read(resourcePath, 1, folder);
+	}
+
+	private static PracticeQuestionBank read(String resourcePath, int expectedExamCount, String soundFolder) {
 		ObjectMapper mapper = new ObjectMapper();
-		try (InputStream in = PracticeQuestionBank.class.getResourceAsStream("/practice/practice-questions.json")) {
+		try (InputStream in = PracticeQuestionBank.class.getResourceAsStream(resourcePath)) {
 			if (in == null) {
-				throw new IllegalStateException("Missing practice/practice-questions.json");
+				throw new IllegalStateException("Missing " + resourcePath);
 			}
 			FileModel model = mapper.readValue(in, FileModel.class);
-			return new PracticeQuestionBank(model.exams);
+			PracticeQuestionBank bank = new PracticeQuestionBank(model.exams);
+			bank.expectedExamCount = expectedExamCount;
+			bank.soundFolder = soundFolder;
+			return bank;
 		} catch (IOException ex) {
 			throw new IllegalStateException("Could not read practice questions", ex);
 		}
 	}
 
 	public void validate() {
-		if (exams == null || exams.size() != 3) {
-			throw new IllegalStateException("Expected 3 practice exams");
+		if (exams == null || exams.size() != expectedExamCount) {
+			throw new IllegalStateException("Expected " + expectedExamCount + " practice exams");
 		}
 		Set<String> stems = new HashSet<>();
 		Set<String> passages = new HashSet<>();
@@ -193,7 +207,8 @@ public class PracticeQuestionBank {
 		if (part < 1 || part > 4) {
 			return null;
 		}
-		String folder = examIndex == 0 ? "/data/sounds/" : "/data/sounds/exam" + (examIndex + 1) + "/";
+		String folder = soundFolder != null ? soundFolder
+				: (examIndex == 0 ? "/data/sounds/" : "/data/sounds/exam" + (examIndex + 1) + "/");
 		return folder + "part" + part + "-" + number + ".wav";
 	}
 

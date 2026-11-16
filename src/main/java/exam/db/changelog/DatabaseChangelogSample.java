@@ -95,7 +95,7 @@ public class DatabaseChangelogSample {
 			user.setEmail(SAMPLE_USER_EMAIL);
 			user.setUsername(SAMPLE_USER_EMAIL);
 			user.setPassword(new BCryptPasswordEncoder().encode(SAMPLE_USER_PASSWORD));
-			user.setDisplayName("Tester");
+			user.setDisplayName("Học viên");
 			user.setFirstName("Test");
 			user.setLastName("User");
 			user.setEnabled(true);

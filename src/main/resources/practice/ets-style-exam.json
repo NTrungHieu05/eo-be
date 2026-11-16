@@ -1,0 +1,2209 @@
+{
+  "exams": [
+    {
+      "part1": [
+        {
+          "text": "What is the person doing?",
+          "options": [
+            "The person is swimming in a pool.",
+            "The person is seated at a desk.",
+            "The person is painting a wall.",
+            "The person is boarding a train."
+          ],
+          "correct": 1
+        },
+        {
+          "text": "Where are the two people standing?",
+          "options": [
+            "They are working behind a counter.",
+            "They are sitting inside a theater.",
+            "They are standing outdoors on the grass.",
+            "They are riding bicycles on a road."
+          ],
+          "correct": 2
+        },
+        {
+          "text": "Which objects are arranged on the table?",
+          "options": [
+            "Two framed photographs.",
+            "A laptop and a coffee cup.",
+            "A stack of dinner plates.",
+            "A red ball, a blue box, and a yellow ball."
+          ],
+          "correct": 3
+        },
+        {
+          "text": "What is the person holding in front of them?",
+          "options": [
+            "The person is holding a yellow folder.",
+            "The person is holding a camera.",
+            "The person is holding an umbrella.",
+            "The person is holding a shopping bag."
+          ],
+          "correct": 0
+        },
+        {
+          "text": "What is the weather like in the picture?",
+          "options": [
+            "Snow is covering the ground.",
+            "Rain is falling under a cloudy sky.",
+            "The sun is shining brightly.",
+            "Thick fog covers the street."
+          ],
+          "correct": 1
+        },
+        {
+          "text": "What is standing next to the building?",
+          "options": [
+            "A fountain is next to the building.",
+            "A bus is parked next to the building.",
+            "A tree is standing next to the building.",
+            "A bicycle rack is next to the building."
+          ],
+          "correct": 2
+        }
+      ],
+      "part2": [
+        {
+          "text": "Where can I leave this package for Ms. Tran?",
+          "options": [
+            "It weighs about two kilograms.",
+            "On the cabinet by the reception desk.",
+            "Yes, she signed the form."
+          ],
+          "correct": 1
+        },
+        {
+          "text": "Has the quarterly report been printed yet?",
+          "options": [
+            "About forty pages.",
+            "In the finance office.",
+            "The printer is still warming up."
+          ],
+          "correct": 2
+        },
+        {
+          "text": "Who will substitute for the receptionist on Friday?",
+          "options": [
+            "Ken from the second floor.",
+            "At the front counter.",
+            "Because she is on leave."
+          ],
+          "correct": 0
+        },
+        {
+          "text": "Why was the product launch moved to June?",
+          "options": [
+            "In the main auditorium.",
+            "The samples arrived late.",
+            "Next Thursday morning."
+          ],
+          "correct": 1
+        },
+        {
+          "text": "Would you like me to call a taxi?",
+          "options": [
+            "It is parked across the street.",
+            "The fare is listed on the door.",
+            "No, thanks. I will take the bus."
+          ],
+          "correct": 2
+        },
+        {
+          "text": "How long will the software update take?",
+          "options": [
+            "About fifteen minutes.",
+            "On every workstation.",
+            "The technician from Hanoi."
+          ],
+          "correct": 0
+        },
+        {
+          "text": "When does the shuttle leave for the airport?",
+          "options": [
+            "At the east exit.",
+            "Every half hour from bay two.",
+            "Yes, I already have a ticket."
+          ],
+          "correct": 1
+        },
+        {
+          "text": "Could you reserve a meeting room for ten people?",
+          "options": [
+            "Ten copies of the agenda.",
+            "The chairs are stacked in the hall.",
+            "Room 4B is free after two."
+          ],
+          "correct": 2
+        },
+        {
+          "text": "Is the cafeteria still serving lunch?",
+          "options": [
+            "Only until one thirty.",
+            "On the ground floor.",
+            "Soup and sandwiches."
+          ],
+          "correct": 0
+        },
+        {
+          "text": "Whose badge was found in the elevator?",
+          "options": [
+            "On the security desk.",
+            "It belongs to the new intern.",
+            "Yesterday afternoon."
+          ],
+          "correct": 1
+        },
+        {
+          "text": "What time should we meet the client?",
+          "options": [
+            "At ten, in the lobby.",
+            "By taxi.",
+            "The contract is ready."
+          ],
+          "correct": 2
+        },
+        {
+          "text": "Did you enjoy the workshop on customer service?",
+          "options": [
+            "Yes, the examples were useful.",
+            "In conference room C.",
+            "About two hours."
+          ],
+          "correct": 0
+        },
+        {
+          "text": "How many boxes should I send to Da Nang?",
+          "options": [
+            "The loading dock is downstairs.",
+            "Three, and mark them fragile.",
+            "By the end of the week."
+          ],
+          "correct": 1
+        },
+        {
+          "text": "The projector in room 2 is not working.",
+          "options": [
+            "At nine o'clock sharp.",
+            "The slides are on the shared drive.",
+            "I will ask maintenance to look at it."
+          ],
+          "correct": 2
+        },
+        {
+          "text": "Where did you put the signed contracts?",
+          "options": [
+            "In the blue folder on my desk.",
+            "The lawyer arrives tomorrow.",
+            "Yes, both parties signed."
+          ],
+          "correct": 0
+        },
+        {
+          "text": "Can we finish the inventory before the store opens?",
+          "options": [
+            "The shelves are in aisle four.",
+            "If we start at seven, yes.",
+            "About two hundred items."
+          ],
+          "correct": 1
+        },
+        {
+          "text": "Who is giving the welcome speech tonight?",
+          "options": [
+            "After dinner.",
+            "In the hotel ballroom.",
+            "The director of sales."
+          ],
+          "correct": 2
+        },
+        {
+          "text": "Should I book a window seat or an aisle seat?",
+          "options": [
+            "A window seat, if one is left.",
+            "Flight 418 to Singapore.",
+            "The gate has changed."
+          ],
+          "correct": 0
+        },
+        {
+          "text": "Why is the north entrance closed?",
+          "options": [
+            "Use the side door instead.",
+            "Workers are replacing the glass doors.",
+            "It opens at eight."
+          ],
+          "correct": 1
+        },
+        {
+          "text": "Have you submitted your travel expenses?",
+          "options": [
+            "Last Monday.",
+            "To the accounting inbox.",
+            "Not yet. I am missing one receipt."
+          ],
+          "correct": 2
+        },
+        {
+          "text": "What color name tags should we print?",
+          "options": [
+            "Blue for staff and white for guests.",
+            "The printer is in the copy room.",
+            "About fifty tags."
+          ],
+          "correct": 0
+        },
+        {
+          "text": "Let's review the budget after lunch.",
+          "options": [
+            "The cafe is crowded at noon.",
+            "That works. I will bring the spreadsheet.",
+            "Because the figures changed."
+          ],
+          "correct": 1
+        },
+        {
+          "text": "Is Mr. Patel still in his office?",
+          "options": [
+            "Until five o'clock.",
+            "On the third floor.",
+            "He stepped out for a client call."
+          ],
+          "correct": 2
+        },
+        {
+          "text": "How was the drive from the station?",
+          "options": [
+            "Slow, because of the rain.",
+            "About twelve kilometers.",
+            "In a company car."
+          ],
+          "correct": 0
+        },
+        {
+          "text": "Do you know a good place for photocopying near here?",
+          "options": [
+            "Black and white is cheaper.",
+            "The shop next to the pharmacy.",
+            "I need twenty copies."
+          ],
+          "correct": 1
+        }
+      ],
+      "part3": [
+        {
+          "passage": "M: The color printer on the third floor is jammed again. W: I already called the service desk. A technician can come at four. M: Then I will print the handouts on the second floor before the seminar. W: Good. Please leave the jammed machine switched on so they can see the error.",
+          "questions": [
+            {
+              "text": "What problem are the speakers discussing?",
+              "options": [
+                "A jammed printer.",
+                "A missing handout.",
+                "A late seminar.",
+                "A broken elevator."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "When will the technician arrive?",
+              "options": [
+                "Before noon.",
+                "At four.",
+                "Tomorrow morning.",
+                "After the seminar."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "What will the man do next?",
+              "options": [
+                "Repair the printer himself.",
+                "Cancel the seminar.",
+                "Print the handouts on another floor.",
+                "Call the service desk."
+              ],
+              "correct": 2
+            }
+          ]
+        },
+        {
+          "passage": "W: I would like a late checkout on Sunday, if that is possible. M: We can offer noon at no charge. Anything later is half the daily rate. W: Noon is fine. Could you also store one suitcase until six? M: Yes. Bring it to the bell desk and keep this claim ticket.",
+          "questions": [
+            {
+              "text": "What does the woman ask about first?",
+              "options": [
+                "A wake-up call.",
+                "A cheaper room.",
+                "An airport shuttle.",
+                "A later checkout time."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "How much does a checkout after noon cost?",
+              "options": [
+                "Half the daily rate.",
+                "There is no charge.",
+                "A fixed fee of ten dollars.",
+                "The full weekly rate."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "What will the woman receive?",
+              "options": [
+                "A new room key.",
+                "A claim ticket for her suitcase.",
+                "A printed invoice.",
+                "A meal voucher."
+              ],
+              "correct": 1
+            }
+          ]
+        },
+        {
+          "passage": "M: We are low on letterhead and large envelopes. W: I can place an order with the usual supplier this afternoon. How many boxes do you need? M: Two boxes of letterhead and one of envelopes. Please ask for delivery on Thursday. W: I will. Their truck usually arrives before ten.",
+          "questions": [
+            {
+              "text": "What does the man want to order?",
+              "options": [
+                "Desks and chairs.",
+                "Printer ink and paper.",
+                "Letterhead and envelopes.",
+                "Name badges."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "When should the supplies arrive?",
+              "options": [
+                "Before the office opens today.",
+                "This afternoon.",
+                "Next Monday.",
+                "On Thursday."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "Who will contact the supplier?",
+              "options": [
+                "The woman.",
+                "The receptionist.",
+                "A delivery driver.",
+                "The finance manager."
+              ],
+              "correct": 0
+            }
+          ]
+        },
+        {
+          "passage": "W: I need to change my flight from Friday morning to Friday evening. M: There is a seat on the 6:40 departure, but it is an aisle seat. W: That is acceptable. Is there a change fee? M: The fare difference is 35 dollars, and the change fee is waived for this ticket.",
+          "questions": [
+            {
+              "text": "What does the woman want to change?",
+              "options": [
+                "The city she is flying to.",
+                "The time of her Friday flight.",
+                "Her hotel reservation.",
+                "Her seat on a morning train."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "What kind of seat is available?",
+              "options": [
+                "A seat in first class.",
+                "A window seat.",
+                "An aisle seat.",
+                "Two seats together."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "What will the woman have to pay?",
+              "options": [
+                "The full price of a new ticket.",
+                "A change fee only.",
+                "Nothing at all.",
+                "A fare difference of 35 dollars."
+              ],
+              "correct": 3
+            }
+          ]
+        },
+        {
+          "passage": "M: Two adult tickets for the three o'clock museum tour, please. W: That tour is full. The next one with space is at 4:30, and it includes the special exhibit. M: We have a dinner reservation at seven, so 4:30 works. W: These tickets are timed, so please arrive ten minutes early.",
+          "questions": [
+            {
+              "text": "Why can the visitors not take the three o'clock tour?",
+              "options": [
+                "It is already full.",
+                "It has been canceled.",
+                "It is only for members.",
+                "It does not include the exhibit."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "Which tour will they attend?",
+              "options": [
+                "The noon tour.",
+                "The 4:30 tour.",
+                "The evening tour.",
+                "A private tour at seven."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "What are the visitors asked to do?",
+              "options": [
+                "Buy dinner at the museum.",
+                "Bring their own headsets.",
+                "Arrive ten minutes early.",
+                "Show a membership card."
+              ],
+              "correct": 2
+            }
+          ]
+        },
+        {
+          "passage": "W: I would like a table for six on Saturday at seven. M: The window tables are booked then. I can offer a table near the piano at 7:15. W: That is all right. One guest needs a vegetarian meal. M: I have noted that. The name on the booking is Chen.",
+          "questions": [
+            {
+              "text": "What is the woman trying to do?",
+              "options": [
+                "Schedule a music lesson.",
+                "Order food for delivery.",
+                "Buy concert tickets.",
+                "Reserve a restaurant table."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "Why is the first request not available?",
+              "options": [
+                "The window tables are already booked.",
+                "The restaurant is closed on Saturday.",
+                "Parties of six are not allowed.",
+                "The piano is being repaired."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "What special request does the woman make?",
+              "options": [
+                "A birthday cake.",
+                "A vegetarian meal for one guest.",
+                "A table outdoors.",
+                "A quieter room."
+              ],
+              "correct": 1
+            }
+          ]
+        },
+        {
+          "passage": "M: The spreadsheet class was moved from Wednesday to Thursday. W: Does it still start at nine in the training lab? M: Yes, but please bring headphones because the video has narration. W: I will tell the other new hires. Two of them were planning to come on Wednesday.",
+          "questions": [
+            {
+              "text": "What has been rescheduled?",
+              "options": [
+                "A job interview.",
+                "A client meeting.",
+                "A spreadsheet class.",
+                "A building inspection."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "What should participants bring?",
+              "options": [
+                "An identification badge only.",
+                "Their own laptops.",
+                "A printed manual.",
+                "Headphones."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "What will the woman do?",
+              "options": [
+                "Tell the other new hires about the change.",
+                "Cancel the class.",
+                "Move the class back to Wednesday.",
+                "Record the narration."
+              ],
+              "correct": 0
+            }
+          ]
+        },
+        {
+          "passage": "W: This carton is going to the Hai Phong warehouse. It cannot be stacked. M: Then I will mark it fragile and put it on the noon truck. W: The receiving clerk is Ms. Doan. Please call her when the truck leaves. M: I will send you the tracking number as well.",
+          "questions": [
+            {
+              "text": "Where is the carton being sent?",
+              "options": [
+                "To a store in Da Nang.",
+                "To a warehouse in Hai Phong.",
+                "To the customer's home.",
+                "To the airport."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "How will the carton be shipped?",
+              "options": [
+                "By passenger train.",
+                "By overnight air.",
+                "On the noon truck.",
+                "In a company car."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "What will the man send the woman?",
+              "options": [
+                "A photo of the warehouse.",
+                "A new invoice.",
+                "A packing list only.",
+                "A tracking number."
+              ],
+              "correct": 3
+            }
+          ]
+        },
+        {
+          "passage": "M: I am calling to confirm an interview with the design team. W: Yes, you are scheduled for Tuesday at 10:30. Please bring a portfolio and a photo ID. M: Should I wait in the lobby? W: Check in at reception, and someone will walk you to the studio.",
+          "questions": [
+            {
+              "text": "Why is the man calling?",
+              "options": [
+                "To confirm an interview.",
+                "To cancel a meeting.",
+                "To ask for a salary figure.",
+                "To report a late train."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "What should the man bring?",
+              "options": [
+                "A completed tax form.",
+                "A portfolio and a photo ID.",
+                "A laptop only.",
+                "Copies of his diploma."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "Where should the man go when he arrives?",
+              "options": [
+                "The employee cafeteria.",
+                "Directly to the studio.",
+                "The reception desk.",
+                "The parking office."
+              ],
+              "correct": 2
+            }
+          ]
+        },
+        {
+          "passage": "W: I would like to renew my gym membership for six months. M: If you pay today, the joining fee is waived and you may use the pool. W: Does that include the evening classes? M: Yes. The schedule is posted by the locker rooms, and towels are available at the desk.",
+          "questions": [
+            {
+              "text": "What does the woman want to renew?",
+              "options": [
+                "A library card.",
+                "A magazine subscription.",
+                "A parking permit.",
+                "A gym membership."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "What benefit is offered if she pays today?",
+              "options": [
+                "The joining fee is waived.",
+                "A free personal trainer.",
+                "A discount on equipment.",
+                "An extra free month."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "Where can members find the class schedule?",
+              "options": [
+                "On the pool door only.",
+                "By the locker rooms.",
+                "At the cafe.",
+                "In a monthly letter."
+              ],
+              "correct": 1
+            }
+          ]
+        },
+        {
+          "passage": "M: I registered online, but I never received a conference badge. W: Badges are printed on site. Bring the confirmation e-mail and a photo ID. M: The workshop I chose is at nine. Will there be a line? W: Arrive by 8:15. After that, the registration desk gets crowded.",
+          "questions": [
+            {
+              "text": "What problem is the man reporting?",
+              "options": [
+                "His workshop was canceled.",
+                "He was charged twice.",
+                "He did not receive a conference badge.",
+                "He cannot find the hotel."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "How will he get a badge?",
+              "options": [
+                "He must print it at home.",
+                "It will be mailed tomorrow.",
+                "A colleague will bring it.",
+                "It will be printed at the conference."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "When should he arrive?",
+              "options": [
+                "By 8:15.",
+                "At nine exactly.",
+                "After the first workshop.",
+                "Any time before noon."
+              ],
+              "correct": 0
+            }
+          ]
+        },
+        {
+          "passage": "W: The art history books I ordered last week have not arrived. M: They were shipped on Monday and are out for delivery today. W: I need them for a class tomorrow morning. Can you hold them at the store if I miss the courier? M: Yes. If no one is home, the driver will leave them at our Tran Phu branch.",
+          "questions": [
+            {
+              "text": "What is the woman waiting for?",
+              "options": [
+                "A repaired laptop.",
+                "Books she ordered.",
+                "Concert tickets.",
+                "A furniture delivery."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "When were the items shipped?",
+              "options": [
+                "Last month.",
+                "This morning.",
+                "On Monday.",
+                "They have not been shipped."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "Where can the books be collected if she is not home?",
+              "options": [
+                "From the publisher.",
+                "At the university library.",
+                "At the airport counter.",
+                "At the Tran Phu branch."
+              ],
+              "correct": 3
+            }
+          ]
+        },
+        {
+          "passage": "M: The air conditioner in apartment 12B is leaking onto the floor. W: A technician can visit between one and three today. Will someone be home? M: I will be there. Please ask them to bring a replacement hose if that is the problem. W: I have added that note to the work order.",
+          "questions": [
+            {
+              "text": "What is wrong in the apartment?",
+              "options": [
+                "An air conditioner is leaking.",
+                "The front door will not lock.",
+                "The lights have gone out.",
+                "The window is cracked."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "When will the technician come?",
+              "options": [
+                "Tomorrow morning.",
+                "Between one and three today.",
+                "Next Monday.",
+                "Only in the evening."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "What does the man ask the technician to bring?",
+              "options": [
+                "Extra floor tiles.",
+                "A new air conditioner.",
+                "A replacement hose.",
+                "A door key."
+              ],
+              "correct": 2
+            }
+          ]
+        }
+      ],
+      "part4": [
+        {
+          "passage": "Attention, shoppers. The Riverside Market will close at 7 P.M. this evening because of a power inspection. All fresh bread is half price until closing. Please take your baskets to the registers on the first floor. The market will open again at 8 A.M. tomorrow.",
+          "questions": [
+            {
+              "text": "Why will the market close early?",
+              "options": [
+                "Because of bad weather.",
+                "Because of a holiday.",
+                "Because the staff is at a meeting.",
+                "Because of a power inspection."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "What is being offered at a discount?",
+              "options": [
+                "Fresh bread.",
+                "All frozen food.",
+                "School supplies.",
+                "Membership cards."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "When will the market open again?",
+              "options": [
+                "At noon tomorrow.",
+                "At 8 A.M. tomorrow.",
+                "On Monday.",
+                "It will not reopen."
+              ],
+              "correct": 1
+            }
+          ]
+        },
+        {
+          "passage": "This is a platform announcement. The 4:10 express to Hai Phong will depart from platform 3 instead of platform 1. The change is due to track maintenance. The train is expected to leave on time. Passengers with bicycles should board the last car.",
+          "questions": [
+            {
+              "text": "What has changed?",
+              "options": [
+                "The ticket price.",
+                "The destination.",
+                "The departure platform.",
+                "The departure day."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "Why was the change made?",
+              "options": [
+                "Because platform 3 is newer.",
+                "Because the train is late.",
+                "Because of a staff shortage.",
+                "Because of track maintenance."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "Where should passengers with bicycles board?",
+              "options": [
+                "The last car.",
+                "The first car.",
+                "Any car with a green door.",
+                "The station office."
+              ],
+              "correct": 0
+            }
+          ]
+        },
+        {
+          "passage": "Good morning. This is a reminder that the company picnic is this Saturday at West Lake Park, starting at 10 A.M. Lunch will be served at noon. If you have not chosen a meal, reply to yesterday's e-mail by Thursday. Family members are welcome, but please register each guest.",
+          "questions": [
+            {
+              "text": "When does the picnic start?",
+              "options": [
+                "At noon on Sunday.",
+                "At 10 A.M. on Saturday.",
+                "On Thursday evening.",
+                "At 10 A.M. today."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "What should employees do if they have not chosen a meal?",
+              "options": [
+                "Pay at the entrance.",
+                "Call the park office.",
+                "Reply to an e-mail by Thursday.",
+                "Bring their own lunch."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "What is required for family members?",
+              "options": [
+                "Guests must arrive at noon.",
+                "Each guest must bring a dish.",
+                "Children are not allowed.",
+                "Each guest must be registered."
+              ],
+              "correct": 3
+            }
+          ]
+        },
+        {
+          "passage": "The city library will close at 4 P.M. on Friday for staff training. Book returns can still be placed in the slot by the side door. Reserved items that were due on Friday may be collected on Saturday morning. The reading rooms will reopen at the usual time on Monday.",
+          "questions": [
+            {
+              "text": "Why will the library close early on Friday?",
+              "options": [
+                "For staff training.",
+                "For a public holiday.",
+                "Because of construction.",
+                "Because of a storm."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "How can readers return books on Friday?",
+              "options": [
+                "At the main desk until 4 P.M. only.",
+                "Through the slot by the side door.",
+                "By mail.",
+                "They cannot return books."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "When will the reading rooms reopen?",
+              "options": [
+                "The following Friday.",
+                "On Saturday afternoon.",
+                "On Monday.",
+                "They will stay closed."
+              ],
+              "correct": 2
+            }
+          ]
+        },
+        {
+          "passage": "Before we begin the factory tour, please put on the blue visitor badges and the ear protection at the door. Stay inside the yellow lines at all times. Photography is not allowed on the production floor. The tour lasts forty minutes and ends in the showroom, where you may ask questions.",
+          "questions": [
+            {
+              "text": "What must visitors wear?",
+              "options": [
+                "Company uniforms.",
+                "White coats and gloves.",
+                "Hard hats only.",
+                "Blue badges and ear protection."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "What is not permitted?",
+              "options": [
+                "Photography on the production floor.",
+                "Asking questions.",
+                "Walking in the showroom.",
+                "Wearing a badge."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "Where does the tour end?",
+              "options": [
+                "In the cafeteria.",
+                "In the showroom.",
+                "At the main gate.",
+                "On the production floor."
+              ],
+              "correct": 1
+            }
+          ]
+        },
+        {
+          "passage": "This is an announcement for passengers on flight VN214 to Da Nang. The departure gate has changed from B12 to C3. Boarding will begin in twenty minutes. Passengers who need extra time may board first. Please have your boarding pass and identification ready.",
+          "questions": [
+            {
+              "text": "What is the new gate?",
+              "options": [
+                "A1.",
+                "B12.",
+                "C3.",
+                "The announcement does not give a gate."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "When will boarding begin?",
+              "options": [
+                "Tomorrow morning.",
+                "In two hours.",
+                "Immediately.",
+                "In twenty minutes."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "Who may board first?",
+              "options": [
+                "Passengers who need extra time.",
+                "Passengers in the last row.",
+                "Only passengers with children.",
+                "Passengers who arrived late."
+              ],
+              "correct": 0
+            }
+          ]
+        },
+        {
+          "passage": "Welcome to the afternoon workshop on writing clearer e-mails. I am Linh Pham from the communications team. We will spend the first half reviewing examples, and the second half rewriting messages in pairs. Please silence your phones. Handouts are on the table by the door if you did not get one.",
+          "questions": [
+            {
+              "text": "Who is the speaker?",
+              "options": [
+                "A guest from another company.",
+                "Linh Pham from the communications team.",
+                "The office manager.",
+                "A software trainer."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "What will participants do in the second half?",
+              "options": [
+                "Listen to a long lecture.",
+                "Take a written test.",
+                "Rewrite messages in pairs.",
+                "Tour the building."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "Where are the handouts?",
+              "options": [
+                "They will be sent later.",
+                "At the reception desk.",
+                "In an e-mail only.",
+                "On the table by the door."
+              ],
+              "correct": 3
+            }
+          ]
+        },
+        {
+          "passage": "Good afternoon, and thank you for joining the walking tour of the Old Quarter. We will start from the lake and finish at the craft market. The path is about two kilometers. If it rains, we will visit the covered market first and return to the lake at the end. Please stay with the group at each crossing.",
+          "questions": [
+            {
+              "text": "Where does the tour finish if the weather stays dry?",
+              "options": [
+                "At the craft market.",
+                "At the lake.",
+                "At the train station.",
+                "At a museum."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "About how long is the path?",
+              "options": [
+                "Ten kilometers.",
+                "Two kilometers.",
+                "Two hundred meters.",
+                "The speaker does not say."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "What will the group do if it rains?",
+              "options": [
+                "Take a bus the whole way.",
+                "Cancel the tour.",
+                "Visit the covered market first.",
+                "Stay at the lake."
+              ],
+              "correct": 2
+            }
+          ]
+        },
+        {
+          "passage": "Starting Monday, the staff cafeteria will offer a new lunch menu. Hot meals will be served from 11:30 to 1:30. A vegetarian option will be available every day, and soup will no longer be served after 1 P.M. Employees may still bring food from outside, but please use the labeled shelves in the refrigerator.",
+          "questions": [
+            {
+              "text": "When will the new menu begin?",
+              "options": [
+                "On the first of the year.",
+                "Today.",
+                "Next month.",
+                "On Monday."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "What will stop being served after 1 P.M.?",
+              "options": [
+                "Soup.",
+                "The vegetarian option.",
+                "Hot meals.",
+                "Drinks."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "What should employees do with food they bring?",
+              "options": [
+                "Leave it on any table.",
+                "Put it on the labeled refrigerator shelves.",
+                "Give it to the kitchen staff.",
+                "Eat it before 11:30."
+              ],
+              "correct": 1
+            }
+          ]
+        },
+        {
+          "passage": "Drivers using the basement garage should note that level B2 will be closed for repainting from Wednesday through Friday. Please park on level B1 or in the outdoor lot on Nguyen Trai Street. Monthly pass holders will not be charged extra for the outdoor lot during those three days. The exit gates will remain open until 10 P.M.",
+          "questions": [
+            {
+              "text": "Which parking level will be closed?",
+              "options": [
+                "The outdoor lot.",
+                "Level B1.",
+                "Level B2.",
+                "Every level of the garage."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "How long will the work last?",
+              "options": [
+                "Until 10 P.M. tonight.",
+                "One afternoon.",
+                "The whole month.",
+                "From Wednesday through Friday."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "What is true about monthly pass holders?",
+              "options": [
+                "They will not pay extra to use the outdoor lot.",
+                "They must park on the street.",
+                "Their passes will be canceled.",
+                "They can park on B2 as usual."
+              ],
+              "correct": 0
+            }
+          ]
+        }
+      ],
+      "part5": [
+        {
+          "text": "The revised contract will be sent to both parties _____ Friday afternoon.",
+          "options": [
+            "until",
+            "by",
+            "during",
+            "among"
+          ],
+          "correct": 1
+        },
+        {
+          "text": "Ms. Ortega _____ the orientation for new employees yesterday morning.",
+          "options": [
+            "conducts",
+            "conducting",
+            "conducted",
+            "conduct"
+          ],
+          "correct": 2
+        },
+        {
+          "text": "Please stack the boxes _____ the wall so the aisle stays clear.",
+          "options": [
+            "through",
+            "onto",
+            "between",
+            "against"
+          ],
+          "correct": 3
+        },
+        {
+          "text": "The museum offers a discount to visitors who show a student _____.",
+          "options": [
+            "identification",
+            "identify",
+            "identifiable",
+            "identified"
+          ],
+          "correct": 0
+        },
+        {
+          "text": "Neither the manager nor the assistants _____ available after four today.",
+          "options": [
+            "is",
+            "are",
+            "was",
+            "be"
+          ],
+          "correct": 1
+        },
+        {
+          "text": "We chose this hotel because it is _____ to the conference center.",
+          "options": [
+            "closed",
+            "closely",
+            "close",
+            "closer"
+          ],
+          "correct": 2
+        },
+        {
+          "text": "All expense claims must be _____ with original receipts.",
+          "options": [
+            "submit",
+            "submitting",
+            "submission",
+            "submitted"
+          ],
+          "correct": 3
+        },
+        {
+          "text": "The seminar was postponed _____ the speaker missed her connecting flight.",
+          "options": [
+            "because",
+            "although",
+            "despite",
+            "unless"
+          ],
+          "correct": 0
+        },
+        {
+          "text": "Customers may exchange an item _____ thirty days of purchase.",
+          "options": [
+            "during",
+            "within",
+            "since",
+            "by"
+          ],
+          "correct": 1
+        },
+        {
+          "text": "The new software is _____ to install than the previous version.",
+          "options": [
+            "easily",
+            "easiest",
+            "easier",
+            "ease"
+          ],
+          "correct": 2
+        },
+        {
+          "text": "A technician will inspect the elevator _____ it is put back into service.",
+          "options": [
+            "during",
+            "while",
+            "since",
+            "before"
+          ],
+          "correct": 3
+        },
+        {
+          "text": "The announcement was posted _____ the entrance to the staff lounge.",
+          "options": [
+            "near",
+            "nearly",
+            "nearby",
+            "nearness"
+          ],
+          "correct": 0
+        },
+        {
+          "text": "Applicants should send a résumé and a cover letter _____ the hiring office.",
+          "options": [
+            "at",
+            "to",
+            "on",
+            "among"
+          ],
+          "correct": 1
+        },
+        {
+          "text": "The parts we ordered last month have not _____ arrived.",
+          "options": [
+            "still",
+            "already",
+            "yet",
+            "ever"
+          ],
+          "correct": 2
+        },
+        {
+          "text": "Mr. Chen recommended that the team _____ the draft once more.",
+          "options": [
+            "reviewed",
+            "reviews",
+            "reviewing",
+            "review"
+          ],
+          "correct": 3
+        },
+        {
+          "text": "The brochure includes a _____ map of the exhibition halls.",
+          "options": [
+            "detailed",
+            "detail",
+            "detailing",
+            "details"
+          ],
+          "correct": 0
+        },
+        {
+          "text": "Staff members are asked to keep the kitchen _____ after using it.",
+          "options": [
+            "cleanly",
+            "clean",
+            "cleaner",
+            "cleanliness"
+          ],
+          "correct": 1
+        },
+        {
+          "text": "The flight was delayed, _____ we missed the opening session.",
+          "options": [
+            "or",
+            "but",
+            "so",
+            "nor"
+          ],
+          "correct": 2
+        },
+        {
+          "text": "Tickets bought online can be collected _____ showing a confirmation message.",
+          "options": [
+            "of",
+            "with",
+            "for",
+            "by"
+          ],
+          "correct": 3
+        },
+        {
+          "text": "The committee has _____ a new chairperson for the coming year.",
+          "options": [
+            "appointed",
+            "appointing",
+            "appointment",
+            "appoints"
+          ],
+          "correct": 0
+        },
+        {
+          "text": "Please do not enter the laboratory _____ you are wearing safety glasses.",
+          "options": [
+            "although",
+            "unless",
+            "because",
+            "so"
+          ],
+          "correct": 1
+        },
+        {
+          "text": "The workshop was _____ attended than the organizers had expected.",
+          "options": [
+            "good",
+            "best",
+            "better",
+            "well"
+          ],
+          "correct": 2
+        },
+        {
+          "text": "Our store will be closed _____ the national holiday.",
+          "options": [
+            "since",
+            "while",
+            "between",
+            "during"
+          ],
+          "correct": 3
+        },
+        {
+          "text": "The report contains several _____ that need to be corrected.",
+          "options": [
+            "errors",
+            "erroneous",
+            "err",
+            "error"
+          ],
+          "correct": 0
+        },
+        {
+          "text": "Ms. Ibrahim speaks _____ enough for every guest to hear her.",
+          "options": [
+            "clear",
+            "clearly",
+            "clearer",
+            "clearest"
+          ],
+          "correct": 1
+        },
+        {
+          "text": "The company is looking for someone with experience _____ event planning.",
+          "options": [
+            "at",
+            "on",
+            "in",
+            "to"
+          ],
+          "correct": 2
+        },
+        {
+          "text": "Once the payment is received, the order will be _____ immediately.",
+          "options": [
+            "ships",
+            "shipping",
+            "shipment",
+            "shipped"
+          ],
+          "correct": 3
+        },
+        {
+          "text": "The director wants the proposal finished _____ the client arrives.",
+          "options": [
+            "before",
+            "until",
+            "during",
+            "since"
+          ],
+          "correct": 0
+        },
+        {
+          "text": "There is a small fee for deliveries made _____ the city limits.",
+          "options": [
+            "out",
+            "outside",
+            "without",
+            "outer"
+          ],
+          "correct": 1
+        },
+        {
+          "text": "The instructions were _____ , so several people assembled the shelf incorrectly.",
+          "options": [
+            "cleared",
+            "unclearly",
+            "unclear",
+            "clearing"
+          ],
+          "correct": 2
+        }
+      ],
+      "part6": [
+        {
+          "passage": "To: All sales staff\nFrom: Operations\nSubject: Sample kits\n\nThe spring sample kits (1) _____ yesterday and are in the storeroom. Please take one kit before you visit a client this week. (2) _____ you need a second kit, ask Minh at the supply desk. Kits must be returned (3) _____ the end of the month. (4) _____ .",
+          "questions": [
+            {
+              "text": "Sample kits: which choice best completes blank (1)?",
+              "options": [
+                "arrive",
+                "arriving",
+                "arrival",
+                "arrived"
+              ],
+              "correct": 3
+            },
+            {
+              "text": "Sample kits: which choice best completes blank (2)?",
+              "options": [
+                "If",
+                "Although",
+                "Despite",
+                "So"
+              ],
+              "correct": 0
+            },
+            {
+              "text": "Sample kits: which choice best completes blank (3)?",
+              "options": [
+                "until",
+                "by",
+                "on",
+                "between"
+              ],
+              "correct": 1
+            },
+            {
+              "text": "Sample kits: which choice best completes blank (4)?",
+              "options": [
+                "Parking is free on Sundays.",
+                "The cafeteria opens at seven.",
+                "A checklist is attached to each kit.",
+                "The elevator is out of service."
+              ],
+              "correct": 2
+            }
+          ]
+        },
+        {
+          "passage": "Notice to residents of building C\n\nWater service will be turned off on Tuesday from 9 A.M. to 1 P.M. so that a damaged pipe can be (1) _____. Please store enough water (2) _____ Monday evening. The management office (3) _____ for the inconvenience. (4) _____.",
+          "questions": [
+            {
+              "text": "Building C notice: which choice best completes blank (1)?",
+              "options": [
+                "replacing",
+                "replace",
+                "replacement",
+                "replaced"
+              ],
+              "correct": 3
+            },
+            {
+              "text": "Building C notice: which choice best completes blank (2)?",
+              "options": [
+                "by",
+                "at",
+                "on",
+                "in"
+              ],
+              "correct": 0
+            },
+            {
+              "text": "Building C notice: which choice best completes blank (3)?",
+              "options": [
+                "apology",
+                "apologizes",
+                "apologetic",
+                "apologize"
+              ],
+              "correct": 1
+            },
+            {
+              "text": "Building C notice: which choice best completes blank (4)?",
+              "options": [
+                "Rent is due on the fifth.",
+                "The pool will open an hour early.",
+                "Technicians will be working in the basement.",
+                "A new tenant moves in today."
+              ],
+              "correct": 2
+            }
+          ]
+        },
+        {
+          "passage": "Green Leaf Cafe is now hiring part-time servers for the evening shift. Successful applicants will be (1) _____ to work at least three nights a week. Experience is helpful but not required, and training (2) _____ during the first week. To apply, leave a résumé (3) _____ the manager before Friday. (4) _____.",
+          "questions": [
+            {
+              "text": "Green Leaf Cafe: which choice best completes blank (1)?",
+              "options": [
+                "expecting",
+                "expect",
+                "expectation",
+                "expected"
+              ],
+              "correct": 3
+            },
+            {
+              "text": "Green Leaf Cafe: which choice best completes blank (2)?",
+              "options": [
+                "is provided",
+                "providing",
+                "to provide",
+                "provide"
+              ],
+              "correct": 0
+            },
+            {
+              "text": "Green Leaf Cafe: which choice best completes blank (3)?",
+              "options": [
+                "to",
+                "with",
+                "at",
+                "on"
+              ],
+              "correct": 1
+            },
+            {
+              "text": "Green Leaf Cafe: which choice best completes blank (4)?",
+              "options": [
+                "Uniforms are sold at the market.",
+                "The cafe does not serve dinner.",
+                "Interviews will be held next Monday.",
+                "The manager is on vacation."
+              ],
+              "correct": 2
+            }
+          ]
+        },
+        {
+          "passage": "Memorandum\nTo: Project leaders\n\nThe client has asked for a shorter progress report. Beginning this month, reports should be no (1) _____ than two pages. Please focus on tasks that were finished and tasks that are still (2) _____. Send the file to the shared folder (3) _____ noon on the last Friday of the month. (4) _____.",
+          "questions": [
+            {
+              "text": "Progress report memo: which choice best completes blank (1)?",
+              "options": [
+                "length",
+                "long",
+                "longest",
+                "longer"
+              ],
+              "correct": 3
+            },
+            {
+              "text": "Progress report memo: which choice best completes blank (2)?",
+              "options": [
+                "pending",
+                "pend",
+                "pends",
+                "pendingly"
+              ],
+              "correct": 0
+            },
+            {
+              "text": "Progress report memo: which choice best completes blank (3)?",
+              "options": [
+                "until",
+                "before",
+                "during",
+                "while"
+              ],
+              "correct": 1
+            },
+            {
+              "text": "Progress report memo: which choice best completes blank (4)?",
+              "options": [
+                "Meetings will now be held daily.",
+                "The client canceled the project.",
+                "A sample report is available on the intranet.",
+                "Office supplies must be ordered today."
+              ],
+              "correct": 2
+            }
+          ]
+        }
+      ],
+      "part7single": [
+        {
+          "passage": "Lantern Books\n20 Hang Bai Street\n\nReceipt 1842\nDate: 12 March\n\nOne city guidebook — 180,000 VND\nOne notebook — 45,000 VND\nDiscount, member card — 15,000 VND\nTotal paid in cash — 210,000 VND\n\nReturns are accepted within seven days with this receipt. Opened maps cannot be returned.",
+          "questions": [
+            {
+              "text": "How did the customer pay?",
+              "options": [
+                "With a gift voucher.",
+                "By credit card.",
+                "By bank transfer.",
+                "In cash."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "What cannot be returned?",
+              "options": [
+                "Opened maps.",
+                "Notebooks.",
+                "Member cards.",
+                "Any item bought in March."
+              ],
+              "correct": 0
+            }
+          ]
+        },
+        {
+          "passage": "From: facilities@northbridge.example\nTo: all-staff@northbridge.example\nSubject: Badge readers\n\nThe badge readers at the west entrance will be offline on Thursday from 7 A.M. to 9 A.M. During that time, please enter through the main lobby and sign the visitor book. Your badge will work at all other doors.",
+          "questions": [
+            {
+              "text": "What will be offline on Thursday morning?",
+              "options": [
+                "The main lobby doors.",
+                "The badge readers at the west entrance.",
+                "Every badge reader in the building.",
+                "The visitor book."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "What should staff do during that time?",
+              "options": [
+                "Use the west entrance as usual.",
+                "Wait until 9 A.M. to enter.",
+                "Enter through the main lobby and sign in.",
+                "Collect a new badge."
+              ],
+              "correct": 2
+            }
+          ]
+        },
+        {
+          "passage": "City Ferry — Weekend notice\n\nOn Saturday and Sunday, the first ferry from Pier 2 leaves at 8:20 A.M., thirty minutes later than on weekdays. The last return ferry is at 6:40 P.M. Bicycles are allowed on the 8:20 and 6:40 sailings only. Tickets bought on the pier cost more than tickets bought in the mobile app.",
+          "questions": [
+            {
+              "text": "How is the Saturday morning ferry different from a weekday ferry?",
+              "options": [
+                "It costs less.",
+                "It leaves from a different pier.",
+                "It does not run.",
+                "It leaves thirty minutes later."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "On which sailings are bicycles allowed?",
+              "options": [
+                "The 8:20 and the 6:40.",
+                "Every weekend sailing.",
+                "Weekday sailings only.",
+                "None of the weekend sailings."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "What is true about ticket prices?",
+              "options": [
+                "All tickets cost the same.",
+                "Pier tickets cost more than app tickets.",
+                "App tickets are no longer sold.",
+                "Weekend tickets are free."
+              ],
+              "correct": 1
+            }
+          ]
+        },
+        {
+          "passage": "Thank you for staying at the Orchid Hotel. Your room, 1408, is reserved from 14 April to 16 April. Check-in begins at 2 P.M. Breakfast is included and is served in the garden restaurant until 10 A.M. The pool is closed on Monday for cleaning. A late arrival after 10 P.M. should call the front desk from the taxi stand.",
+          "questions": [
+            {
+              "text": "How many nights is the room reserved?",
+              "options": [
+                "Three nights.",
+                "One night.",
+                "Two nights.",
+                "A full week."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "What is included in the stay?",
+              "options": [
+                "A pool lesson.",
+                "Dinner.",
+                "Airport transportation.",
+                "Breakfast."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "What should a guest do if arriving after 10 P.M.?",
+              "options": [
+                "Call the front desk from the taxi stand.",
+                "Wait in the garden restaurant.",
+                "Use the pool entrance.",
+                "Collect the key from room 1408."
+              ],
+              "correct": 0
+            }
+          ]
+        },
+        {
+          "passage": "Position: Warehouse assistant, day shift\nLocation: Long Bien\n\nDuties include scanning incoming cartons, updating the inventory screen, and keeping aisles clear. The shift is 8 A.M. to 4:30 P.M., Monday to Friday. Applicants must be able to lift 15 kilograms. Previous warehouse experience is preferred. Send a résumé to jobs@haulog.example by 30 April. Phone calls will not be accepted.",
+          "questions": [
+            {
+              "text": "What is one duty of the job?",
+              "options": [
+                "Driving a delivery truck.",
+                "Scanning incoming cartons.",
+                "Designing the inventory screen.",
+                "Hiring other assistants."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "What is a requirement?",
+              "options": [
+                "A university degree.",
+                "A driver's license.",
+                "The ability to lift 15 kilograms.",
+                "Weekend availability."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "How should someone apply?",
+              "options": [
+                "By completing a form at the pier.",
+                "By calling the warehouse.",
+                "By visiting on 30 April.",
+                "By sending a résumé by e-mail."
+              ],
+              "correct": 3
+            }
+          ]
+        },
+        {
+          "passage": "Community board — Apartment complex\n\nThe recycling room will move from the basement to the room beside the mailboxes on 1 May. Glass and plastic may be left there any day. Large furniture will no longer be accepted. Residents who need help moving a heavy item should book the service elevator with the guard at least one day ahead.",
+          "questions": [
+            {
+              "text": "Where will the recycling room be after 1 May?",
+              "options": [
+                "Beside the mailboxes.",
+                "In the basement.",
+                "Next to the service elevator.",
+                "Outside the main gate."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "What will no longer be accepted?",
+              "options": [
+                "Glass.",
+                "Large furniture.",
+                "Plastic.",
+                "Paper."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "What should residents do before moving a heavy item?",
+              "options": [
+                "Call a furniture store.",
+                "Leave it in the basement.",
+                "Book the service elevator with the guard.",
+                "Wait until May."
+              ],
+              "correct": 2
+            }
+          ]
+        },
+        {
+          "passage": "E-mail\nTo: n.quyen@brightpath.example\nFrom: seminars@brightpath.example\n\nYour seat in the 18 May class, Writing for the Web, has been confirmed. The class meets in room 305 from 9 A.M. to 12 P.M. Please bring a laptop. Printed materials will be provided. If you cannot attend, cancel by 15 May so that someone on the waiting list can take the seat. There is no refund after that date.",
+          "questions": [
+            {
+              "text": "What class did the person register for?",
+              "options": [
+                "A class on 15 May.",
+                "A morning photography class.",
+                "An all-day software class.",
+                "Writing for the Web."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "What should the participant bring?",
+              "options": [
+                "A laptop.",
+                "Printed materials.",
+                "A textbook.",
+                "A headset."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "What happens if the person cancels after 15 May?",
+              "options": [
+                "The fee is returned in full.",
+                "There is no refund.",
+                "The seat is kept for June.",
+                "A classmate is charged instead."
+              ],
+              "correct": 1
+            }
+          ]
+        },
+        {
+          "passage": "Harbor Clinic\nAppointment card\n\nPatient: Tran Minh Khoa\nDoctor: Dr. Elise Nguyen\nDate: Tuesday, 3 June, 8:10 A.M.\nDepartment: Eye examinations, second floor\n\nPlease arrive fifteen minutes early and bring your insurance card. If you wear contact lenses, remove them before the examination. To change the time, use the clinic app at least 24 hours in advance.",
+          "questions": [
+            {
+              "text": "Which department is the patient visiting?",
+              "options": [
+                "Physical therapy.",
+                "Dental care.",
+                "Eye examinations.",
+                "The pharmacy."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "What should the patient do before the examination?",
+              "options": [
+                "Arrive at 8:10 exactly, not earlier.",
+                "Eat a full meal.",
+                "Buy new glasses.",
+                "Remove contact lenses."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "How can the appointment be changed?",
+              "options": [
+                "Through the clinic app.",
+                "Only by visiting the second floor.",
+                "By calling on the same morning.",
+                "It cannot be changed."
+              ],
+              "correct": 0
+            }
+          ]
+        },
+        {
+          "passage": "Review posted on 2 August\nThe Loom, textile shop, 15 Nha Tho\n\nI bought a cotton scarf and a set of napkins. The staff let me see three colors before I chose. Prices were fair, and the scarf was wrapped as a gift at no charge. The shop was crowded, and I waited ten minutes to pay. I would go back for the napkins, which washed well, but I would avoid Saturday afternoon.",
+          "questions": [
+            {
+              "text": "What did the reviewer buy?",
+              "options": [
+                "A shirt and a hat.",
+                "A scarf and napkins.",
+                "Only a gift box.",
+                "Three scarves."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "What was free?",
+              "options": [
+                "Saturday delivery.",
+                "The scarf.",
+                "Gift wrapping.",
+                "The napkins."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "What complaint does the reviewer make?",
+              "options": [
+                "The staff were unhelpful.",
+                "The prices were too high.",
+                "The napkins did not wash well.",
+                "Paying took a long time because the shop was crowded."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "When does the reviewer suggest not visiting?",
+              "options": [
+                "Saturday afternoon.",
+                "Any weekday morning.",
+                "Sunday evening.",
+                "The review does not say."
+              ],
+              "correct": 0
+            }
+          ]
+        },
+        {
+          "passage": "From: events@riverside.example\nTo: members\nSubject: Hall rental\n\nMembers may reserve the riverside hall up to three months in advance. A refundable deposit of 500,000 VND is required when the date is booked. Music must end by 9:30 P.M. on weeknights and by 10:30 P.M. on Friday and Saturday. The hall is not available on public holidays. Tables and chairs are included; dishes must be rented separately.",
+          "questions": [
+            {
+              "text": "How far ahead can a member reserve the hall?",
+              "options": [
+                "Up to three weeks.",
+                "Up to three months.",
+                "Only one day.",
+                "Any time, including holidays."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "What is required when the date is booked?",
+              "options": [
+                "A hired cook.",
+                "A list of songs.",
+                "A refundable deposit.",
+                "Payment for the dishes."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "What is included with the hall?",
+              "options": [
+                "A holiday booking.",
+                "Dishes.",
+                "Live music.",
+                "Tables and chairs."
+              ],
+              "correct": 3
+            }
+          ]
+        }
+      ],
+      "part7double": [
+        {
+          "passage": "E-mail\nTo: mai.le@horizon.example\nFrom: travel@horizon.example\nSubject: Trip to Da Nang, 9-11 July\n\nYour train is SE2, departing Hanoi at 7:50 P.M. on 8 July and arriving at 8:10 A.M. Hotel Sun is a ten-minute walk from the station. The client meeting is at their office on Bach Dang at 10 A.M. on 9 July. A return ticket on SE3, leaving at 8:40 P.M. on 11 July, is attached.\n\n----\nHotel Sun confirmation\nGuest: Mai Le\nRoom: 612, one person\nCheck-in: 9 July after 2 P.M. Early check-in is not available.\nCheck-out: 11 July by noon\nBreakfast: 6:30 to 9:30, included\nThe hotel can store luggage before check-in.",
+          "questions": [
+            {
+              "text": "What time does Mai Le's train leave Hanoi?",
+              "options": [
+                "At 7:50 P.M.",
+                "At 8:10 A.M.",
+                "At 10 A.M.",
+                "At 8:40 P.M."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "Where is the client meeting?",
+              "options": [
+                "At Hotel Sun.",
+                "At an office on Bach Dang.",
+                "On the train.",
+                "At the Hanoi station."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "Why might Mai Le need the hotel to store luggage?",
+              "options": [
+                "Breakfast ends before she arrives.",
+                "The room is not on the sixth floor.",
+                "She arrives before check-in opens.",
+                "She is traveling with several people."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "When must she leave the hotel?",
+              "options": [
+                "At 8:40 P.M. on 8 July.",
+                "On the morning of 9 July.",
+                "After 2 P.M. on 9 July.",
+                "By noon on 11 July."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "What is included at the hotel?",
+              "options": [
+                "Breakfast.",
+                "Early check-in.",
+                "A ride to the meeting.",
+                "A second guest in the room."
+              ],
+              "correct": 0
+            }
+          ]
+        },
+        {
+          "passage": "Advertisement\nSwift Copy, 88 Lang Ha\nSame-day printing for reports, posters, and name cards. Orders placed before 11 A.M. are ready by 4 P.M. Color pages cost more than black-and-white pages. Orders of more than 100 pages receive a 10 percent discount. Pickup is at the counter. We do not deliver.\n\n----\nE-mail\nTo: orders@swiftcopy.example\nFrom: hoa.nguyen@fieldnote.example\n\nPlease print 80 black-and-white pages and 30 color posters. I will place the order at 9 A.M. on Tuesday and pick everything up after my 3 P.M. meeting. Please use the company account of Field Note. I understand the posters may be ready later than the pages if the color printer is busy.",
+          "questions": [
+            {
+              "text": "What discount does Swift Copy offer?",
+              "options": [
+                "10 percent on every color page.",
+                "10 percent on orders of more than 100 pages.",
+                "Free delivery.",
+                "A lower price after 4 P.M."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "How many pages is Hoa Nguyen ordering in total?",
+              "options": [
+                "30.",
+                "80.",
+                "110.",
+                "100."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "Does the order qualify for the discount?",
+              "options": [
+                "Yes, because it is placed before noon.",
+                "No, because posters are excluded.",
+                "No, because it is a company account.",
+                "Yes, because it is more than 100 pages."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "When does Hoa plan to collect the order?",
+              "options": [
+                "After a 3 P.M. meeting.",
+                "Before 11 A.M.",
+                "The next morning.",
+                "At 4 P.M. exactly."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "What service is not offered?",
+              "options": [
+                "Same-day printing.",
+                "Delivery.",
+                "Color printing.",
+                "Company accounts."
+              ],
+              "correct": 1
+            }
+          ]
+        }
+      ],
+      "part7triple": [
+        {
+          "passage": "Article from the company newsletter\nThe West Plant will start a four-day workweek in September. Employees will work Monday through Thursday, nine and a half hours each day. Friday shifts will stop. Production targets will stay the same.\n\n----\nE-mail\nTo: plant-staff\nFrom: r.costa@westplant.example\n\nThe newsletter is correct about the new week. The first four-day week begins on 7 September. Anyone who cannot work the longer day should talk to me before 20 August. The cafeteria will close on Fridays. Pay will not change.\n\n----\nNotice on the cafeteria door\nFrom 7 September, lunch will be served Monday to Thursday from 11:30 A.M. to 1:00 P.M. Friday service will end. Staff who forgot a Friday lunch order for September will receive a refund at the cashier.",
+          "questions": [
+            {
+              "text": "What change is planned for the West Plant?",
+              "options": [
+                "A new cafeteria menu.",
+                "A lower production target.",
+                "A four-day workweek.",
+                "A pay increase."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "When does the new schedule begin?",
+              "options": [
+                "Next Monday.",
+                "On 20 August.",
+                "In October.",
+                "On 7 September."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "What should an employee do if the longer day is a problem?",
+              "options": [
+                "Speak with R. Costa before 20 August.",
+                "Send a note to the newsletter.",
+                "Skip work on Thursday.",
+                "Ask the cafeteria cashier."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "What will happen to Friday cafeteria service?",
+              "options": [
+                "It will start earlier.",
+                "It will end.",
+                "It will be limited to managers.",
+                "It will move to the plant floor."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "Who can receive a refund?",
+              "options": [
+                "Visitors to the plant.",
+                "Everyone who works four days.",
+                "Staff who ordered a Friday lunch for September.",
+                "Only employees hired in August."
+              ],
+              "correct": 2
+            }
+          ]
+        },
+        {
+          "passage": "Web page\nHill Language Center — Evening course\nBusiness Listening, level 4\nTuesdays and Thursdays, 6:30 to 8:30 P.M., room 12\nFee: 2,400,000 VND for eight weeks\nA placement test is required unless the student finished level 3 here.\n\n----\nE-mail\nTo: study@hillcenter.example\nFrom: phuong.do@mail.example\n\nI finished level 3 at your center in March. I would like the Tuesday and Thursday class that starts on 5 October. I can pay the full fee this week. I work until 6 P.M., so I may arrive a few minutes late on Tuesdays.\n\n----\nReply\nFrom: study@hillcenter.example\n\nYou do not need a placement test. The 5 October class still has seats. Please pay by 28 September to keep a seat. The door to room 12 is locked at 6:40, so try to arrive before then. Recordings of each class are posted the next morning.",
+          "questions": [
+            {
+              "text": "How long is each class meeting?",
+              "options": [
+                "Four hours.",
+                "Eight hours.",
+                "One hour.",
+                "Two hours."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "Why does Phuong Do not need a placement test?",
+              "options": [
+                "She finished level 3 at the center.",
+                "She paid the full fee.",
+                "She works until 6 P.M.",
+                "The class is already full."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "What is the deadline for payment?",
+              "options": [
+                "5 October.",
+                "28 September.",
+                "The next morning.",
+                "The end of the eight weeks."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "Why might Phuong have trouble entering on a Tuesday?",
+              "options": [
+                "She has not finished level 3.",
+                "The class is only on Thursday.",
+                "The classroom door is locked at 6:40.",
+                "Recordings are not available."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "What can a student who misses part of a class do?",
+              "options": [
+                "Receive a full refund.",
+                "Take the placement test instead.",
+                "Move to a morning class.",
+                "Listen to a recording the next morning."
+              ],
+              "correct": 3
+            }
+          ]
+        },
+        {
+          "passage": "Schedule for the product fair, 21 October, Hall B\n9:00 Registration\n9:30 Opening remarks, main stage\n10:00 Demonstrations at booths 1 to 8\n12:00 Lunch, served in the side room\n1:30 Panel discussion\n3:00 Prize draw. Winners must be present.\n\n----\nE-mail to exhibitors\nFrom: fair@marketplace.example\n\nBooths must be ready by 8:30. Lunch tickets for staff are in the registration packet. The prize draw uses the cards visitors complete at your booth, so please collect them all day. Do not leave the booth unattended during the demonstrations.\n\n----\nText message\nFrom: Ken\nTo: Aisha\nI will watch booth 4 from 12:00 to 12:40 while you eat. The extra catalogs are under the table. If the prize cards run out, more are at the information desk near the main stage.",
+          "questions": [
+            {
+              "text": "What happens at 1:30?",
+              "options": [
+                "A panel discussion.",
+                "The prize draw.",
+                "Registration.",
+                "Lunch."
+              ],
+              "correct": 0
+            },
+            {
+              "text": "When must booths be ready?",
+              "options": [
+                "By 9:30.",
+                "By 8:30.",
+                "By noon.",
+                "By 3:00."
+              ],
+              "correct": 1
+            },
+            {
+              "text": "Where do exhibitors get lunch tickets?",
+              "options": [
+                "From the prize winners.",
+                "At booth 4.",
+                "In the registration packet.",
+                "In the side room at noon."
+              ],
+              "correct": 2
+            },
+            {
+              "text": "What will Ken do at noon?",
+              "options": [
+                "Close the information desk.",
+                "Give the opening remarks.",
+                "Run the prize draw.",
+                "Watch booth 4 while Aisha eats."
+              ],
+              "correct": 3
+            },
+            {
+              "text": "Where can Aisha find more prize cards?",
+              "options": [
+                "At the information desk near the main stage.",
+                "Under the table.",
+                "In the side room.",
+                "At booths 1 to 8 only."
+              ],
+              "correct": 0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

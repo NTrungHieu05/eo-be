@@ -56,6 +56,23 @@ class PracticeQuestionBankTest {
 		assertThat(exam2.get(30).getQuestion().getSound()).isEqualTo("/data/sounds/exam2/part2-25.wav");
 	}
 
+	@Test
+	void etsStyleExamUsesOfficialCountsAndItsOwnAudio() {
+		PracticeQuestionBank bank = PracticeQuestionBank.loadSingle("/practice/ets-style-exam.json", "/data/sounds/exam4/");
+		bank.validate();
+		assertThat(bank.parentTexts(0)).hasSize(103);
+
+		List<Question> exam = skeleton();
+		bank.apply(exam, 0);
+		assertThat(exam.get(0).getQuestion().getText()).isEqualTo("What is the person doing?");
+		assertThat(exam.get(0).getQuestion().getImage()).isEqualTo("/data/images/part1-1.png");
+		assertThat(exam.get(0).getQuestion().getSound()).isEqualTo("/data/sounds/exam4/part1-1.wav");
+		assertThat(exam.get(0).getAnswer().getTexts()).containsExactly("The person is seated at a desk.");
+		assertThat(exam.get(31).getQuestion().getSound()).isEqualTo("/data/sounds/exam4/part3-1.wav");
+		assertThat(exam.get(54).getQuestion().getSound()).isNull();
+		assertThat(exam.get(102).getChildQuestions()).hasSize(5);
+	}
+
 	private List<Question> skeleton() {
 		List<Question> questions = new ArrayList<>();
 		addSingles(questions, 6);

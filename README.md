@@ -9,9 +9,11 @@ Kế hoạch module, API và phạm vi unit test nằm ở [docs/PLAN.md](docs/P
 Cần MongoDB tại `localhost:27017`. Có thể dùng Docker:
 
 ```
-docker compose up mongo -d
+docker compose -f docker-compose.yml -f docker-compose.dev-mongo.yml up mongo -d
 .\gradlew.bat bootRun
 ```
+
+Cổng 27017 chỉ mở cho `127.0.0.1` nhờ `docker-compose.dev-mongo.yml`. Chạy cả stack để demo bằng `docker compose up --build` rồi mở `http://localhost:3000`; lúc này BE và Mongo chỉ nằm trong mạng Docker.
 
 Ứng dụng lắng nghe cổng `8080`. Kiểm tra mail đã tắt, nên `http://localhost:8080/actuator/health` không trả 503 chỉ vì chưa cấu hình Gmail. Mã đặt lại mật khẩu của email không phải `*.local` được ghi ra log.
 

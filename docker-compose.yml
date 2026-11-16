@@ -1,28 +1,45 @@
+# Local stack. The browser uses port 3000. MongoDB and the API stay on the Docker network.
+# Copy .env.example to .env before the first start.
 services:
   mongo:
     image: mongo:7
-    ports:
-      - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
 
   be:
     build: .
-    ports:
-      - "8080:8080"
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
+    env_file:
+      - .env
     environment:
       SPRING_PROFILES_ACTIVE: prod
       MONGO_HOST: mongo
       MONGO_PORT: 27017
       MONGO_DATABASE: exam_online
-      JWT_SECRET: change-me-in-production
       APP_UPLOAD_ROOT: /data
       CORS_ORIGIN: "*"
       PORT: 8080
     volumes:
       - ./data:/data
+
+  fe:
+    build:
+      context: ../eo-fe
+      args:
+        NEXT_PUBLIC_API_URL: /api
+        BACKEND_URL: http://be:8080
+    ports:
+      - "3000:3000"
+    depends_on:
+      - be
 
 volumes:
   mongo_data:

@@ -41,8 +41,20 @@ bin/
 ### Mac OS ###
 .DS_Store
 
+### Local secrets ###
+.env
+!.env.example
+
 ### Uploaded media ###
 data/images/**
 data/sounds/**
 data/files/**
 !data/**/.gitkeep
+
+### Scratch scripts ###
+/_*.py
+demo.log
+
+### Local run logs ###
+bootrun.log
+test.log

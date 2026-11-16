@@ -1,0 +1,6 @@
+# Chọn thủ công bằng `-f docker-compose.yml -f docker-compose.dev-mongo.yml`. Mở Mongo cho máy local (chỉ 127.0.0.1)
+# để chạy `gradlew bootRun` ngoài Docker. Không dùng khi demo cả stack.
+services:
+  mongo:
+    ports:
+      - "127.0.0.1:27017:27017"

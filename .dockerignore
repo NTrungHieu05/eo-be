@@ -2,6 +2,9 @@
 build
 .idea
 .git
+.env
+.env.*
+!.env.example
 data/images/**
 data/sounds/**
 data/files/**

@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +23,8 @@ public class ErrorInfo implements Serializable {
 		try {
 			properties = new Properties();
 			InputStream is = ErrorInfo.class.getResourceAsStream("/error_info.properties");
-			properties.load(is);
+			// File lưu UTF-8; load(InputStream) đọc theo ISO-8859-1 nên làm vỡ dấu tiếng Việt.
+			properties.load(new InputStreamReader(is, StandardCharsets.UTF_8));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}

@@ -9,9 +9,12 @@ import exam.db.dto.exam.ListExamResponse;
 import exam.db.dto.exam.ListPracticeTestResponse;
 import exam.db.dto.exam.PracticeTestPartResponse;
 import exam.db.dto.exam.PracticeTestResponse;
+import exam.db.dto.exam.SubmitExamRequest;
+import exam.db.dto.exam.SubmitExamResponse;
 import exam.db.dto.exam.ToeicScoreRequest;
 import exam.db.dto.exam.ToeicScoreResponse;
 import exam.db.dto.exam.UpdateExamRequest;
+import exam.db.dto.history.HistoryRequest;
 import exam.db.dto.question.QuestionResponse;
 import exam.db.dto.user.ExamUser;
 import exam.db.entity.Question;
@@ -25,6 +28,7 @@ import exam.db.repository.question.QuestionRepository;
 import exam.db.repository.exam.ExamRepository;
 import exam.db.repository.history.HistoryRepository;
 import exam.db.repository.topic.TopicRepository;
+import exam.service.history.HistoryService;
 import exam.ultis.ExamBaseException;
 import exam.ultis.SecurityContextService;
 import org.springframework.beans.BeanUtils;
@@ -61,6 +65,9 @@ public class ExamServiceImpl implements ExamService {
 
 	@Autowired
 	private HistoryRepository historyRepo;
+
+	@Autowired
+	private HistoryService historyService;
 
 	@Override
 	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -164,7 +171,9 @@ public class ExamServiceImpl implements ExamService {
 				? new ArrayList<>()
 				: questionRepo.findByIdInAndDeletedIsFalse(questionIds);
 		ExamResponse response = new ExamResponse(exam);
-		response.setQuestions(orderQuestions(exam.getQuestionIds(), questions));
+		response.setQuestions(orderQuestions(exam.getQuestionIds(), questions).stream()
+				.map(AnswerKeys::redact)
+				.collect(Collectors.toList()));
 		return response;
 	}
 
@@ -382,7 +391,7 @@ public class ExamServiceImpl implements ExamService {
 	}
 
 	private QuestionResponse toQuestionResponse(Question question, Map<String, Integer> partByTopic) {
-		QuestionResponse response = new QuestionResponse(question);
+		QuestionResponse response = new QuestionResponse(AnswerKeys.redact(question));
 		int part = partByTopic.getOrDefault(question.getTopicId(), 0);
 		if (part > 0) {
 			response.setPartNumber(part);
@@ -539,6 +548,115 @@ public class ExamServiceImpl implements ExamService {
 			return part <= 4;
 		}
 		return questionNo <= 100;
+	}
+
+	@Override
+	public SubmitExamResponse submit(SubmitExamRequest request) throws ExamBaseException {
+		requireUser();
+		Assert.notNull(request, ErrorInfo.EXAM_NOT_FOUND_ERROR);
+		Assert.notEmpty(request.getExamId(), ErrorInfo.EXAM_NOT_FOUND_ERROR);
+		Exam exam = examRepo.findFirstByIdAndDeletedIsFalse(request.getExamId());
+		Assert.notNull(exam, ErrorInfo.EXAM_NOT_FOUND_ERROR);
+		boolean practiceTest = Boolean.TRUE.equals(exam.getPracticeTest());
+
+		List<String> questionIds = exam.getQuestionIds() == null ? Collections.emptyList() : exam.getQuestionIds();
+		List<Question> questions = questionIds.isEmpty()
+				? new ArrayList<>()
+				: orderQuestions(questionIds, questionRepo.findByIdInAndDeletedIsFalse(questionIds));
+		Map<String, Integer> partByTopic = practiceTest ? partNumbers(questions) : new HashMap<>();
+		if (practiceTest) {
+			// Cùng thứ tự với GET /practice-test/{id} để số câu khớp với màn làm bài.
+			questions = orderQuestionsByToeicPart(questions, partByTopic);
+		}
+
+		Map<String, String> given = new HashMap<>();
+		if (request.getAnswers() != null) {
+			for (SubmitExamRequest.Item item : request.getAnswers()) {
+				if (item != null && item.getQuestionId() != null) {
+					given.put(answerKey(item.getQuestionId(), item.getChildIndex()), item.getAnswer());
+				}
+			}
+		}
+
+		SubmitExamResponse response = new SubmitExamResponse();
+		response.setExamId(exam.getId());
+		response.setPracticeTest(practiceTest);
+		int questionNo = 0;
+		for (Question question : questions) {
+			if (question == null) {
+				continue;
+			}
+			int part = partByTopic.getOrDefault(question.getTopicId(), 0);
+			boolean group = isQuestionGroup(question);
+			List<Question> leaves = group
+					? (question.getChildQuestions() == null ? Collections.emptyList() : question.getChildQuestions())
+					: Collections.singletonList(question);
+			for (int i = 0; i < leaves.size(); i++) {
+				questionNo++;
+				Question leaf = leaves.get(i);
+				Integer childIndex = group ? i : null;
+				String answer = given.get(answerKey(question.getId(), childIndex));
+				List<String> texts = leaf == null || leaf.getAnswer() == null || leaf.getAnswer().getTexts() == null
+						? Collections.emptyList()
+						: leaf.getAnswer().getTexts();
+				boolean correct = AnswerKeys.matches(answer, texts);
+				boolean answered = answer != null && !answer.trim().isEmpty();
+
+				response.setTotal(response.getTotal() + 1);
+				if (correct) {
+					response.setCorrect(response.getCorrect() + 1);
+				} else if (answered) {
+					response.setIncorrect(response.getIncorrect() + 1);
+				} else {
+					response.setUnanswered(response.getUnanswered() + 1);
+				}
+				if (isListening(part, questionNo)) {
+					response.setListeningTotal(response.getListeningTotal() + 1);
+					if (correct) {
+						response.setListeningCorrect(response.getListeningCorrect() + 1);
+					}
+				} else {
+					response.setReadingTotal(response.getReadingTotal() + 1);
+					if (correct) {
+						response.setReadingCorrect(response.getReadingCorrect() + 1);
+					}
+				}
+
+				SubmitExamResponse.QuestionResult result = new SubmitExamResponse.QuestionResult();
+				result.setQuestionId(question.getId());
+				result.setChildIndex(childIndex);
+				result.setCorrect(correct);
+				result.setCorrectAnswers(new ArrayList<>(texts));
+				result.setHint(leaf == null || leaf.getAnswer() == null ? null : leaf.getAnswer().getHint());
+				response.getResults().add(result);
+			}
+		}
+
+		boolean official = practiceTest && response.getListeningTotal() == 100 && response.getReadingTotal() == 100;
+		response.setOfficialScale(official);
+		if (official) {
+			response.setListeningScore(ToeicScore.listening(response.getListeningCorrect()));
+			response.setReadingScore(ToeicScore.reading(response.getReadingCorrect()));
+			response.setTotalScore(response.getListeningScore() + response.getReadingScore());
+		}
+		int progress;
+		if (!practiceTest) {
+			progress = response.getTotal() == 0 ? 0 : Math.round(response.getCorrect() * 100f / response.getTotal());
+		} else {
+			progress = official ? response.getTotalScore() : response.getCorrect();
+		}
+		response.setProgress(progress);
+
+		HistoryRequest history = new HistoryRequest();
+		history.setExamId(exam.getId());
+		history.setProgress(progress);
+		history.setStatus(1);
+		historyService.create(history);
+		return response;
+	}
+
+	private String answerKey(String questionId, Integer childIndex) {
+		return questionId + "#" + (childIndex == null ? "" : childIndex);
 	}
 
 	private void requireUser() throws ExamBaseException {

@@ -1,5 +1,7 @@
 package exam.db.entity;
 
+import java.util.Date;
+
 import exam.db.enums.CollectionConst;
 import exam.db.enums.FieldConst;
 import lombok.Data;
@@ -76,6 +78,10 @@ public class User extends AbstractVersion implements UserDetails, CredentialsCon
 
 	@Field(FieldConst.OTP)
 	private String otp;
+
+	/** Token JWT phát hành trước thời điểm này bị từ chối (đăng xuất, đặt lại mật khẩu). */
+	@Field(FieldConst.TOKENS_VALID_AFTER)
+	private Date tokensValidAfter;
 
 	public Set<String> getRoleStrings() {
 		Set<String> names = new HashSet<>();

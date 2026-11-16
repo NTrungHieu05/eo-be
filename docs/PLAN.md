@@ -10,7 +10,7 @@ Backend Spring Boot cho web luyện thi TOEIC Listening & Reading. API giữ cù
 | Entity User, Role, Skill, Topic, Exam, Question, History, Media | Xong |
 | Đăng nhập `/app/login`, đăng ký, đổi / quên / đặt lại mật khẩu | Xong |
 | CRUD skill, topic, exam, question và danh sách admin | Xong |
-| Thi thử `GET /practice-test` (7 phần, 120 phút) và `POST /exam/collect` | Xong |
+| Thi thử `GET /practice-test` (7 phần, 120 phút) và nộp bài `POST /exam/submit` | Xong |
 | Upload media, phục vụ file tĩnh | Xong |
 | Unit test nghiệp vụ cốt lõi (không cần Mongo) | Xong |
 | Quy đổi điểm TOEIC 10–990 (`POST /exam/score`) | Xong |
@@ -63,9 +63,9 @@ Request tạo/sửa cùng tên field với response: `name`, danh sách id con (
 | GET | `/topic/exam/{topicId}` | Danh sách bài trong một part |
 | GET | `/exam/question/{examId}` | Câu hỏi của một bài luyện |
 | GET | `/practice-test` | Danh sách đề thi thử, cần JWT |
-| GET | `/practice-test/{id}` | Chi tiết một đề thi thử, cần JWT |
+| GET | `/practice-test/{id}` | Chi tiết một đề thi thử, cần JWT. Không kèm đáp án đúng và giải thích |
 | POST | `/exam/score` | Quy đổi số câu đúng Listening/Reading sang điểm 5–495, tổng 10–990 |
-| POST | `/exam/collect` | Lưu kết quả vào History của user đang đăng nhập. Luyện Part lưu phần trăm 0–100. Đề đủ 100 nghe và 100 đọc lưu điểm 10–990. Đề ngắn lưu số câu đúng. |
+| POST | `/exam/submit` | Nộp bài `{examId, answers: [{questionId, childIndex, answer}]}`. Server chấm, lưu History của user đang đăng nhập và trả đáp án đúng, giải thích từng câu. Luyện Part lưu phần trăm 0–100. Đề đủ 100 nghe và 100 đọc lưu điểm 10–990. Đề ngắn lưu số câu đúng. |
 | POST | `/user/pwd/change` | Đổi mật khẩu, kiểm tra mật khẩu cũ và xác nhận |
 | POST | `/user/pwd/forgot`, `/user/pwd/reset` | Quên mật khẩu bằng mã reset |
 | POST | `/admin/users/block`, `/admin/users/unblock` | Khóa / mở tài khoản, chỉ admin |

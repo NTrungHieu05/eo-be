@@ -7,6 +7,8 @@ import exam.db.dto.exam.DeleteExamRequest;
 import exam.db.dto.exam.ExamResponse;
 import exam.db.dto.exam.ListPracticeTestResponse;
 import exam.db.dto.exam.PracticeTestResponse;
+import exam.db.dto.exam.SubmitExamRequest;
+import exam.db.dto.exam.SubmitExamResponse;
 import exam.db.dto.exam.ToeicScoreRequest;
 import exam.db.dto.exam.ToeicScoreResponse;
 import exam.db.dto.exam.UpdateExamRequest;
@@ -91,6 +93,17 @@ public class ExamController {
 		ResponseObject<ExamResponse> response = new ResponseObject<>();
 		try {
 			response.setResponseData(examService.addQuestion(request));
+		} catch (ExamBaseException e) {
+			response.setError(e.getError());
+		}
+		return new ResponseEntity<>(response, new HttpHeaders(), HttpStatus.OK);
+	}
+
+	@PostMapping(Endpoints.EXAM_SUBMIT_URL)
+	public final ResponseEntity<Object> submit(@RequestBody SubmitExamRequest request) {
+		ResponseObject<SubmitExamResponse> response = new ResponseObject<>();
+		try {
+			response.setResponseData(examService.submit(request));
 		} catch (ExamBaseException e) {
 			response.setError(e.getError());
 		}

@@ -246,6 +246,8 @@ public class UserServiceImpl implements UserService {
 		requirePasswordLength(newPassword);
 		user.setPassword(passwordEncoder.encode(newPassword));
 		user.setOtp(null);
+		// Đặt lại mật khẩu thì đăng xuất mọi phiên cũ.
+		user.setTokensValidAfter(new Date());
 		userRepo.save(user);
 		userRecovery.setDeleted(true);
 		userRecoveryRepo.save(userRecovery);

@@ -1987,7 +1987,7 @@
           ]
         },
         {
-          "name": "Collect practice test result",
+          "name": "Submit exam (server scores)",
           "request": {
             "method": "POST",
             "header": [
@@ -1997,20 +1997,20 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/exam/collect",
+              "raw": "{{baseUrl}}/exam/submit",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "exam",
-                "collect"
+                "submit"
               ],
               "query": []
             },
             "description": "Luu progress thi thu. status=1 la complete.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"examId\": \"{{practiceExamId}}\",\n  \"progress\": 75,\n  \"status\": 1\n}",
+              "raw": "{\n  \"examId\": \"68ca00010000000000000001\",\n  \"answers\": [\n    {\n      \"questionId\": \"68ca00020000000000000001\",\n      \"childIndex\": null,\n      \"answer\": \"A lamp and a sheet of paper are on the desk.\"\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"

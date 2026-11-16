@@ -5,6 +5,7 @@ import exam.db.dto.LoginResponse;
 import exam.db.entity.User;
 import exam.db.enums.ErrorInfo;
 import exam.db.enums.RoleEnum;
+import exam.db.repository.user.UserRepository;
 import exam.support.TestUsers;
 import exam.ultis.ExamBaseException;
 import exam.ultis.jwt.JwtUtils;
@@ -21,9 +22,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,6 +38,9 @@ class AuthServiceImplTest {
 
 	@Mock
 	private JwtUtils jwtUtils;
+
+	@Mock
+	private UserRepository userRepository;
 
 	@InjectMocks
 	private AuthServiceImpl authService;
@@ -111,6 +118,19 @@ class AuthServiceImplTest {
 		authService.logout("Bearer token");
 
 		assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+	}
+
+	@Test
+	void logoutRevokesTokensIssuedBefore() {
+		User principal = TestUsers.user("user-1", RoleEnum.ROLE_USER);
+		User stored = TestUsers.user("user-1", RoleEnum.ROLE_USER);
+		TestUsers.authenticate(principal);
+		when(userRepository.findById("user-1")).thenReturn(Optional.of(stored));
+
+		authService.logout("Bearer token");
+
+		assertThat(stored.getTokensValidAfter()).isNotNull();
+		verify(userRepository).save(stored);
 	}
 
 	private LoginRequest loginRequest() {

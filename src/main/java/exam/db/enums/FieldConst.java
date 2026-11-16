@@ -25,6 +25,7 @@ public class FieldConst {
 	public static final String DOB = "dob";
 	public static final String GENDER = "gender";
 	public static final String OTP = "otp";
+	public static final String TOKENS_VALID_AFTER = "tokens_valid_after";
 
 	public static final String SUBJECT = "subject";
 	public static final String CONTENT = "content";

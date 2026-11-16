@@ -6,9 +6,13 @@ import exam.db.dto.exam.DeleteExamRequest;
 import exam.db.dto.exam.ExamResponse;
 import exam.db.dto.exam.ListPracticeTestResponse;
 import exam.db.dto.exam.PracticeTestResponse;
+import exam.db.dto.exam.SubmitExamRequest;
+import exam.db.dto.exam.SubmitExamResponse;
+import exam.db.dto.history.HistoryRequest;
 import exam.db.dto.exam.UpdateExamRequest;
 import exam.db.dto.exam.ToeicScoreRequest;
 import exam.db.dto.exam.ToeicScoreResponse;
+import exam.db.entity.Answer;
 import exam.db.entity.Question;
 import exam.db.entity.Exam;
 import exam.db.entity.ExamResult;
@@ -20,11 +24,13 @@ import exam.db.repository.question.QuestionRepository;
 import exam.db.repository.exam.ExamRepository;
 import exam.db.repository.history.HistoryRepository;
 import exam.db.repository.topic.TopicRepository;
+import exam.service.history.HistoryService;
 import exam.support.TestUsers;
 import exam.ultis.ExamBaseException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -54,6 +60,9 @@ class ExamServiceImplTest {
 
 	@Mock
 	private HistoryRepository historyRepo;
+
+	@Mock
+	private HistoryService historyService;
 
 	@InjectMocks
 	private ExamServiceImpl examService;
@@ -368,6 +377,87 @@ class ExamServiceImplTest {
 
 		assertThat(response.getQuestionIds()).containsExactly("a", "b");
 		assertThat(question.getExamId()).isNull();
+	}
+
+	@Test
+	void getAllQuestionsHidesAnswerKeyBeforeSubmit() throws ExamBaseException {
+		TestUsers.authenticate(TestUsers.user("user-1", RoleEnum.ROLE_USER));
+		Exam exam = new Exam();
+		exam.setId("exam-1");
+		exam.setQuestionIds(List.of("a"));
+		Question question = withAnswer(single("a", "t1"), "Right", "Wrong 1", "Wrong 2");
+		when(examRepo.findFirstByIdAndDeletedIsFalse("exam-1")).thenReturn(exam);
+		when(questionRepo.findByIdInAndDeletedIsFalse(exam.getQuestionIds())).thenReturn(List.of(question));
+
+		Question sent = examService.getAllQuestionsByExamId("exam-1").getQuestions().get(0);
+
+		assertThat(sent.getAnswer().getTexts()).isEmpty();
+		assertThat(sent.getAnswer().getHint()).isNull();
+		assertThat(sent.getAnswer().getChoices()).containsExactly("Right", "Wrong 1", "Wrong 2");
+		// Bản trong DB không bị đổi.
+		assertThat(question.getAnswer().getTexts()).containsExactly("Right");
+	}
+
+	@Test
+	void submitScoresOnServerAndSavesPercentForPartPractice() throws ExamBaseException {
+		TestUsers.authenticate(TestUsers.user("user-1", RoleEnum.ROLE_USER));
+		Exam exam = new Exam();
+		exam.setId("exam-1");
+		exam.setQuestionIds(List.of("a", "g"));
+		Question single = withAnswer(single("a", "t1"), "A1", "x");
+		Question group = group("g", "t1", 2);
+		withAnswer(group.getChildQuestions().get(0), "G0", "y");
+		withAnswer(group.getChildQuestions().get(1), "G1", "z");
+		when(examRepo.findFirstByIdAndDeletedIsFalse("exam-1")).thenReturn(exam);
+		when(questionRepo.findByIdInAndDeletedIsFalse(exam.getQuestionIds())).thenReturn(List.of(single, group));
+
+		SubmitExamRequest request = new SubmitExamRequest();
+		request.setExamId("exam-1");
+		request.getAnswers().add(item("a", null, " A1 "));
+		request.getAnswers().add(item("g", 0, "y"));
+
+		SubmitExamResponse response = examService.submit(request);
+
+		assertThat(response.getTotal()).isEqualTo(3);
+		assertThat(response.getCorrect()).isEqualTo(1);
+		assertThat(response.getIncorrect()).isEqualTo(1);
+		assertThat(response.getUnanswered()).isEqualTo(1);
+		assertThat(response.getProgress()).isEqualTo(33);
+		assertThat(response.getResults()).extracting(SubmitExamResponse.QuestionResult::getCorrectAnswers)
+				.containsExactly(List.of("A1"), List.of("G0"), List.of("G1"));
+		ArgumentCaptor<HistoryRequest> saved = ArgumentCaptor.forClass(HistoryRequest.class);
+		verify(historyService).create(saved.capture());
+		assertThat(saved.getValue().getExamId()).isEqualTo("exam-1");
+		assertThat(saved.getValue().getProgress()).isEqualTo(33);
+	}
+
+	@Test
+	void submitRejectsUnknownExam() {
+		TestUsers.authenticate(TestUsers.user("user-1", RoleEnum.ROLE_USER));
+		SubmitExamRequest request = new SubmitExamRequest();
+		request.setExamId("missing");
+
+		assertThatThrownBy(() -> examService.submit(request))
+				.isInstanceOf(ExamBaseException.class)
+				.extracting(ex -> ((ExamBaseException) ex).getError().getCode())
+				.isEqualTo(ErrorInfo.EXAM_NOT_FOUND_ERROR_CODE);
+	}
+
+	private Question withAnswer(Question question, String correct, String... wrong) {
+		Answer answer = new Answer();
+		answer.setTexts(new ArrayList<>(List.of(correct)));
+		answer.setChoices(new ArrayList<>(Arrays.asList(wrong)));
+		answer.setHint("hint-" + correct);
+		question.setAnswer(answer);
+		return question;
+	}
+
+	private SubmitExamRequest.Item item(String questionId, Integer childIndex, String answer) {
+		SubmitExamRequest.Item item = new SubmitExamRequest.Item();
+		item.setQuestionId(questionId);
+		item.setChildIndex(childIndex);
+		item.setAnswer(answer);
+		return item;
 	}
 
 	private Exam practiceExam(List<String> questionIds) {

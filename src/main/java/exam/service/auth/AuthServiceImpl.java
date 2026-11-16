@@ -4,6 +4,7 @@ import exam.db.dto.LoginRequest;
 import exam.db.dto.LoginResponse;
 import exam.db.entity.User;
 import exam.db.enums.ErrorInfo;
+import exam.db.repository.user.UserRepository;
 import exam.ultis.ExamBaseException;
 import exam.ultis.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 public class AuthServiceImpl implements AuthService {
 
@@ -25,6 +28,9 @@ public class AuthServiceImpl implements AuthService {
 
 	@Autowired
 	private JwtUtils jwtUtils;
+
+	@Autowired
+	private UserRepository userRepository;
 
 	@Override
 	public LoginResponse login(LoginRequest request) throws ExamBaseException {
@@ -51,6 +57,15 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	public void logout(String authorizationHeader) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication != null && authentication.getPrincipal() instanceof User) {
+			String userId = ((User) authentication.getPrincipal()).getUserId();
+			// Mọi token phát hành trước lúc này của user sẽ bị AuthenticationFilter từ chối.
+			userRepository.findById(userId).ifPresent(user -> {
+				user.setTokensValidAfter(new Date());
+				userRepository.save(user);
+			});
+		}
 		SecurityContextHolder.clearContext();
 	}
 }

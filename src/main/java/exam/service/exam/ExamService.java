@@ -1,5 +1,8 @@
 package exam.service.exam;
 
+import exam.db.dto.exam.SubmitExamRequest;
+import exam.db.dto.exam.SubmitExamResponse;
+
 import exam.db.dto.exam.AddQuestionToExamRequest;
 import exam.db.dto.exam.CreateExamRequest;
 import exam.db.dto.exam.DeleteExamRequest;
@@ -33,4 +36,6 @@ public interface ExamService {
 	ToeicScoreResponse score(ToeicScoreRequest request) throws ExamBaseException;
 
 	ExamResponse addQuestion(AddQuestionToExamRequest request) throws ExamBaseException;
+
+	SubmitExamResponse submit(SubmitExamRequest request) throws ExamBaseException;
 }

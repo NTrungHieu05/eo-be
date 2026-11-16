@@ -18,6 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Date;
 
 public class AuthenticationFilter extends OncePerRequestFilter {
 	@Autowired
@@ -41,7 +42,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 			if (StringUtils.hasText(token)) {
 				String username = jwtUtils.getUserNameFromJwtToken(token);
 				UserDetails userDetails = examUserDetailsService.loadUserByUsername(username);
-				if (!isActiveAccount(userDetails)) {
+				if (!isActiveAccount(userDetails) || isRevoked(token, userDetails)) {
 					SecurityContextHolder.clearContext();
 					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 					return;
@@ -56,6 +57,19 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		filterChain.doFilter(request, response);
+	}
+
+	private boolean isRevoked(String token, UserDetails userDetails) {
+		if (!(userDetails instanceof User)) {
+			return false;
+		}
+		Date validAfter = ((User) userDetails).getTokensValidAfter();
+		if (validAfter == null) {
+			return false;
+		}
+		Date issuedAt = jwtUtils.getClaimsFromJwtToken(token).getIssuedAt();
+		// iat chỉ có độ chính xác giây, nên so sánh theo giây.
+		return issuedAt == null || issuedAt.getTime() / 1000 < validAfter.getTime() / 1000;
 	}
 
 	private boolean isActiveAccount(UserDetails userDetails) {

@@ -1,0 +1,11 @@
+{$SITE_ADDRESS}
+
+encode gzip
+
+# Ảnh và audio tải lên tối đa 30 MB (giới hạn của BE).
+request_body {
+	max_size 35MB
+}
+
+# Mọi request vào FE; FE chuyển /api/* sang BE trong mạng Docker.
+reverse_proxy fe:3000

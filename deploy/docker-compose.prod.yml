@@ -1,0 +1,66 @@
+# Chạy trên VPS. Image do GitHub Actions build sẵn và đẩy lên ghcr.io, VPS chỉ kéo về.
+# Biến lấy từ deploy/.env (bootstrap.sh tạo lần đầu).
+name: toeic
+
+services:
+  mongo:
+    image: ${MONGO_IMAGE:-mongo:7}
+    restart: unless-stopped
+    # VPS 4 GB: giới hạn bộ nhớ đệm để còn RAM cho BE và FE.
+    command: ["--wiredTigerCacheSizeGB", "0.5"]
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand(\"ping\")' || mongo --quiet --eval 'db.adminCommand(\"ping\")'"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  be:
+    image: ghcr.io/ntrunghieu05/eo-be:${BE_TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      MONGO_HOST: mongo
+      MONGO_PORT: 27017
+      MONGO_DATABASE: exam_online
+      APP_UPLOAD_ROOT: /data
+      CORS_ORIGIN: "*"
+      PORT: 8080
+      JAVA_TOOL_OPTIONS: -Xmx768m
+    volumes:
+      # Ảnh và audio tải lên. Nằm ngoài container nên không mất khi cập nhật image.
+      - ${DATA_DIR:-/opt/toeic/data}:/data
+
+  fe:
+    image: ghcr.io/ntrunghieu05/eo-fe:${FE_TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      - be
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - fe
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      # ":80" = chỉ HTTP theo IP. Đặt tên miền (vd. toeic.example.com) để Caddy tự lấy HTTPS.
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  mongo_data:
+  caddy_data:
+  caddy_config:

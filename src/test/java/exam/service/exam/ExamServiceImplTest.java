@@ -1,6 +1,8 @@
 package exam.service.exam;
 
 import exam.db.dto.exam.AddQuestionToExamRequest;
+import exam.db.dto.exam.AttemptDetailResponse;
+import exam.db.dto.exam.ListAttemptResponse;
 import exam.db.dto.exam.CreateExamRequest;
 import exam.db.dto.exam.DeleteExamRequest;
 import exam.db.dto.exam.ExamResponse;
@@ -15,12 +17,14 @@ import exam.db.dto.exam.ToeicScoreResponse;
 import exam.db.entity.Answer;
 import exam.db.entity.Question;
 import exam.db.entity.Exam;
+import exam.db.entity.ExamAttempt;
 import exam.db.entity.ExamResult;
 import exam.db.entity.History;
 import exam.db.entity.Topic;
 import exam.db.enums.ErrorInfo;
 import exam.db.enums.RoleEnum;
 import exam.db.repository.question.QuestionRepository;
+import exam.db.repository.exam.ExamAttemptRepository;
 import exam.db.repository.exam.ExamRepository;
 import exam.db.repository.history.HistoryRepository;
 import exam.db.repository.topic.TopicRepository;
@@ -63,6 +67,9 @@ class ExamServiceImplTest {
 
 	@Mock
 	private HistoryService historyService;
+
+	@Mock
+	private ExamAttemptRepository attemptRepo;
 
 	@InjectMocks
 	private ExamServiceImpl examService;
@@ -416,8 +423,24 @@ class ExamServiceImplTest {
 		request.getAnswers().add(item("a", null, " A1 "));
 		request.getAnswers().add(item("g", 0, "y"));
 
+		when(attemptRepo.save(any(ExamAttempt.class))).thenAnswer(invocation -> {
+			ExamAttempt attempt = invocation.getArgument(0);
+			attempt.setId("attempt-1");
+			return attempt;
+		});
+
 		SubmitExamResponse response = examService.submit(request);
 
+		assertThat(response.getAttemptId()).isEqualTo("attempt-1");
+		ArgumentCaptor<ExamAttempt> attempt = ArgumentCaptor.forClass(ExamAttempt.class);
+		verify(attemptRepo).save(attempt.capture());
+		assertThat(attempt.getValue().getUserId()).isEqualTo("user-1");
+		assertThat(attempt.getValue().getExamId()).isEqualTo("exam-1");
+		assertThat(attempt.getValue().getSubmittedAt()).isNotNull();
+		assertThat(attempt.getValue().getProgress()).isEqualTo(33);
+		assertThat(attempt.getValue().getAnswers())
+				.extracting(ExamAttempt.Answer::getQuestionId, ExamAttempt.Answer::getChildIndex)
+				.containsExactly(org.assertj.core.groups.Tuple.tuple("a", null), org.assertj.core.groups.Tuple.tuple("g", 0));
 		assertThat(response.getTotal()).isEqualTo(3);
 		assertThat(response.getCorrect()).isEqualTo(1);
 		assertThat(response.getIncorrect()).isEqualTo(1);
@@ -441,6 +464,62 @@ class ExamServiceImplTest {
 				.isInstanceOf(ExamBaseException.class)
 				.extracting(ex -> ((ExamBaseException) ex).getError().getCode())
 				.isEqualTo(ErrorInfo.EXAM_NOT_FOUND_ERROR_CODE);
+	}
+
+	@Test
+	void listMyAttemptsReturnsOnlySignedInUsersAttemptsNewestFirst() throws ExamBaseException {
+		TestUsers.authenticate(TestUsers.user("user-1", RoleEnum.ROLE_USER));
+		ExamAttempt newer = attempt("attempt-2", "user-1", "exam-1");
+		ExamAttempt older = attempt("attempt-1", "user-1", "exam-1");
+		when(attemptRepo.findAllByUserIdAndDeletedIsFalseOrderBySubmittedAtDesc("user-1")).thenReturn(List.of(newer, older));
+
+		ListAttemptResponse response = examService.listMyAttempts();
+
+		assertThat(response.getTotal()).isEqualTo(2);
+		assertThat(response.getAttempts()).extracting("id").containsExactly("attempt-2", "attempt-1");
+	}
+
+	@Test
+	void getMyAttemptRejectsAnotherUsersAttempt() {
+		TestUsers.authenticate(TestUsers.user("user-2", RoleEnum.ROLE_USER));
+		when(attemptRepo.findFirstByIdAndUserIdAndDeletedIsFalse("attempt-1", "user-2")).thenReturn(null);
+
+		assertThatThrownBy(() -> examService.getMyAttempt("attempt-1"))
+				.isInstanceOf(ExamBaseException.class)
+				.extracting(ex -> ((ExamBaseException) ex).getError().getCode())
+				.isEqualTo(ErrorInfo.EXAM_NOT_FOUND_ERROR_CODE);
+	}
+
+	@Test
+	void getMyAttemptReturnsChosenAnswersAndAnswerKey() throws ExamBaseException {
+		TestUsers.authenticate(TestUsers.user("user-1", RoleEnum.ROLE_USER));
+		ExamAttempt saved = attempt("attempt-1", "user-1", "exam-1");
+		ExamAttempt.Answer chosen = new ExamAttempt.Answer();
+		chosen.setQuestionId("a");
+		chosen.setAnswer("x");
+		saved.setAnswers(List.of(chosen));
+		Exam exam = new Exam();
+		exam.setId("exam-1");
+		exam.setQuestionIds(List.of("a"));
+		when(attemptRepo.findFirstByIdAndUserIdAndDeletedIsFalse("attempt-1", "user-1")).thenReturn(saved);
+		when(examRepo.findFirstByIdAndDeletedIsFalse("exam-1")).thenReturn(exam);
+		when(questionRepo.findByIdInAndDeletedIsFalse(exam.getQuestionIds()))
+				.thenReturn(List.of(withAnswer(single("a", "t1"), "A1", "x")));
+
+		AttemptDetailResponse response = examService.getMyAttempt("attempt-1");
+
+		assertThat(response.getAnswers()).extracting(ExamAttempt.Answer::getAnswer).containsExactly("x");
+		assertThat(response.getQuestions()).hasSize(1);
+		assertThat(response.getQuestions().get(0).getAnswer().getTexts()).containsExactly("A1");
+	}
+
+	private ExamAttempt attempt(String id, String userId, String examId) {
+		ExamAttempt attempt = new ExamAttempt();
+		attempt.setId(id);
+		attempt.setUserId(userId);
+		attempt.setExamId(examId);
+		attempt.setSubmittedAt(new Date());
+		return attempt;
 	}
 
 	private Question withAnswer(Question question, String correct, String... wrong) {

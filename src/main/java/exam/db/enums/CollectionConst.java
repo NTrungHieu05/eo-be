@@ -14,4 +14,5 @@ public class CollectionConst {
 	public static final String TOPIC = "topic";
 	public static final String SKILL = "skill";
 	public static final String HISTORY = "history";
+	public static final String EXAM_ATTEMPT = "exam_attempt";
 }

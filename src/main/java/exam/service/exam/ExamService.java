@@ -1,5 +1,7 @@
 package exam.service.exam;
 
+import exam.db.dto.exam.AttemptDetailResponse;
+import exam.db.dto.exam.ListAttemptResponse;
 import exam.db.dto.exam.SubmitExamRequest;
 import exam.db.dto.exam.SubmitExamResponse;
 
@@ -38,4 +40,8 @@ public interface ExamService {
 	ExamResponse addQuestion(AddQuestionToExamRequest request) throws ExamBaseException;
 
 	SubmitExamResponse submit(SubmitExamRequest request) throws ExamBaseException;
+
+	ListAttemptResponse listMyAttempts() throws ExamBaseException;
+
+	AttemptDetailResponse getMyAttempt(String attemptId) throws ExamBaseException;
 }

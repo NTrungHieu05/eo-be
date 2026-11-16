@@ -7,6 +7,8 @@ import exam.db.dto.exam.DeleteExamRequest;
 import exam.db.dto.exam.ExamResponse;
 import exam.db.dto.exam.ListPracticeTestResponse;
 import exam.db.dto.exam.PracticeTestResponse;
+import exam.db.dto.exam.AttemptDetailResponse;
+import exam.db.dto.exam.ListAttemptResponse;
 import exam.db.dto.exam.SubmitExamRequest;
 import exam.db.dto.exam.SubmitExamResponse;
 import exam.db.dto.exam.ToeicScoreRequest;
@@ -93,6 +95,28 @@ public class ExamController {
 		ResponseObject<ExamResponse> response = new ResponseObject<>();
 		try {
 			response.setResponseData(examService.addQuestion(request));
+		} catch (ExamBaseException e) {
+			response.setError(e.getError());
+		}
+		return new ResponseEntity<>(response, new HttpHeaders(), HttpStatus.OK);
+	}
+
+	@GetMapping(Endpoints.EXAM_ATTEMPT_URL)
+	public final ResponseEntity<Object> listMyAttempts() {
+		ResponseObject<ListAttemptResponse> response = new ResponseObject<>();
+		try {
+			response.setResponseData(examService.listMyAttempts());
+		} catch (ExamBaseException e) {
+			response.setError(e.getError());
+		}
+		return new ResponseEntity<>(response, new HttpHeaders(), HttpStatus.OK);
+	}
+
+	@GetMapping(Endpoints.EXAM_ATTEMPT_URL + Endpoints.PATH_VARIABLE_URL)
+	public final ResponseEntity<Object> getMyAttempt(@PathVariable(DBConst.ID) String id) {
+		ResponseObject<AttemptDetailResponse> response = new ResponseObject<>();
+		try {
+			response.setResponseData(examService.getMyAttempt(id));
 		} catch (ExamBaseException e) {
 			response.setError(e.getError());
 		}

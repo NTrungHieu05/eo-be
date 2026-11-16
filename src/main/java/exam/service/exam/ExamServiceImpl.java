@@ -1,11 +1,14 @@
 package exam.service.exam;
 
 import exam.db.dto.exam.AddQuestionToExamRequest;
+import exam.db.dto.exam.AttemptDetailResponse;
+import exam.db.dto.exam.AttemptSummaryResponse;
 import exam.db.dto.exam.CreateExamRequest;
 import exam.db.dto.exam.DeleteExamRequest;
 import exam.db.dto.exam.ExamResponse;
 import exam.db.dto.exam.ListExamRequest;
 import exam.db.dto.exam.ListExamResponse;
+import exam.db.dto.exam.ListAttemptResponse;
 import exam.db.dto.exam.ListPracticeTestResponse;
 import exam.db.dto.exam.PracticeTestPartResponse;
 import exam.db.dto.exam.PracticeTestResponse;
@@ -19,12 +22,14 @@ import exam.db.dto.question.QuestionResponse;
 import exam.db.dto.user.ExamUser;
 import exam.db.entity.Question;
 import exam.db.entity.Exam;
+import exam.db.entity.ExamAttempt;
 import exam.db.entity.ExamResult;
 import exam.db.entity.History;
 import exam.db.entity.Topic;
 import exam.db.enums.Assert;
 import exam.db.enums.ErrorInfo;
 import exam.db.repository.question.QuestionRepository;
+import exam.db.repository.exam.ExamAttemptRepository;
 import exam.db.repository.exam.ExamRepository;
 import exam.db.repository.history.HistoryRepository;
 import exam.db.repository.topic.TopicRepository;
@@ -68,6 +73,9 @@ public class ExamServiceImpl implements ExamService {
 
 	@Autowired
 	private HistoryService historyService;
+
+	@Autowired
+	private ExamAttemptRepository attemptRepo;
 
 	@Override
 	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -652,6 +660,80 @@ public class ExamServiceImpl implements ExamService {
 		history.setProgress(progress);
 		history.setStatus(1);
 		historyService.create(history);
+
+		response.setAttemptId(saveAttempt(exam, response, request).getId());
+		return response;
+	}
+
+	private ExamAttempt saveAttempt(Exam exam, SubmitExamResponse result, SubmitExamRequest request) {
+		ExamUser examUser = SecurityContextService.getUser();
+		ExamAttempt attempt = new ExamAttempt();
+		BeanUtils.copyProperties(result, attempt);
+		attempt.setUserId(examUser.getUserId());
+		attempt.setExamId(exam.getId());
+		attempt.setExamName(exam.getName());
+		attempt.setTopicId(exam.getTopicId());
+		attempt.setSubmittedAt(new Date());
+		List<ExamAttempt.Answer> answers = new ArrayList<>();
+		if (request.getAnswers() != null) {
+			for (SubmitExamRequest.Item item : request.getAnswers()) {
+				if (item == null || item.getQuestionId() == null
+						|| item.getAnswer() == null || item.getAnswer().trim().isEmpty()) {
+					continue;
+				}
+				ExamAttempt.Answer answer = new ExamAttempt.Answer();
+				answer.setQuestionId(item.getQuestionId());
+				answer.setChildIndex(item.getChildIndex());
+				answer.setAnswer(item.getAnswer());
+				answers.add(answer);
+			}
+		}
+		attempt.setAnswers(answers);
+		return attemptRepo.save(attempt);
+	}
+
+	@Override
+	public ListAttemptResponse listMyAttempts() throws ExamBaseException {
+		ExamUser examUser = SecurityContextService.getUser();
+		Assert.notNull(examUser, ErrorInfo.ACCESS_DENIED_ERROR);
+		List<ExamAttempt> attempts = attemptRepo.findAllByUserIdAndDeletedIsFalseOrderBySubmittedAtDesc(examUser.getUserId());
+		List<AttemptSummaryResponse> items = attempts == null
+				? new ArrayList<>()
+				: attempts.stream().map(AttemptSummaryResponse::new).collect(Collectors.toList());
+		return new ListAttemptResponse(items, items.size());
+	}
+
+	@Override
+	public AttemptDetailResponse getMyAttempt(String attemptId) throws ExamBaseException {
+		ExamUser examUser = SecurityContextService.getUser();
+		Assert.notNull(examUser, ErrorInfo.ACCESS_DENIED_ERROR);
+		Assert.notEmpty(attemptId, ErrorInfo.EXAM_NOT_FOUND_ERROR);
+		// Chỉ xem được lần làm của chính mình.
+		ExamAttempt attempt = attemptRepo.findFirstByIdAndUserIdAndDeletedIsFalse(attemptId, examUser.getUserId());
+		Assert.notNull(attempt, ErrorInfo.EXAM_NOT_FOUND_ERROR);
+
+		AttemptDetailResponse response = new AttemptDetailResponse(attempt);
+		Exam exam = examRepo.findFirstByIdAndDeletedIsFalse(attempt.getExamId());
+		if (exam == null || exam.getQuestionIds() == null || exam.getQuestionIds().isEmpty()) {
+			return response;
+		}
+		List<Question> questions = orderQuestions(exam.getQuestionIds(),
+				questionRepo.findByIdInAndDeletedIsFalse(exam.getQuestionIds()));
+		Map<String, Integer> partByTopic = partNumbers(questions);
+		if (Boolean.TRUE.equals(exam.getPracticeTest())) {
+			questions = orderQuestionsByToeicPart(questions, partByTopic);
+		}
+		// Bài đã nộp nên trả kèm đáp án đúng và giải thích, không ẩn như lúc làm bài.
+		response.setQuestions(questions.stream()
+				.map(question -> {
+					QuestionResponse item = new QuestionResponse(question);
+					int part = partByTopic.getOrDefault(question.getTopicId(), 0);
+					if (part > 0) {
+						item.setPartNumber(part);
+					}
+					return item;
+				})
+				.collect(Collectors.toList()));
 		return response;
 	}
 

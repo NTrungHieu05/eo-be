@@ -10,6 +10,8 @@ import java.util.List;
 @NoArgsConstructor
 public class SubmitExamResponse {
 	private String examId;
+	/** Id lần làm vừa lưu, dùng để mở lại trong Lịch sử làm bài. */
+	private String attemptId;
 	private boolean practiceTest;
 	private int total;
 	private int correct;

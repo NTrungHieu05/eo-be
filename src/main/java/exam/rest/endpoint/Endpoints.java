@@ -45,6 +45,7 @@ public interface Endpoints {
 	public static final String EXAM_ADD_QUESTION_URL = "/exam/add-question";
 	public static final String EXAM_DELETE_MULTIPLE = "/exam/delete/multiple";
 	public static final String EXAM_SUBMIT_URL = "/exam/submit";
+	public static final String EXAM_ATTEMPT_URL = "/exam/attempt";
 	public static final String EXAM_SCORE_URL = "/exam/score";
 	//=========================== HISTORY =====================
 }

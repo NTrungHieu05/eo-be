@@ -18,8 +18,10 @@ Backend Spring Boot cho web luyện thi TOEIC Listening & Reading. API giữ cù
 
 Tài khoản seed sau lần chạy đầu:
 
-- Admin: `admin@toeic.local` / `Admin@123`
-- Học viên: `user@toeic.local` / `User@123`
+- Admin: `admin@toeic.local`, mật khẩu lấy từ biến `SEED_ADMIN_PASSWORD`
+- Học viên: `user@toeic.local`, mật khẩu lấy từ biến `SEED_USER_PASSWORD`
+
+Đặt hai biến này trong `.env` trước lần chạy đầu. Thiếu biến thì BE sinh mật khẩu ngẫu nhiên và ghi một lần vào log lúc nạp dữ liệu (dòng `Mật khẩu khởi tạo của ...`). Database cũ còn dùng mật khẩu mẫu trước đây sẽ được đổi sang giá trị của biến ở lần khởi động kế tiếp.
 
 ## Cấu trúc đề thi thử
 

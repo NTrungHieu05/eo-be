@@ -15,7 +15,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class DatabaseChangelogAdmin {
 
 	public static final String ADMIN_EMAIL = "admin@toeic.local";
-	public static final String ADMIN_PASSWORD = "Admin@123";
 
 	@ChangeSet(id = "admin_default", author = "system", order = "001")
 	public void seedAdmin(UserRepository userRepo, RoleRepository roleRepo) {
@@ -32,7 +31,7 @@ public class DatabaseChangelogAdmin {
 		User admin = new User();
 		admin.setEmail(ADMIN_EMAIL);
 		admin.setUsername(ADMIN_EMAIL);
-		admin.setPassword(new BCryptPasswordEncoder().encode(ADMIN_PASSWORD));
+		admin.setPassword(new BCryptPasswordEncoder().encode(SeedPasswords.forNewAccount(SeedPasswords.ADMIN_ENV, ADMIN_EMAIL)));
 		admin.setDisplayName("Admin");
 		admin.setFirstName("Admin");
 		admin.setLastName("TOEIC");

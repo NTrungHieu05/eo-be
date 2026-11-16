@@ -30,7 +30,6 @@ public class DatabaseChangelogSample {
 	public static final String SAMPLE_QUESTION_ID = "68ca00020000000000000001";
 	public static final String SAMPLE_USER_ID = "68ca00030000000000000001";
 	public static final String SAMPLE_USER_EMAIL = "user@toeic.local";
-	public static final String SAMPLE_USER_PASSWORD = "User@123";
 	public static final String SAMPLE_TOPIC_NAME = "Phần 1:Mô Tả Tranh";
 
 	@ChangeSet(id = "sample_exam_card_user", author = "system", order = "001")
@@ -94,7 +93,7 @@ public class DatabaseChangelogSample {
 			user.setUserId(SAMPLE_USER_ID);
 			user.setEmail(SAMPLE_USER_EMAIL);
 			user.setUsername(SAMPLE_USER_EMAIL);
-			user.setPassword(new BCryptPasswordEncoder().encode(SAMPLE_USER_PASSWORD));
+			user.setPassword(new BCryptPasswordEncoder().encode(SeedPasswords.forNewAccount(SeedPasswords.USER_ENV, SAMPLE_USER_EMAIL)));
 			user.setDisplayName("Học viên");
 			user.setFirstName("Test");
 			user.setLastName("User");

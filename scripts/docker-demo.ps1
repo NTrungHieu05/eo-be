@@ -25,6 +25,15 @@ if (-not (Test-Path ..\eo-fe\Dockerfile)) { Bad 'Khong thay ..\eo-fe (eo-fe phai
 Ok 'Tim thay eo-fe canh eo-be'
 if (-not (Test-Path .env)) { Copy-Item .env.example .env; Write-Host '  Da tao .env tu .env.example (nen doi JWT_SECRET)' -ForegroundColor Yellow }
 Ok 'Co file .env'
+# Mat khau tai khoan mau lay tu .env; chua co thi sinh ngau nhien va ghi vao .env.
+$envText = Get-Content .env -Raw
+if ($envText -notmatch '(?m)^SEED_ADMIN_PASSWORD=\S') {
+  $pw = -join ((48..57) + (97..122) | Get-Random -Count 20 | ForEach-Object { [char]$_ })
+  $envText = ($envText -replace '(?m)^SEED_ADMIN_PASSWORD=.*\r?\n?', '').TrimEnd() + "`nSEED_ADMIN_PASSWORD=$pw`n"
+  Set-Content .env $envText -NoNewline
+  Write-Host '  Da sinh SEED_ADMIN_PASSWORD trong .env' -ForegroundColor Yellow
+}
+$adminPw = ((Get-Content .env) | Where-Object { $_ -match '^SEED_ADMIN_PASSWORD=' } | Select-Object -First 1) -replace '^SEED_ADMIN_PASSWORD=', ''
 $busy = Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue
 if ($busy -and -not (docker compose ps -q fe 2>$null)) { Bad 'Cong 3000 dang bi chuong trinh khac dung. Tat no hoac doi cong.'; exit 1 }
 Ok 'Cong 3000 san sang'
@@ -56,7 +65,7 @@ foreach ($p in '/welcome','/login','/signup') {
   catch { Bad "$p -> $($_.Exception.Message)" }
 }
 try {
-  $body = @{ email = 'admin@toeic.local'; password = 'Admin@123' } | ConvertTo-Json
+  $body = @{ email = 'admin@toeic.local'; password = $adminPw } | ConvertTo-Json
   $r = Invoke-WebRequest "$base/api/app/login" -Method Post -Body $body -ContentType 'application/json' -UseBasicParsing -TimeoutSec 15
   if ($r.Content.Length -gt 20) { Ok "Dang nhap admin -> $($r.StatusCode)" } else { Bad 'Dang nhap tra ve rong' }
 } catch { Bad "Dang nhap admin that bai: $($_.Exception.Message)" }

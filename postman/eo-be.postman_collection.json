@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "7c9e2b1a-4d55-4f3a-9c10-eo-be-phase5",
     "name": "eo-be Phase 4-6",
-    "description": "Collection test day du API eo-be (Endpoints.java).\n\nCach dung:\n1. Import collection + environment eo-be local\n2. Chon environment eo-be local\n3. Login admin truoc khi goi API can JWT\n\nTai khoan:\n- Admin: admin@toeic.local / Admin@123\n- User: user@toeic.local / User@123\n",
+    "description": "Collection test day du API eo-be (Endpoints.java).\n\nCach dung:\n1. Import collection + environment eo-be local\n2. Chon environment eo-be local\n3. Login admin truoc khi goi API can JWT\n\nTai khoan:\n- Admin: admin@toeic.local, User: user@toeic.local\n- Dien mat khau (SEED_ADMIN_PASSWORD / SEED_USER_PASSWORD) vao environment truoc khi chay\n",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -78,7 +78,7 @@
     },
     {
       "key": "userPassword",
-      "value": "User@123"
+      "value": ""
     },
     {
       "key": "otp",
@@ -94,7 +94,7 @@
     },
     {
       "key": "adminPassword",
-      "value": "Admin@123"
+      "value": ""
     }
   ],
   "item": [
@@ -447,7 +447,7 @@
             "description": "Giu nguyen password admin de test tiep. Doi neu muon thu that.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"oldPassword\": \"{{adminPassword}}\",\n  \"newPassword\": \"Admin@123\",\n  \"confirmPassword\": \"Admin@123\"\n}",
+              "raw": "{\n  \"oldPassword\": \"{{adminPassword}}\",\n  \"newPassword\": \"{{adminPassword}}\",\n  \"confirmPassword\": \"{{adminPassword}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -547,7 +547,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"resetCode\": \"{{resetCode}}\",\n  \"newPassword\": \"Admin@123\",\n  \"confirmPassword\": \"Admin@123\"\n}",
+              "raw": "{\n  \"resetCode\": \"{{resetCode}}\",\n  \"newPassword\": \"{{adminPassword}}\",\n  \"confirmPassword\": \"{{adminPassword}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

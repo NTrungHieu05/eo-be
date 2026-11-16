@@ -58,6 +58,9 @@ if [ ! -f "$ENV_FILE" ]; then
   cat > "$ENV_FILE" <<EOF
 # Sinh bởi bootstrap.sh. Không commit file này.
 JWT_SECRET=$(openssl rand -hex 32)
+# Mật khẩu tài khoản mẫu admin@toeic.local và user@toeic.local.
+SEED_ADMIN_PASSWORD=$(openssl rand -hex 12)
+SEED_USER_PASSWORD=$(openssl rand -hex 12)
 # ":80" = chạy bằng IP. Có tên miền thì đổi thành tên miền để có HTTPS.
 SITE_ADDRESS=:80
 MONGO_IMAGE=$MONGO_IMAGE

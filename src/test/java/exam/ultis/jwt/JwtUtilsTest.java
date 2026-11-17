@@ -34,6 +34,17 @@ class JwtUtilsTest {
 	}
 
 	@Test
+	void generatedTokenCarriesIssueTimeInMilliseconds() {
+		long before = System.currentTimeMillis();
+
+		String token = jwtUtils.generateJwtToken(TestUsers.user("user-1", RoleEnum.ROLE_USER));
+
+		Object issuedMs = jwtUtils.getClaimsFromJwtToken(token).get(JwtUtils.ISSUED_AT_MS);
+		assertThat(issuedMs).isInstanceOf(Number.class);
+		assertThat(((Number) issuedMs).longValue()).isBetween(before, System.currentTimeMillis());
+	}
+
+		@Test
 	void invalidAndBlankTokensAreRejected() {
 		assertThat(jwtUtils.validateJwtToken("not-a-jwt")).isFalse();
 		assertThat(jwtUtils.validateJwtToken("")).isFalse();

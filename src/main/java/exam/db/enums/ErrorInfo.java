@@ -51,6 +51,7 @@ public class ErrorInfo implements Serializable {
 	public static final int ACCOUNT_LOCKED_CODE = 1018;
 	public static final int CANNOT_BLOCK_SELF_CODE = 1019;
 	public static final int PASSWORD_TOO_SHORT_CODE = 1021;
+	public static final int ANSWER_REQUIRED_CODE = 1022;
 
 	private int code;
 	private List<String> messages = new ArrayList<>();
@@ -137,4 +138,7 @@ public class ErrorInfo implements Serializable {
 
 	public static final ErrorInfo PASSWORD_TOO_SHORT = new ErrorInfo(PASSWORD_TOO_SHORT_CODE,
 			properties.getProperty("password.too.short"));
+
+	public static final ErrorInfo ANSWER_REQUIRED = new ErrorInfo(ANSWER_REQUIRED_CODE,
+			properties.getProperty("answer.required"));
 }

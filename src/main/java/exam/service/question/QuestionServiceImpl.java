@@ -51,6 +51,7 @@ public class QuestionServiceImpl implements QuestionService {
 		Question question = new Question();
 		BeanUtils.copyProperties(request, question);
 		question.setTopicId(request.getTopicId());
+		requireAnswerKey(question);
 		questionRepo.save(question);
 		if (StringUtils.hasText(request.getExamId())) {
 			Exam exam = examRepo.findFirstByIdAndDeletedIsFalse(request.getExamId());
@@ -95,6 +96,7 @@ public class QuestionServiceImpl implements QuestionService {
 		} else if (request.getChildQuestions() == null) {
 			question.setChildQuestions(childQuestions);
 		}
+		requireAnswerKey(question);
 		questionRepo.save(question);
 		return new QuestionResponse(question);
 	}
@@ -129,6 +131,27 @@ public class QuestionServiceImpl implements QuestionService {
 				.map(QuestionResponse::new)
 				.collect(Collectors.toList());
 		return new ListQuestionResponse(questions, questions.size());
+	}
+
+	/** Câu đơn cần một đáp án đúng; câu nhóm cần ít nhất một câu con và mỗi câu con có đáp án đúng. */
+	private void requireAnswerKey(Question question) throws ExamBaseException {
+		boolean group = Boolean.TRUE.equals(question.getIsQuestionGroup())
+				|| (question.getChildQuestions() != null && !question.getChildQuestions().isEmpty());
+		if (!group) {
+			Assert.isTrue(hasAnswerKey(question), ErrorInfo.ANSWER_REQUIRED);
+			return;
+		}
+		Assert.isTrue(question.getChildQuestions() != null && !question.getChildQuestions().isEmpty(), ErrorInfo.ANSWER_REQUIRED);
+		for (Question child : question.getChildQuestions()) {
+			Assert.isTrue(hasAnswerKey(child), ErrorInfo.ANSWER_REQUIRED);
+		}
+	}
+
+	private boolean hasAnswerKey(Question question) {
+		if (question == null || question.getAnswer() == null || question.getAnswer().getTexts() == null) {
+			return false;
+		}
+		return question.getAnswer().getTexts().stream().anyMatch(StringUtils::hasText);
 	}
 
 	private void detachQuestionsFromExams(List<String> questionIds) {

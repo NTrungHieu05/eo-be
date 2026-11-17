@@ -67,9 +67,15 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 		if (validAfter == null) {
 			return false;
 		}
-		Date issuedAt = jwtUtils.getClaimsFromJwtToken(token).getIssuedAt();
-		// iat chỉ có độ chính xác giây, nên so sánh theo giây.
-		return issuedAt == null || issuedAt.getTime() / 1000 < validAfter.getTime() / 1000;
+		io.jsonwebtoken.Claims claims = jwtUtils.getClaimsFromJwtToken(token);
+		Object issuedMs = claims.get(JwtUtils.ISSUED_AT_MS);
+		if (issuedMs instanceof Number) {
+			// Token mới có mốc mili giây: token cấp trước hoặc cùng lúc đăng xuất đều bị từ chối.
+			return ((Number) issuedMs).longValue() <= validAfter.getTime();
+		}
+		// Token cũ chỉ có iat theo giây.
+		Date issuedAt = claims.getIssuedAt();
+		return issuedAt == null || issuedAt.getTime() / 1000 <= validAfter.getTime() / 1000;
 	}
 
 	private boolean isActiveAccount(UserDetails userDetails) {

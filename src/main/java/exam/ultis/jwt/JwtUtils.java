@@ -15,6 +15,8 @@ import java.util.Date;
 public class JwtUtils {
 	private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
+	public static final String ISSUED_AT_MS = "iatMs";
+
 	@Value("${jwt.app.jwtSecret}")
 	private String jwtSecret;
 
@@ -22,9 +24,12 @@ public class JwtUtils {
 	private int jwtExpirationMs;
 
 	public String generateJwtToken(UserDetails userDetails) {
+		Date now = new Date();
 		return Jwts.builder()
 				.setSubject((userDetails.getUsername()))
-				.setIssuedAt(new Date())
+				// iat của JWT chỉ tính theo giây; iatMs giúp thu hồi đúng token cấp cùng giây với lúc đăng xuất.
+				.claim(ISSUED_AT_MS, now.getTime())
+				.setIssuedAt(now)
 				.setExpiration(generateExpirationDate())
 				.signWith(SignatureAlgorithm.HS512, jwtSecret)
 				.compact();

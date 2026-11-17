@@ -16,6 +16,16 @@ compose pull --quiet
 compose up -d --remove-orphans
 docker image prune -f >/dev/null
 
+# Lịch sao lưu hằng ngày 02:30 (cài một lần, các lần deploy sau giữ nguyên).
+chmod +x ./backup.sh
+mkdir -p /opt/toeic/backups
+CRON_LINE="30 2 * * * $PWD/backup.sh >> /opt/toeic/backups/backup.log 2>&1"
+if command -v crontab >/dev/null 2>&1; then
+  ( crontab -l 2>/dev/null | grep -v 'deploy/backup.sh' || true; echo "$CRON_LINE" ) | crontab -
+else
+  echo "Chưa có crontab trên máy, bỏ qua lịch sao lưu (cài gói cron rồi deploy lại)." >&2
+fi
+
 # Đợi FE trả lời qua Caddy rồi mới báo thành công.
 for _ in $(seq 1 60); do
   if curl -fsS -o /dev/null http://localhost/; then

@@ -151,6 +151,7 @@ public class ExamServiceImpl implements ExamService {
 	}
 
 	@Override
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	public ExamResponse getDetail(String id) throws ExamBaseException {
 		requireUser();
 		Exam exam = examRepo.findFirstByIdAndDeletedIsFalse(id);

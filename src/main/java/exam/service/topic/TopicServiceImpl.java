@@ -86,6 +86,7 @@ public class TopicServiceImpl implements TopicService {
 	}
 
 	@Override
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	public TopicResponse getDetail(String id) throws ExamBaseException {
 		requireUser();
 		Topic topic = topicRepo.findFirstByIdAndDeletedIsFalse(id);

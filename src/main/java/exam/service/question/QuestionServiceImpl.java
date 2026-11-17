@@ -116,6 +116,7 @@ public class QuestionServiceImpl implements QuestionService {
 	}
 
 	@Override
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	public QuestionResponse getDetail(String id) throws ExamBaseException {
 		requireUser();
 		Question question = questionRepo.findFirstByIdAndDeletedIsFalse(id);

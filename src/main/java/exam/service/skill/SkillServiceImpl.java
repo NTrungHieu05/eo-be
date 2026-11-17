@@ -77,6 +77,7 @@ public class SkillServiceImpl implements SkillService {
 	}
 
 	@Override
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	public SkillResponse getDetail(String id) throws ExamBaseException {
 		requireUser();
 		Skill skill = skillRepo.findFirstByIdAndDeletedIsFalse(id);

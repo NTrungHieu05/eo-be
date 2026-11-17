@@ -91,6 +91,10 @@
     {
       "key": "adminPassword",
       "value": ""
+    },
+    {
+      "key": "attemptId",
+      "value": ""
     }
   ],
   "item": [
@@ -1923,6 +1927,73 @@
                   "const json = pm.response.json();",
                   "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
                   "pm.test('no business error', () => pm.expect(json.error).to.eql(null));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List my attempts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/exam/attempt",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "exam",
+                "attempt"
+              ],
+              "query": []
+            },
+            "description": "Danh sach bai da nop cua nguoi dang dang nhap, moi nhat truoc. Can JWT."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error == null).to.be.true);",
+                  "pm.test('has attempts', () => pm.expect(json.responseData.attempts.length).to.be.above(0));",
+                  "pm.collectionVariables.set('attemptId', json.responseData.attempts[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get my attempt",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/exam/attempt/{{attemptId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "exam",
+                "attempt",
+                "{{attemptId}}"
+              ],
+              "query": []
+            },
+            "description": "Xem lai mot lan lam: ket qua, dap an da chon va dap an dung. Chi chu bai mo duoc. Can JWT."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('no business error', () => pm.expect(json.error == null).to.be.true);"
                 ]
               }
             }

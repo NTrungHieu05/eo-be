@@ -485,7 +485,8 @@ class ExamServiceImplTest {
 				.containsExactly(org.assertj.core.groups.Tuple.tuple("a", null), org.assertj.core.groups.Tuple.tuple("g", 0));
 		assertThat(response.getTotal()).isEqualTo(3);
 		assertThat(response.getCorrect()).isEqualTo(1);
-		assertThat(response.getIncorrect()).isEqualTo(1);
+		// Câu bỏ trống tính là sai: 1 câu chọn sai + 1 câu bỏ trống.
+		assertThat(response.getIncorrect()).isEqualTo(2);
 		assertThat(response.getUnanswered()).isEqualTo(1);
 		assertThat(response.getProgress()).isEqualTo(33);
 		assertThat(response.getResults()).extracting(SubmitExamResponse.QuestionResult::getCorrectAnswers)

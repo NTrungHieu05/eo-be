@@ -631,10 +631,12 @@ public class ExamServiceImpl implements ExamService {
 				response.setTotal(response.getTotal() + 1);
 				if (correct) {
 					response.setCorrect(response.getCorrect() + 1);
-				} else if (answered) {
-					response.setIncorrect(response.getIncorrect() + 1);
 				} else {
-					response.setUnanswered(response.getUnanswered() + 1);
+					// Câu bỏ trống tính là sai; unanswered chỉ để biết trong số câu sai có bao nhiêu câu bỏ trống.
+					response.setIncorrect(response.getIncorrect() + 1);
+					if (!answered) {
+						response.setUnanswered(response.getUnanswered() + 1);
+					}
 				}
 				if (isListening(part, questionNo)) {
 					response.setListeningTotal(response.getListeningTotal() + 1);

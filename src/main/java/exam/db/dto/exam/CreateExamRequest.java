@@ -12,4 +12,5 @@ public class CreateExamRequest {
 	private String topicId;
 	private List<String> questionIds;
 	private Boolean practiceTest;
+	private Integer durationMinutes;
 }

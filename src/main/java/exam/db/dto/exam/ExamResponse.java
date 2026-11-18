@@ -17,6 +17,7 @@ public class ExamResponse {
 	private List<String> questionIds;
 	private List<Question> questions;
 	private Boolean practiceTest;
+	private Integer durationMinutes;
 
 	public ExamResponse(Exam exam) {
 		BeanUtils.copyProperties(exam, this);

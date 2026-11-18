@@ -88,6 +88,7 @@ public class ExamServiceImpl implements ExamService {
 		}
 		Exam exam = new Exam();
 		BeanUtils.copyProperties(request, exam);
+		exam.setDurationMinutes(requireDuration(request.getDurationMinutes()));
 		if (practiceTest) {
 			exam.setTopicId(null);
 			exam.setPracticeTest(true);
@@ -129,6 +130,9 @@ public class ExamServiceImpl implements ExamService {
 		}
 		if (request.getQuestionIds() != null) {
 			exam.setQuestionIds(filterQuestionIds(request.getQuestionIds(), exam.getTopicId(), practiceTest));
+		}
+		if (request.getDurationMinutes() != null) {
+			exam.setDurationMinutes(requireDuration(request.getDurationMinutes()));
 		}
 		examRepo.save(exam);
 		return new ExamResponse(exam);
@@ -357,6 +361,17 @@ public class ExamServiceImpl implements ExamService {
 		}
 	}
 
+	private static final int DEFAULT_PRACTICE_TEST_MINUTES = 120;
+	private static final int MAX_DURATION_MINUTES = 300;
+
+	/** Thời gian làm bài bắt buộc khi tạo đề, từ 1 đến 300 phút. */
+	private Integer requireDuration(Integer minutes) throws ExamBaseException {
+		if (minutes == null || minutes < 1 || minutes > MAX_DURATION_MINUTES) {
+			throw new ExamBaseException(ErrorInfo.INVALID_DURATION);
+		}
+		return minutes;
+	}
+
 	private void detachExamFromTopic(String examId, String topicId) {
 		if (!StringUtils.hasText(examId) || !StringUtils.hasText(topicId)) {
 			return;
@@ -379,7 +394,9 @@ public class ExamServiceImpl implements ExamService {
 				: orderQuestions(questionIds, questionRepo.findByIdInAndDeletedIsFalse(questionIds));
 
 		PracticeTestResponse response = new PracticeTestResponse(exam);
-		response.setDurationMinutes(120);
+		response.setDurationMinutes(exam.getDurationMinutes() != null
+				? exam.getDurationMinutes()
+				: DEFAULT_PRACTICE_TEST_MINUTES);
 		response.setListeningMinutes(45);
 		response.setReadingMinutes(75);
 		response.setListeningQuestionCount(100);

@@ -63,4 +63,5 @@ public class FieldConst {
 	public static final String TOPIC_IDS = "topicIds";
 	public static final String EXAM_RESULTS = "examResults";
 	public static final String PRACTICE_TEST = "practiceTest";
+	public static final String DURATION_MINUTES = "durationMinutes";
 }

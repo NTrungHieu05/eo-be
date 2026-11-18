@@ -30,4 +30,8 @@ public class Exam extends AbstractVersion {
 
 	@Field(FieldConst.PRACTICE_TEST)
 	private Boolean practiceTest;
+
+	/** Thời gian làm bài (phút) do admin đặt khi tạo đề; null với đề cũ chưa đặt. */
+	@Field(FieldConst.DURATION_MINUTES)
+	private Integer durationMinutes;
 }

@@ -52,6 +52,7 @@ public class ErrorInfo implements Serializable {
 	public static final int CANNOT_BLOCK_SELF_CODE = 1019;
 	public static final int PASSWORD_TOO_SHORT_CODE = 1021;
 	public static final int ANSWER_REQUIRED_CODE = 1022;
+	public static final int INVALID_DURATION_CODE = 1023;
 
 	private int code;
 	private List<String> messages = new ArrayList<>();
@@ -141,4 +142,7 @@ public class ErrorInfo implements Serializable {
 
 	public static final ErrorInfo ANSWER_REQUIRED = new ErrorInfo(ANSWER_REQUIRED_CODE,
 			properties.getProperty("answer.required"));
+
+	public static final ErrorInfo INVALID_DURATION = new ErrorInfo(INVALID_DURATION_CODE,
+			properties.getProperty("invalid.duration"));
 }

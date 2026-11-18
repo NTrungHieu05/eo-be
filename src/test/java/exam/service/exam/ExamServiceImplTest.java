@@ -47,6 +47,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -272,6 +273,7 @@ class ExamServiceImplTest {
 
 		CreateExamRequest request = new CreateExamRequest();
 		request.setName("Incomplete Sentences 1");
+		request.setDurationMinutes(30);
 		request.setTopicId("topic-5");
 		ExamResponse response = examService.create(request);
 
@@ -297,6 +299,7 @@ class ExamServiceImplTest {
 
 		CreateExamRequest request = new CreateExamRequest();
 		request.setName("Part 5 đề 1");
+		request.setDurationMinutes(30);
 		request.setTopicId("topic-5");
 		request.setQuestionIds(List.of("keep", "drop"));
 		ExamResponse response = examService.create(request);
@@ -317,13 +320,52 @@ class ExamServiceImplTest {
 
 		CreateExamRequest request = new CreateExamRequest();
 		request.setName("Đề thi thử TOEIC 4");
+		request.setDurationMinutes(30);
 		request.setPracticeTest(true);
 		request.setTopicId("topic-5");
 		ExamResponse response = examService.create(request);
 
 		assertThat(response.getId()).isEqualTo("exam-pt");
+		assertThat(response.getDurationMinutes()).isEqualTo(30);
 		assertThat(response.getTopicId()).isNull();
 		assertThat(response.getPracticeTest()).isTrue();
+	}
+
+	@Test
+	void createRejectsMissingOrOutOfRangeDuration() {
+		TestUsers.authenticate(TestUsers.user("admin-1", RoleEnum.ROLE_ADMIN));
+		for (Integer minutes : new Integer[] { null, 0, 301 }) {
+			CreateExamRequest request = new CreateExamRequest();
+			request.setName("Đề thi thử TOEIC 5");
+			request.setPracticeTest(true);
+			request.setDurationMinutes(minutes);
+
+			assertThatThrownBy(() -> examService.create(request))
+					.isInstanceOf(ExamBaseException.class)
+					.extracting(ex -> ((ExamBaseException) ex).getError().getCode())
+					.isEqualTo(ErrorInfo.INVALID_DURATION_CODE);
+		}
+		verify(examRepo, never()).save(any(Exam.class));
+	}
+
+	@Test
+	void updateChangesDurationOnlyWhenProvided() throws ExamBaseException {
+		TestUsers.authenticate(TestUsers.user("admin-1", RoleEnum.ROLE_ADMIN));
+		Exam exam = new Exam();
+		exam.setId("exam-1");
+		exam.setPracticeTest(true);
+		exam.setDurationMinutes(120);
+		when(examRepo.findFirstByIdAndDeletedIsFalse("exam-1")).thenReturn(exam);
+		when(examRepo.save(exam)).thenReturn(exam);
+
+		UpdateExamRequest keep = new UpdateExamRequest();
+		keep.setId("exam-1");
+		assertThat(examService.update(keep).getDurationMinutes()).isEqualTo(120);
+
+		UpdateExamRequest change = new UpdateExamRequest();
+		change.setId("exam-1");
+		change.setDurationMinutes(45);
+		assertThat(examService.update(change).getDurationMinutes()).isEqualTo(45);
 	}
 
 	@Test

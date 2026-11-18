@@ -1017,7 +1017,7 @@
             "description": "topicId lay tu Skill header. Exam se duoc append vao topic.examIds.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Exam test Part 1 {{$timestamp}}\",\n  \"topicId\": \"{{topicId}}\",\n  \"questionIds\": []\n}",
+              "raw": "{\n  \"name\": \"Exam test Part 1 {{$timestamp}}\",\n  \"topicId\": \"{{topicId}}\",\n  \"durationMinutes\": 15,\n  \"questionIds\": []\n}",
               "options": {
                 "raw": {
                   "language": "json"
